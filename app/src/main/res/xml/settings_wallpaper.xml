@@ -1,0 +1,35 @@
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <Preference
+        android:key="wallpaper_main"
+        android:title="Main Screen Wallpaper"
+        android:summary="Set the main screen wallpaper">
+        <intent android:targetPackage="com.graymatterapps.dualitylauncher"
+            android:targetClass="com.graymatterapps.dualitylauncher.WallpaperActivity"
+            android:action="android.intent.action.SET_WALLPAPER"
+            android:data="main"/>
+    </Preference>
+    <Preference
+        android:key="wallpaper_dual"
+        android:title="Dual Screen Wallpaper"
+        android:summary="Set the dual screen wallpaper">
+        <intent android:targetPackage="com.graymatterapps.dualitylauncher"
+            android:targetClass="com.graymatterapps.dualitylauncher.WallpaperActivity"
+            android:action="android.intent.action.SET_WALLPAPER"
+            android:data="dual"/>
+    </Preference>
+    <Preference
+        android:key="wallpaper_wide"
+        android:title="Wide Wallpaper"
+        android:summary="Set a wide wallpaper across both screens">
+        <intent android:targetPackage="com.graymatterapps.dualitylauncher"
+            android:targetClass="com.graymatterapps.dualitylauncher.WallpaperActivity"
+            android:action="android.intent.action.SET_WALLPAPER"
+            android:data="wide"/>
+    </Preference>
+    <CheckBoxPreference
+        android:key="dual_wallpaper_hack"
+        android:title="Override dual screen wallpaper"
+        android:summary="Show the chosen dual screen wallpaper instead of the OS wallpaper"
+        android:defaultValue="true">
+    </CheckBoxPreference>
+</PreferenceScreen>

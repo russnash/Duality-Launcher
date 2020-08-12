@@ -1,0 +1,81 @@
+<PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <PreferenceCategory
+        android:title="Dock">
+
+        <ListPreference
+            android:key="dock_icons"
+            android:title="Number of dock icons"
+            app:useSimpleSummaryProvider="true"
+            android:entries="@array/values_5_to_8"
+            android:entryValues="@array/values_5_to_8"
+            android:defaultValue="6"/>
+        <CheckBoxPreference
+            android:key="dock_background"
+            android:title="@string/pref_dock_background"
+            android:defaultValue="false"/>
+        <ListPreference
+            android:key="dock_background_color"
+            android:title="@string/pref_dock_background_color"
+            app:useSimpleSummaryProvider="true"
+            android:entries="@array/android_colors"
+            android:entryValues="@array/android_colors"
+            android:defaultValue="Light Gray"/>
+        <SeekBarPreference
+            android:key="dock_background_alpha"
+            android:title="Background transparency"
+            android:max="255"
+            app:showSeekBarValue="true"
+            app:updatesContinuously="true"
+            android:defaultValue="80"/>
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:title="Icon Grid">
+
+        <ListPreference
+            android:key="home_grid_pages"
+            android:title="Number of pages"
+            app:useSimpleSummaryProvider="true"
+            android:entries="@array/values_1_to_5"
+            android:entryValues="@array/values_1_to_5"
+            android:defaultValue="1"/>
+        <ListPreference
+            android:key="home_grid_columns"
+            android:title="Number of columns"
+            app:useSimpleSummaryProvider="true"
+            android:entries="@array/values_5_to_8"
+            android:entryValues="@array/values_5_to_8"
+            android:defaultValue="6"/>
+        <ListPreference
+            android:key="home_grid_rows"
+            android:title="Number of rows"
+            app:useSimpleSummaryProvider="true"
+            android:entries="@array/values_5_to_8"
+            android:entryValues="@array/values_5_to_8"
+            android:defaultValue="7"/>
+        <ListPreference
+            android:key="home_widget_color"
+            android:title="Widget color"
+            app:useSimpleSummaryProvider="true"
+            android:entries="@array/android_colors"
+            android:entryValues="@array/android_colors"
+            android:defaultValue="White"/>
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:title="App Widgets">
+
+        <Preference
+            android:key="widget_add"
+            android:title="Add home screen widget"
+            android:summary="Add an app widget to your home screen">
+            <intent android:targetPackage="com.graymatterapps.dualitylauncher"
+                android:targetClass="com.graymatterapps.dualitylauncher.WidgetActivity"
+                android:action="android.intent.action.ATTACH_DATA"/>
+        </Preference>
+
+    </PreferenceCategory>
+
+</PreferenceScreen>

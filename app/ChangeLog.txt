@@ -1,0 +1,32 @@
+Version 2020.8.10.1-internal
+Changes:
+- Implemented trash can drag target on home screen.
+- Implemented custom color setting for home widgets (page idicator, trash can etc).
+
+Bug fixes:
+- Dragging an icon out of the dock now removes it from the dock.
+- Fixed grid sizes not updating until an icon was dragged and dropped.
+- Fixed app drawer occasionally freezing the launcher when opened.
+- Fixed apps with multiple launcher activities (such as contacts / phone) not showing correctly.
+
+Version 2020.8.8.1-internal
+Changes:
+- Settings now accessed by swiping down on the home screen.
+- Renamed Dock settings to Home settings to incorporate home screen icon grid settings.
+- Converted App Drawer to use new Icon framework.
+- Implemented Home Screen App Grid with configurable rows, columns and pages.
+- Home button / gesture now closes app grid, if open.
+- Changed default for Light status bar text to on.
+
+Bug fixes:
+-
+
+Version 2020.8.6.1-internal
+
+Changes:
+- Performance and memory usage improvements.
+- Dock can now have between 5 & 8 icons.
+- Built a new re-usable framework for managing icons.
+
+Bug fixes:
+-

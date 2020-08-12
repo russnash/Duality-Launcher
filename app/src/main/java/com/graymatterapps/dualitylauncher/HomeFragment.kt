@@ -1,0 +1,182 @@
+package com.graymatterapps.dualitylauncher
+
+import android.appwidget.AppWidgetHostView
+import android.content.ClipData
+import android.content.SharedPreferences
+import android.graphics.Color
+import android.os.Bundle
+import android.view.DragEvent
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.*
+import androidx.appcompat.app.AppCompatActivity
+import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.fragment.app.Fragment
+import androidx.preference.PreferenceManager
+import androidx.viewpager2.widget.ViewPager2
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
+
+class HomeFragment : Fragment(), SharedPreferences.OnSharedPreferenceChangeListener {
+
+    private lateinit var listener: HomeInterface
+    lateinit var dock: Dock
+    lateinit var frameLayout: LinearLayout
+    lateinit var homePager: ViewPager2
+    lateinit var homePagerAdapter: HomePagerAdapter
+    lateinit var homePageIndicator: TableRow
+    lateinit var homeDelete: ImageView
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        prefs.registerOnSharedPreferenceChangeListener(this)
+        settingsPreferences.registerOnSharedPreferenceChangeListener(this)
+    }
+
+    override fun onDestroy() {
+        prefs.unregisterOnSharedPreferenceChangeListener(this)
+        settingsPreferences.unregisterOnSharedPreferenceChangeListener(this)
+        super.onDestroy()
+    }
+
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        val view = inflater.inflate(R.layout.fragment_home, container, false)
+        dock = view.findViewById(R.id.dock)
+        dock.depersistDock()
+        dock.populateDock()
+        dock.setListener(activity as MainActivity)
+        frameLayout = view.findViewById(R.id.frameLayout)
+
+        homePager = view.findViewById(R.id.homePager)
+        homePagerAdapter = HomePagerAdapter(context as AppCompatActivity)
+        homePager.adapter = homePagerAdapter
+        homePager.registerOnPageChangeCallback(object: ViewPager2.OnPageChangeCallback() {
+            override fun onPageScrollStateChanged(state: Int) {
+                super.onPageScrollStateChanged(state)
+                setupHomePageIndicator()
+            }
+        })
+        homePagerAdapter.setListener(MainActivity.context as HomePagerAdapter.HomeIconsInterface)
+
+        homePager.adapter?.notifyDataSetChanged()
+
+        homePageIndicator = view.findViewById(R.id.homePageIndicator)
+        setupHomePageIndicator()
+
+        homeDelete = view.findViewById(R.id.homeDelete)
+        homeDelete.setColorFilter(MainActivity.colorPrefToColor(settingsPreferences.getString("home_widget_color", "White")))
+        homeDelete.alpha = 0f
+
+        homeDelete.setOnDragListener(object: View.OnDragListener {
+            override fun onDrag(view: View?, dragEvent: DragEvent?): Boolean {
+                if(dragEvent != null) {
+                    when (dragEvent.action) {
+                        DragEvent.ACTION_DRAG_STARTED -> {
+                            homeDelete.alpha = 1.0f
+                        }
+                        DragEvent.ACTION_DRAG_ENTERED -> {
+                            homeDelete.setBackgroundColor(Color.GREEN)
+                        }
+                        DragEvent.ACTION_DRAG_EXITED -> {
+                            homeDelete.setBackgroundColor(Color.TRANSPARENT)
+                        }
+                        DragEvent.ACTION_DRAG_ENDED -> {
+                            homeDelete.alpha = 0f
+                        }
+                        DragEvent.ACTION_DROP -> {
+                            homeDelete.alpha = 0f
+                            homeDelete.setBackgroundColor(Color.TRANSPARENT)
+                        }
+                    }
+                }
+                return true
+            }
+        })
+        return view
+    }
+
+    fun setupHomePageIndicator(){
+        homePageIndicator.removeAllViews()
+        var params = TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT)
+        val filterColor = MainActivity.colorPrefToColor(settingsPreferences.getString("home_widget_color", "White"))
+
+        for(n in 1..homePagerAdapter.itemCount){
+            var pageIndicator = ImageView(context)
+            pageIndicator.layoutParams = params
+            if(homePager.currentItem == n-1){
+                pageIndicator.setImageResource(R.drawable.pager_active)
+            } else {
+                pageIndicator.setImageResource(R.drawable.pager_inactive)
+            }
+            pageIndicator.setColorFilter(filterColor)
+            homePageIndicator.addView(pageIndicator)
+        }
+    }
+
+    fun persistGrid(position: Int){
+        var homeIconsGrid = HomeIconsGrid()
+        val view = homePager.findViewWithTag<View>(position)
+        val homeIconsTable = view.findViewById<TableLayout>(R.id.homeIconsTable)
+        for(y in 0 until homeIconsTable.childCount){
+            val dockRow: TableRow = homeIconsTable.getChildAt(y) as TableRow
+            for(x in 0 until dockRow.childCount){
+                val icon: Icon = dockRow.getChildAt(x) as Icon
+                homeIconsGrid.change(x, y, icon.launchInfo)
+            }
+        }
+        val saveItJson = Json.encodeToString(homeIconsGrid)
+        val editor = prefs.edit()
+        editor.putString("homeIconsGrid" + position, saveItJson)
+        editor.apply()
+    }
+
+    override fun onSharedPreferenceChanged(sharedPrefs: SharedPreferences?, key: String?) {
+
+        if (key != null) {
+            if(key.contains("homeIconsGrid")){
+                homePagerAdapter.notifyDataSetChanged()
+            }
+            if(key == "apps"){
+                dock.populateDock()
+            }
+
+            if(key == "home_grid_pages" || key == "home_grid_columns" || key == "home_grid_rows"){
+                homePagerAdapter.notifyDataSetChanged()
+                setupHomePageIndicator()
+            }
+            if(key == "home_widget_color"){
+                setupHomePageIndicator()
+                homeDelete.setColorFilter(MainActivity.colorPrefToColor(settingsPreferences.getString("home_widget_color", "White")))
+            }
+        }
+    }
+
+    fun startDrag(view: View, clipData: ClipData) {
+        val dsb = View.DragShadowBuilder(view)
+        view.startDrag(clipData, dsb, view, 0)
+    }
+
+    companion object {
+        @JvmStatic
+        fun newInstance(): HomeFragment {
+            return HomeFragment()
+            }
+    }
+
+    fun setListener(mainActivity: MainActivity) {
+        listener = mainActivity
+    }
+
+    interface HomeInterface {
+        fun onAppDrawerOpen()
+    }
+
+    fun bindWidget(widgetView: AppWidgetHostView) {
+
+    }
+}

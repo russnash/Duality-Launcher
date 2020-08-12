@@ -1,0 +1,14 @@
+<resources>
+    <string name="app_name">Duality Launcher</string>
+    <string name="action_settings">Settings</string>
+    <string name="action_uninstall">Uninstall</string>
+    <string name="action_appinfo">App Info</string>
+    <string name="pref_app_drawer">App Drawer</string>
+    <string name="pref_app_drawer_background">Background color</string>
+    <string name="pref_app_drawer_text">Text color</string>
+    <string name="pref_dock">Dock</string>
+    <string name="pref_dock_background">Show background</string>
+    <string name="pref_dock_background_color">Background color</string>
+    <string name="title_activity_settings">Duality Settings</string>
+    <string name="title_activity_wallpaper">Wallpaper</string>
+</resources>

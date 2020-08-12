@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="Icon">
+        <attr name="dragTarget" format="boolean"/>
+        <attr name="blankOnDrag" format="boolean"/>
+    </declare-styleable>
+</resources>

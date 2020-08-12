@@ -1,0 +1,25 @@
+<PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+    <ListPreference
+        android:key="status_background"
+        android:title="Background color"
+        app:useSimpleSummaryProvider="true"
+        android:entries="@array/android_colors"
+        android:entryValues="@array/android_colors"
+        android:defaultValue="Black"/>
+    <SeekBarPreference
+        android:key="status_background_alpha"
+        android:title="Background transparency"
+        android:max="255"
+        app:showSeekBarValue="true"
+        app:updatesContinuously="true"
+        android:defaultValue="80"/>
+    <CheckBoxPreference
+        android:key="status_light"
+        android:title="Light status bar text"
+        android:defaultValue="true"/>
+    <CheckBoxPreference
+        android:key="status_dual_screen"
+        android:title="Affect dual screen status bar"
+        android:defaultValue="true"/>
+</PreferenceScreen>
