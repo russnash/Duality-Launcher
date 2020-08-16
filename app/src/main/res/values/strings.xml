@@ -11,4 +11,7 @@
     <string name="pref_dock_background_color">Background color</string>
     <string name="title_activity_settings">Duality Settings</string>
     <string name="title_activity_wallpaper">Wallpaper</string>
+    <string name="button_personal">Personal</string>
+    <string name="button_work">Work</string>
+    <string name="acra_dialog_text">Duality Launcher has crashed, please help the developer by following the prompts to send the crash report via email.</string>
 </resources>

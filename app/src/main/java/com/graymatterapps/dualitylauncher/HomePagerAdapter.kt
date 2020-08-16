@@ -2,32 +2,22 @@ package com.graymatterapps.dualitylauncher
 
 import android.content.ClipData
 import android.content.Context
-import android.content.SharedPreferences
 import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
+import androidx.gridlayout.widget.GridLayout
 import android.widget.TableLayout
 import android.widget.TableRow
-import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 
-class HomePagerAdapter (private val context: Context): RecyclerView.Adapter<HomePagerAdapter.HomePagerHolder>(), Icon.IconInterface, SharedPreferences.OnSharedPreferenceChangeListener {
+class HomePagerAdapter (private val context: Context): RecyclerView.Adapter<HomePagerAdapter.HomePagerHolder>(), Icon.IconInterface {
 
     var homeIconsGrid = HomeIconsGrid()
     var numRows: Int = 0
     var numCols: Int = 0
     private lateinit var listener: HomeIconsInterface
-
-    init {
-        prefs.registerOnSharedPreferenceChangeListener(this)
-    }
-
-    override fun onDetachedFromRecyclerView(recyclerView: RecyclerView) {
-        prefs.unregisterOnSharedPreferenceChangeListener(this)
-        super.onDetachedFromRecyclerView(recyclerView)
-    }
 
     class HomePagerHolder(view: View): RecyclerView.ViewHolder(view) {
     }
@@ -42,6 +32,10 @@ class HomePagerAdapter (private val context: Context): RecyclerView.Adapter<Home
         itemView.tag = position
         val homeIconsTable = itemView.findViewById<TableLayout>(R.id.homeIconsTable)
 
+        itemView.setOnLongClickListener { view ->
+            listener.onLongClick()
+            true
+        }
         homeIconsGrid = HomeIconsGrid()
         depersistGrid(position)
 
@@ -49,6 +43,7 @@ class HomePagerAdapter (private val context: Context): RecyclerView.Adapter<Home
         numCols = Integer.parseInt(numColsString)
         val numRowsString = settingsPreferences.getString("home_grid_rows", "7")
         numRows = Integer.parseInt(numRowsString)
+        val textColor = MainActivity.colorPrefToColor(settingsPreferences.getString("home_text_color", "White"))
 
         homeIconsTable.removeAllViews()
 
@@ -67,6 +62,7 @@ class HomePagerAdapter (private val context: Context): RecyclerView.Adapter<Home
                 if (icon != null) {
                     icon.layoutParams = iconParams
                     icon.label.maxLines = 1
+                    icon.label.setTextColor(textColor)
                     icon.setListener(this)
                     icon.setBlankOnDrag(true)
                     val launchInfo = homeIconsGrid.get(x-1, y-1)
@@ -75,6 +71,18 @@ class HomePagerAdapter (private val context: Context): RecyclerView.Adapter<Home
                 tableRow.addView(icon)
             }
             homeIconsTable.addView(tableRow)
+        }
+
+        val widgetLayout = itemView.findViewById<GridLayout>(R.id.widgetLayout)
+
+        var params = GridLayout.LayoutParams()
+        for(x in 0..7){
+            for(y in 0..7){
+                val widgetPlaceholder = WidgetPlaceholder(context)
+                params.columnSpec = GridLayout.spec(x)
+                params.rowSpec = GridLayout.spec(y)
+                widgetLayout.addView(widgetPlaceholder, params)
+            }
         }
     }
 
@@ -102,6 +110,10 @@ class HomePagerAdapter (private val context: Context): RecyclerView.Adapter<Home
         listener.onLaunch(launchInfo, displayId)
     }
 
+    override fun onLongClick() {
+        listener.onLongClick()
+    }
+
     fun setListener(homeIconsInterface: HomeIconsInterface){
         listener = homeIconsInterface
     }
@@ -110,9 +122,6 @@ class HomePagerAdapter (private val context: Context): RecyclerView.Adapter<Home
         fun onDragStarted(view: View, clipData: ClipData)
         fun onLaunch(launchInfo: LaunchInfo, displayId: Int)
         fun onIconChanged()
-    }
-
-    override fun onSharedPreferenceChanged(p0: SharedPreferences?, p1: String?) {
-        // Do nothing
+        fun onLongClick()
     }
 }

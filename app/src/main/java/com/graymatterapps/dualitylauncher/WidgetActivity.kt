@@ -1,28 +1,25 @@
 package com.graymatterapps.dualitylauncher
 
-import android.appwidget.AppWidgetHost
-import android.appwidget.AppWidgetHostView
 import android.appwidget.AppWidgetManager
 import android.appwidget.AppWidgetProviderInfo
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.graphics.ColorUtils
-import androidx.customview.widget.ExploreByTouchHelper.HOST_ID
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.graymatterapps.dualitylauncher.MainActivity.Companion.appList
-import com.graymatterapps.dualitylauncher.MainActivity.Companion.context
+
+//const val REQUEST_PERMISSION = 1
+//const val CONFIGURE_WIDGET = 2
 
 class WidgetActivity : AppCompatActivity(), WidgetChooserAdapter.WidgetChooserInterface {
-    val appWidgetHost = AppWidgetHost(context, HOST_ID)
-    val appWidgetManager = AppWidgetManager.getInstance(context)
+
     lateinit var installedProvs: MutableList<AppWidgetProviderInfo>
     lateinit var widgetChooser: RecyclerView
     lateinit var widgetChooserAdapter: RecyclerView.Adapter<*>
     lateinit var widgetChooserManager: RecyclerView.LayoutManager
     private var appWidgetId: Int = 0
-    private lateinit var info: AppWidgetProviderInfo
+    private lateinit var appWidgetProviderInfo: AppWidgetProviderInfo
     private lateinit var listener: WidgetInterface
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -48,36 +45,68 @@ class WidgetActivity : AppCompatActivity(), WidgetChooserAdapter.WidgetChooserIn
     }
 
     override fun onWidgetChosen(position: Int) {
-        info = installedProvs[position]
+        appWidgetProviderInfo = installedProvs[position]
         appWidgetId = appWidgetHost.allocateAppWidgetId()
-        val canBind = appWidgetManager.bindAppWidgetIdIfAllowed(appWidgetId, info.provider)
+        val canBind = appWidgetManager.bindAppWidgetIdIfAllowed(appWidgetId, appWidgetProviderInfo.provider)
 
         if(!canBind){
             val intent = Intent(AppWidgetManager.ACTION_APPWIDGET_BIND).apply {
                 putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId)
-                putExtra(AppWidgetManager.EXTRA_APPWIDGET_PROVIDER, info.provider)
+                putExtra(AppWidgetManager.EXTRA_APPWIDGET_PROVIDER, appWidgetProviderInfo.provider)
             }
-            startActivityForResult(intent, 1)
+            startActivityForResult(intent, REQUEST_PERMISSION)
         } else {
             bindWidget()
         }
     }
 
     fun bindWidget() {
-        val widgetView = appWidgetHost.createView(mainContext, appWidgetId, info)
-        widgetView.setAppWidget(appWidgetId, info)
-        listener.onWidgetBind(widgetView)
+        if(appWidgetProviderInfo.configure != null){
+            intent = Intent(AppWidgetManager.ACTION_APPWIDGET_CONFIGURE)
+            intent.setComponent(appWidgetProviderInfo.configure)
+            intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId)
+            try {
+                startActivityForResult(intent, CONFIGURE_WIDGET)
+            } catch (e: Exception) {
+                createWidget()
+            }
+
+        } else {
+            createWidget()
+        }
+    }
+
+    fun createWidget(data: Intent? = null) {
+        if(data != null) {
+            val extras = data.extras
+            if (extras != null) {
+                appWidgetId = extras.getInt(AppWidgetManager.EXTRA_APPWIDGET_ID, -1)
+                appWidgetProviderInfo = appWidgetManager.getAppWidgetInfo(appWidgetId)
+            }
+        }
+        listener.onAddWidget(appWidgetId, appWidgetProviderInfo)
         finish()
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if(resultCode == RESULT_OK) {
-            bindWidget()
+            if(requestCode == REQUEST_PERMISSION) {
+                if(resultCode == RESULT_OK) {
+                    bindWidget()
+                }
+            }
+
+            if(requestCode == CONFIGURE_WIDGET) {
+                createWidget(data)
+            }
+        } else {
+            appWidgetHost.deleteAppWidgetId(appWidgetId)
         }
+
         super.onActivityResult(requestCode, resultCode, data)
     }
 
     interface WidgetInterface {
-        fun onWidgetBind(widgetView: AppWidgetHostView)
+        fun onAddWidget(widgetView: Int, appWidgetProviderInfo: AppWidgetProviderInfo)
     }
 }

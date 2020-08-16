@@ -134,6 +134,10 @@ class Dock(context: Context, attrs: AttributeSet): LinearLayout(context, attrs),
         appList.launchPackage(launchInfo, displayId)
     }
 
+    override fun onLongClick() {
+        // Do nothing
+    }
+
     fun startDrag(view: View, clipData: ClipData) {
         val dsb = View.DragShadowBuilder(view)
         view.startDrag(clipData, dsb, view, 0)

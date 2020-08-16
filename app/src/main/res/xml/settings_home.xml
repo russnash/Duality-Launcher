@@ -62,6 +62,13 @@
             android:entries="@array/android_colors"
             android:entryValues="@array/android_colors"
             android:defaultValue="White"/>
+        <ListPreference
+            android:key="home_text_color"
+            android:title="Text color"
+            app:useSimpleSummaryProvider="true"
+            android:entries="@array/android_colors"
+            android:entryValues="@array/android_colors"
+            android:defaultValue="White"/>
     </PreferenceCategory>
 
     <PreferenceCategory

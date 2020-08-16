@@ -1,13 +1,10 @@
 package com.graymatterapps.dualitylauncher
 
-import android.app.Activity
 import android.app.ActivityOptions
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
-import android.content.SharedPreferences
 import android.content.pm.LauncherApps
-import android.content.pm.PackageManager
 import android.graphics.Color
 import android.graphics.drawable.Drawable
 import android.graphics.drawable.ShapeDrawable
@@ -17,7 +14,7 @@ import android.os.UserHandle
 import android.os.UserManager
 import java.util.concurrent.locks.ReentrantLock
 
-class AppList (val pm: PackageManager, val prefs: SharedPreferences, val mainActivity: Activity){
+class AppList (){
     val apps: ArrayList<AppListDataType> = ArrayList()
     var ready: Boolean = false
     val lock = ReentrantLock()
@@ -26,12 +23,13 @@ class AppList (val pm: PackageManager, val prefs: SharedPreferences, val mainAct
         updateApps()
     }
 
-    fun updateApps(){
+    fun updateApps() {
         Thread(Runnable {
             lock.lock()
             apps.clear()
 
-            val launcher: LauncherApps = mainContext.getSystemService(Context.LAUNCHER_APPS_SERVICE) as LauncherApps
+            val launcher: LauncherApps =
+                mainContext.getSystemService(Context.LAUNCHER_APPS_SERVICE) as LauncherApps
             val handles = launcher.profiles
             val userMananger = mainContext.getSystemService(Context.USER_SERVICE) as UserManager
 
@@ -44,20 +42,27 @@ class AppList (val pm: PackageManager, val prefs: SharedPreferences, val mainAct
                     val activityName = apps.componentName.className
                     val handle = apps.user
                     val userSerial = userMananger.getSerialNumberForUser(handle)
-                    this.apps.add(AppListDataType(name, icon, activityName, packageName, handle, userSerial))
+                    this.apps.add(
+                        AppListDataType(
+                            name,
+                            icon,
+                            activityName,
+                            packageName,
+                            handle,
+                            userSerial
+                        )
+                    )
                 }
             }
 
-            try{
+            try {
                 apps.sortBy { it.name }
             } catch (e: Exception) {
                 // Do nothing
             }
-            mainActivity.runOnUiThread(java.lang.Runnable{
-                val editor = prefs.edit()
-                editor.putString("apps", System.currentTimeMillis().toString())
-                editor.apply()
-            })
+            val editor = prefs.edit()
+            editor.putString("apps", System.currentTimeMillis().toString())
+            editor.apply()
             lock.unlock()
             ready = true
         }).start()

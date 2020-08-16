@@ -1,6 +1,6 @@
 package com.graymatterapps.dualitylauncher
 
-import android.appwidget.AppWidgetHostView
+import android.appwidget.AppWidgetProviderInfo
 import android.content.ClipData
 import android.content.SharedPreferences
 import android.graphics.Color
@@ -9,14 +9,16 @@ import android.view.DragEvent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.*
+import android.widget.ImageView
+import android.widget.LinearLayout
+import android.widget.TableLayout
+import android.widget.TableRow
 import androidx.appcompat.app.AppCompatActivity
-import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.Fragment
-import androidx.preference.PreferenceManager
 import androidx.viewpager2.widget.ViewPager2
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import androidx.gridlayout.widget.GridLayout
 
 class HomeFragment : Fragment(), SharedPreferences.OnSharedPreferenceChangeListener {
 
@@ -55,7 +57,7 @@ class HomeFragment : Fragment(), SharedPreferences.OnSharedPreferenceChangeListe
         homePager = view.findViewById(R.id.homePager)
         homePagerAdapter = HomePagerAdapter(context as AppCompatActivity)
         homePager.adapter = homePagerAdapter
-        homePager.registerOnPageChangeCallback(object: ViewPager2.OnPageChangeCallback() {
+        homePager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
             override fun onPageScrollStateChanged(state: Int) {
                 super.onPageScrollStateChanged(state)
                 setupHomePageIndicator()
@@ -69,12 +71,19 @@ class HomeFragment : Fragment(), SharedPreferences.OnSharedPreferenceChangeListe
         setupHomePageIndicator()
 
         homeDelete = view.findViewById(R.id.homeDelete)
-        homeDelete.setColorFilter(MainActivity.colorPrefToColor(settingsPreferences.getString("home_widget_color", "White")))
+        homeDelete.setColorFilter(
+            MainActivity.colorPrefToColor(
+                settingsPreferences.getString(
+                    "home_widget_color",
+                    "White"
+                )
+            )
+        )
         homeDelete.alpha = 0f
 
-        homeDelete.setOnDragListener(object: View.OnDragListener {
+        homeDelete.setOnDragListener(object : View.OnDragListener {
             override fun onDrag(view: View?, dragEvent: DragEvent?): Boolean {
-                if(dragEvent != null) {
+                if (dragEvent != null) {
                     when (dragEvent.action) {
                         DragEvent.ACTION_DRAG_STARTED -> {
                             homeDelete.alpha = 1.0f
@@ -91,6 +100,10 @@ class HomeFragment : Fragment(), SharedPreferences.OnSharedPreferenceChangeListe
                         DragEvent.ACTION_DROP -> {
                             homeDelete.alpha = 0f
                             homeDelete.setBackgroundColor(Color.TRANSPARENT)
+                            if(dragEvent.clipDescription.label.toString().equals("widget")) {
+                                val widgetId: Int = Integer.parseInt(dragEvent.clipData.getItemAt(0).toString())
+                                appWidgetHost.deleteAppWidgetId(widgetId)
+                            }
                         }
                     }
                 }
@@ -100,15 +113,23 @@ class HomeFragment : Fragment(), SharedPreferences.OnSharedPreferenceChangeListe
         return view
     }
 
-    fun setupHomePageIndicator(){
+    fun setupHomePageIndicator() {
         homePageIndicator.removeAllViews()
-        var params = TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT)
-        val filterColor = MainActivity.colorPrefToColor(settingsPreferences.getString("home_widget_color", "White"))
+        var params = TableRow.LayoutParams(
+            TableRow.LayoutParams.WRAP_CONTENT,
+            TableRow.LayoutParams.WRAP_CONTENT
+        )
+        val filterColor = MainActivity.colorPrefToColor(
+            settingsPreferences.getString(
+                "home_widget_color",
+                "White"
+            )
+        )
 
-        for(n in 1..homePagerAdapter.itemCount){
+        for (n in 1..homePagerAdapter.itemCount) {
             var pageIndicator = ImageView(context)
             pageIndicator.layoutParams = params
-            if(homePager.currentItem == n-1){
+            if (homePager.currentItem == n - 1) {
                 pageIndicator.setImageResource(R.drawable.pager_active)
             } else {
                 pageIndicator.setImageResource(R.drawable.pager_inactive)
@@ -118,13 +139,13 @@ class HomeFragment : Fragment(), SharedPreferences.OnSharedPreferenceChangeListe
         }
     }
 
-    fun persistGrid(position: Int){
+    fun persistGrid(position: Int) {
         var homeIconsGrid = HomeIconsGrid()
         val view = homePager.findViewWithTag<View>(position)
         val homeIconsTable = view.findViewById<TableLayout>(R.id.homeIconsTable)
-        for(y in 0 until homeIconsTable.childCount){
+        for (y in 0 until homeIconsTable.childCount) {
             val dockRow: TableRow = homeIconsTable.getChildAt(y) as TableRow
-            for(x in 0 until dockRow.childCount){
+            for (x in 0 until dockRow.childCount) {
                 val icon: Icon = dockRow.getChildAt(x) as Icon
                 homeIconsGrid.change(x, y, icon.launchInfo)
             }
@@ -138,20 +159,30 @@ class HomeFragment : Fragment(), SharedPreferences.OnSharedPreferenceChangeListe
     override fun onSharedPreferenceChanged(sharedPrefs: SharedPreferences?, key: String?) {
 
         if (key != null) {
-            if(key.contains("homeIconsGrid")){
+            if (key.contains("homeIconsGrid")) {
                 homePagerAdapter.notifyDataSetChanged()
             }
-            if(key == "apps"){
+            if (key == "apps") {
                 dock.populateDock()
             }
 
-            if(key == "home_grid_pages" || key == "home_grid_columns" || key == "home_grid_rows"){
+            if (key == "home_grid_pages" || key == "home_grid_columns" || key == "home_grid_rows") {
                 homePagerAdapter.notifyDataSetChanged()
                 setupHomePageIndicator()
             }
-            if(key == "home_widget_color"){
+            if (key == "home_widget_color") {
                 setupHomePageIndicator()
-                homeDelete.setColorFilter(MainActivity.colorPrefToColor(settingsPreferences.getString("home_widget_color", "White")))
+                homeDelete.setColorFilter(
+                    MainActivity.colorPrefToColor(
+                        settingsPreferences.getString(
+                            "home_widget_color",
+                            "White"
+                        )
+                    )
+                )
+            }
+            if(key == "home_text_color"){
+                homePagerAdapter.notifyDataSetChanged()
             }
         }
     }
@@ -159,13 +190,6 @@ class HomeFragment : Fragment(), SharedPreferences.OnSharedPreferenceChangeListe
     fun startDrag(view: View, clipData: ClipData) {
         val dsb = View.DragShadowBuilder(view)
         view.startDrag(clipData, dsb, view, 0)
-    }
-
-    companion object {
-        @JvmStatic
-        fun newInstance(): HomeFragment {
-            return HomeFragment()
-            }
     }
 
     fun setListener(mainActivity: MainActivity) {
@@ -176,7 +200,10 @@ class HomeFragment : Fragment(), SharedPreferences.OnSharedPreferenceChangeListe
         fun onAppDrawerOpen()
     }
 
-    fun bindWidget(widgetView: AppWidgetHostView) {
-
+    fun addWidget(appWidgetId: Int, appWidgetProviderInfo: AppWidgetProviderInfo, position: Int) {
+        val view = homePager.findViewWithTag<View>(position)
+        val widgetLayout = view.findViewById<GridLayout>(R.id.widgetLayout)
+        val widgetContainer = activity?.applicationContext?.let { WidgetContainer(it, appWidgetId, appWidgetProviderInfo) }
+        widgetLayout.addView(widgetContainer)
     }
 }

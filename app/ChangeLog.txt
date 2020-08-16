@@ -1,3 +1,18 @@
+Version 2020.8.16.1-internal
+Changes:
+- Launcher supports personal and work apps.
+- Changed drop target highlight to something less blinding.
+- Swipe down opens notification panel. Long-click for launcher settings.
+- Option to change text color of home screen icons.
+- Portrait only home screen for now.
+
+Bug fixes:
+- Memory leaks.
+- Home screen grid size not updating until drag and drop.
+- Needing to use back twice to exit settings.
+- Home screen pager ghost.
+- Inconsistent dock background alpha.
+
 Version 2020.8.10.1-internal
 Changes:
 - Implemented trash can drag target on home screen.

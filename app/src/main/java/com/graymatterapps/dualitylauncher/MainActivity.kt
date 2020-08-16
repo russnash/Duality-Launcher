@@ -1,7 +1,10 @@
 package com.graymatterapps.dualitylauncher
 
+import android.annotation.SuppressLint
 import android.app.AlertDialog
-import android.appwidget.AppWidgetHostView
+import android.appwidget.AppWidgetHost
+import android.appwidget.AppWidgetManager
+import android.appwidget.AppWidgetProviderInfo
 import android.content.*
 import android.graphics.Color
 import android.hardware.display.DisplayManager
@@ -15,6 +18,7 @@ import android.view.animation.AnimationUtils
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.graphics.ColorUtils
+import androidx.customview.widget.ExploreByTouchHelper
 import androidx.preference.PreferenceManager
 import kotlinx.android.synthetic.main.activity_main.*
 import java.lang.Exception
@@ -24,11 +28,19 @@ const val PREFS_FILENAME = "com.graymatterapps.dualitylauncher.prefs"
 lateinit var settingsPreferences: SharedPreferences
 lateinit var prefs: SharedPreferences
 lateinit var mainContext: Context
+lateinit var appWidgetHost: AppWidgetHost
+lateinit var appWidgetManager: AppWidgetManager
+const val REQUEST_PERMISSION = 1
+const val CONFIGURE_WIDGET = 2
 
-class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterface, SharedPreferences.OnSharedPreferenceChangeListener, Animation.AnimationListener, HomeFragment.HomeInterface, GestureLayout.GestureEvents, Dock.DockInterface, HomePagerAdapter.HomeIconsInterface, WidgetActivity.WidgetInterface {
+class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterface,
+    SharedPreferences.OnSharedPreferenceChangeListener, Animation.AnimationListener,
+    HomeFragment.HomeInterface, GestureLayout.GestureEvents, Dock.DockInterface,
+    HomePagerAdapter.HomeIconsInterface, WidgetActivity.WidgetInterface {
+
     lateinit var broadcastReceiver: BroadcastReceiver
-    var homeFragment = HomeFragment.newInstance()
-    var drawerFragment = DrawerFragment.newInstance()
+    var homeFragment = HomeFragment()
+    var drawerFragment = DrawerFragment()
     var settingsFragment = SettingsFragment()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -38,7 +50,7 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
 
         prefs = context.getSharedPreferences(PREFS_FILENAME, 0)
 
-        if(isMainDisplay()) {
+        if (isMainDisplay()) {
             postUpdateCheck()
         }
 
@@ -53,25 +65,30 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
         homeFragment.setListener(this)
         gestureLayout.setListener(this)
         gestureLayout.setGesturesOn(true)
+        appWidgetHost = AppWidgetHost(applicationContext, ExploreByTouchHelper.HOST_ID)
+        appWidgetManager = AppWidgetManager.getInstance(applicationContext)
+        appWidgetHost.startListening()
 
-        supportFragmentManager
-            .beginTransaction()
-            .add(R.id.fragmentFrame, homeFragment, "home")
-            .commit()
+        if(savedInstanceState == null) {
+            supportFragmentManager
+                .beginTransaction()
+                .add(R.id.fragmentFrame, homeFragment, "home")
+                .commit()
+        }
 
         prefs = this.getSharedPreferences(PREFS_FILENAME, 0)
 
-        appList = AppList(packageManager, prefs, this@MainActivity)
+        appList = AppList()
 
-        if(isMainDisplay()){
+        if (isMainDisplay()) {
             appList.updateApps()
         } else {
             setWindowBackground()
         }
 
-        broadcastReceiver = object: BroadcastReceiver(){
+        broadcastReceiver = object : BroadcastReceiver() {
             override fun onReceive(context: Context?, intent: Intent?) {
-                if(isMainDisplay()){
+                if (isMainDisplay()) {
                     appList.updateApps()
                 }
             }
@@ -86,6 +103,7 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
 
     override fun onDestroy() {
         unregisterReceiver(broadcastReceiver)
+        appWidgetHost.stopListening()
         super.onDestroy()
     }
 
@@ -96,9 +114,9 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
         return displays[0].displayId == currentDisplay
     }
 
-    fun setWindowBackground(){
-        if(!isMainDisplay()){
-            if(settingsPreferences.getBoolean("dual_wallpaper_hack", true)){
+    fun setWindowBackground() {
+        if (!isMainDisplay()) {
+            if (settingsPreferences.getBoolean("dual_wallpaper_hack", true)) {
                 window.clearFlags(WindowManager.LayoutParams.FLAG_SHOW_WALLPAPER)
                 window.decorView.background = dualWallpaper.get()
             } else {
@@ -108,48 +126,55 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
         }
     }
 
-    fun setStatusBars(){
+    fun setStatusBars() {
         window.statusBarColor = Color.TRANSPARENT
-        if(settingsPreferences.getBoolean("status_dual_screen", true)){
+        if (settingsPreferences.getBoolean("status_dual_screen", true)) {
             setStatusBarBackground()
         } else {
-            if(isMainDisplay()) {
+            if (isMainDisplay()) {
                 setStatusBarBackground()
             }
         }
     }
 
-    fun setStatusBarBackground(){
-        var basicColor = MainActivity.colorPrefToColor(settingsPreferences.getString("status_background", "Black"))
+    fun setStatusBarBackground() {
+        var basicColor = MainActivity.colorPrefToColor(
+            settingsPreferences.getString(
+                "status_background",
+                "Black"
+            )
+        )
         var alpha = settingsPreferences.getInt("status_background_alpha", 80)
         var color = ColorUtils.setAlphaComponent(basicColor, alpha)
         window.statusBarColor = color
-        if(settingsPreferences.getBoolean("status_light", true)) {
-            window.decorView.systemUiVisibility = window.decorView.systemUiVisibility and View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR.inv()
+        if (settingsPreferences.getBoolean("status_light", true)) {
+            window.decorView.systemUiVisibility =
+                window.decorView.systemUiVisibility and View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR.inv()
         } else {
             window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
         }
     }
 
-    fun setNavBarBackground(){
-        var basicColor = MainActivity.colorPrefToColor(settingsPreferences.getString("nav_background", "Black"))
+    fun setNavBarBackground() {
+        var basicColor =
+            MainActivity.colorPrefToColor(settingsPreferences.getString("nav_background", "Black"))
         var alpha = settingsPreferences.getInt("nav_background_alpha", 80)
         var color = ColorUtils.setAlphaComponent(basicColor, alpha)
         window.navigationBarColor = color
     }
 
-    companion object{
+    companion object {
         lateinit var context: Context
         lateinit var appList: AppList
         var dragAndDropData = DragAndDropData()
         lateinit var dualWallpaper: DualWallpaper
 
-        fun initCompanion(con: Context){
+        fun initCompanion(con: Context) {
             context = con
             dualWallpaper = DualWallpaper(context)
         }
 
-        fun colorPrefToColor(color: String?) : Int {
+        fun colorPrefToColor(color: String?): Int {
             when (color) {
                 "Black" -> return Color.BLACK
                 "White" -> return Color.WHITE
@@ -166,12 +191,17 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
             }
         }
 
-        fun vibrate(millis: Long){
+        fun vibrate(millis: Long) {
             val vibe = context.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
             vibe.vibrate(VibrationEffect.createOneShot(millis, VibrationEffect.DEFAULT_AMPLITUDE))
         }
 
-        fun showOkCancelDialog(con: Context, message: String, okListener: DialogInterface.OnClickListener, cancelListener: DialogInterface.OnClickListener? = null) {
+        fun showOkCancelDialog(
+            con: Context,
+            message: String,
+            okListener: DialogInterface.OnClickListener,
+            cancelListener: DialogInterface.OnClickListener? = null
+        ) {
             AlertDialog.Builder(con)
                 .setMessage(message)
                 .setPositiveButton("Ok", okListener)
@@ -180,7 +210,11 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
                 .show()
         }
 
-        fun showOkDialog(con: Context, message: String, okListener: DialogInterface.OnClickListener? = null) {
+        fun showOkDialog(
+            con: Context,
+            message: String,
+            okListener: DialogInterface.OnClickListener? = null
+        ) {
             AlertDialog.Builder(con)
                 .setMessage(message)
                 .setPositiveButton("Ok", okListener)
@@ -205,11 +239,11 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
     }
 
     override fun onBackPressed() {
-        if(drawerFragment.isVisible){
+        if (drawerFragment.isVisible) {
             closeAppDrawer()
         }
 
-        if(settingsFragment.isVisible){
+        if (settingsFragment.isVisible) {
             supportFragmentManager
                 .beginTransaction()
                 .replace(R.id.fragmentFrame, homeFragment, "home")
@@ -223,11 +257,14 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
     }
 
     override fun onDragStarted(view: View, clipData: ClipData) {
-        supportFragmentManager
-            .beginTransaction()
-            .remove(drawerFragment)
-            .show(homeFragment)
-            .commit()
+        if(drawerFragment.isVisible) {
+            supportFragmentManager
+                .beginTransaction()
+                .hide(drawerFragment)
+                .show(homeFragment)
+                .commit()
+        }
+
         setStatusBars()
         setNavBarBackground()
         homeFragment.startDrag(view, clipData)
@@ -238,11 +275,13 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
         gestureLayout.setGesturesOn(true)
         setStatusBars()
         setNavBarBackground()
-        supportFragmentManager
-            .beginTransaction()
-            .remove(drawerFragment)
-            .show(homeFragment)
-            .commit()
+        if(drawerFragment.isVisible){
+            supportFragmentManager
+                .beginTransaction()
+                .hide(drawerFragment)
+                .show(homeFragment)
+                .commit()
+        }
         appList.launchPackage(launchInfo, displayId)
     }
 
@@ -250,36 +289,40 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
         homeFragment.persistGrid(homeFragment.homePager.currentItem)
     }
 
+    override fun onLongClick() {
+        openSettings()
+    }
+
     override fun onSharedPreferenceChanged(sharedPrefs: SharedPreferences?, key: String?) {
-        if(key == "status_background"){
+        if (key == "status_background") {
             setStatusBars()
         }
 
-        if(key == "status_background_alpha"){
+        if (key == "status_background_alpha") {
             setStatusBars()
         }
 
-        if(key == "status_light"){
+        if (key == "status_light") {
             setStatusBars()
         }
 
-        if(key == "status_dual_screen"){
+        if (key == "status_dual_screen") {
             setStatusBars()
         }
 
-        if(key == "nav_background"){
+        if (key == "nav_background") {
             setNavBarBackground()
         }
 
-        if(key == "nav_background_alpha"){
+        if (key == "nav_background_alpha") {
             setNavBarBackground()
         }
 
-        if(key == "dual_wallpaper_hack"){
+        if (key == "dual_wallpaper_hack") {
             setWindowBackground()
         }
 
-        if(key == "update_wallpaper"){
+        if (key == "update_wallpaper") {
             setWindowBackground()
         }
     }
@@ -291,7 +334,7 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
     override fun onAnimationEnd(p0: Animation?) {
         supportFragmentManager
             .beginTransaction()
-            .remove(drawerFragment)
+            .hide(drawerFragment)
             .show(homeFragment)
             .commit()
     }
@@ -301,9 +344,9 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
         setNavBarBackground()
     }
 
-    fun openAppDrawer(){
+    fun openAppDrawer() {
         gestureLayout.setGesturesOn(false)
-        /*if(drawerFragment.view != null){
+        if(drawerFragment.isHidden){
             supportFragmentManager
                 .beginTransaction()
                 .hide(homeFragment)
@@ -315,19 +358,19 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
                 .hide(homeFragment)
                 .add(R.id.fragmentFrame, drawerFragment, "drawer")
                 .commit()
-        }*/
-        supportFragmentManager
-            .beginTransaction()
-            .hide(homeFragment)
-            .add(R.id.fragmentFrame, drawerFragment, "drawer")
-            .commit()
+        }
         val animation = AnimationUtils.loadAnimation(this@MainActivity, R.anim.slide_up)
         fragmentFrame.startAnimation(animation)
-        var basicColor = MainActivity.colorPrefToColor(settingsPreferences.getString("app_drawer_background", "Black"))
+        var basicColor = MainActivity.colorPrefToColor(
+            settingsPreferences.getString(
+                "app_drawer_background",
+                "Black"
+            )
+        )
         var alpha = settingsPreferences.getInt("app_drawer_background_alpha", 80)
         var color = ColorUtils.setAlphaComponent(basicColor, alpha)
 
-        if(settingsPreferences.getBoolean("app_drawer_nav_status_sync", true)) {
+        if (settingsPreferences.getBoolean("app_drawer_nav_status_sync", true)) {
             window.statusBarColor = color
             window.navigationBarColor = color
         }
@@ -346,24 +389,31 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
         openAppDrawer()
     }
 
+    @SuppressLint("WrongConstant")
     override fun onSwipeDown() {
-        openSettings()
+        val statusBarService = getSystemService("statusbar")
+        val statusBarManager = Class.forName("android.app.StatusBarManager")
+        val expand = statusBarManager.getMethod("expandNotificationsPanel")
+        expand.invoke(statusBarService)
     }
 
-    override fun onWidgetBind(widgetView: AppWidgetHostView) {
-        homeFragment.bindWidget(widgetView)
+    override fun onAddWidget(widgetView: Int, appWidgetProviderInfo: AppWidgetProviderInfo) {
+        homeFragment.addWidget(widgetView, appWidgetProviderInfo, homeFragment.homePager.currentItem)
     }
 
-    fun postUpdateCheck(){
+    fun postUpdateCheck() {
         val previousVersion = prefs.getInt("previousVersion", 0)
         val editor = prefs.edit()
 
-        if(previousVersion < 7){
-            if(prefs.getString("homeIconsGrid0", "") == "") {
+        if (previousVersion < 7) {
+            if (prefs.getString("homeIconsGrid0", "") == "") {
                 // This is a fresh install, no need to clear any icon persistence
             } else {
                 // Need to clear dock & home icon persistence
-                showOkDialog(this, "Your dock and icon grid setup had to be cleared, sorry but it was the only way!")
+                showOkDialog(
+                    this,
+                    "Your dock and icon grid setup had to be cleared, sorry but it was the only way!"
+                )
 
                 try {
                     editor.remove("dockItems")
@@ -372,8 +422,11 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
                     editor.remove("homeIconsGrid2")
                     editor.remove("homeIconsGrid3")
                     editor.remove("homeIconsGrid4")
-                } catch (e: Exception){
-                    showOkDialog(this, "An error was encountered clearing your dock and icon grid setup, should you experience any issues please uninstall Duality Launcher and re-install.  Sorry for the inconvenience!")
+                } catch (e: Exception) {
+                    showOkDialog(
+                        this,
+                        "An error was encountered clearing your dock and icon grid setup, should you experience any issues please uninstall Duality Launcher and re-install.  Sorry for the inconvenience!"
+                    )
                 }
             }
         }

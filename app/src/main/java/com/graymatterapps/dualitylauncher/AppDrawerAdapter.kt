@@ -74,4 +74,8 @@ class AppDrawerAdapter (private val context: Context, private val apps: MutableL
     override fun onLaunch(launchInfo: LaunchInfo, displayId: Int) {
         listener.onLaunch(launchInfo, displayId)
     }
+
+    override fun onLongClick() {
+        // Do nothing
+    }
 }

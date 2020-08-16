@@ -11,6 +11,7 @@ import android.view.WindowManager
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.core.graphics.ColorUtils
 import com.graymatterapps.dualitylauncher.MainActivity.Companion.appList
 import com.graymatterapps.dualitylauncher.MainActivity.Companion.dragAndDropData
 
@@ -33,6 +34,7 @@ class Icon(private val con: Context,
     private val displayId: Int
     private var dragTarget = true
     private var blankOnDrag = false
+    private val enteredColor = ColorUtils.setAlphaComponent(Color.GREEN, 80)
 
     init {
         inflate(context, R.layout.icon, this)
@@ -60,25 +62,44 @@ class Icon(private val con: Context,
         if(dragTarget){
             icon.setOnDragListener { view, dragEvent ->
                 if (dragEvent != null) {
+
+                    // Check the clip description label and only respond to drag events if its
+                    // a "launchInfo" drag (another Icon)
+                    var respondToDrag = false
+                    try{
+                        if(dragEvent.clipDescription.label.toString().equals("launchInfo")){
+                            respondToDrag = true
+                        }
+                    } catch (e: Exception) {
+                        respondToDrag = false
+                    }
+
                     when (dragEvent.action) {
                         DragEvent.ACTION_DRAG_STARTED -> {
-                            iconLayout.setBackgroundResource(R.drawable.icon_drag_target)
+                            if(respondToDrag) {
+                                iconLayout.setBackgroundResource(R.drawable.icon_drag_target)
+                            }
                         }
                         DragEvent.ACTION_DRAG_ENTERED -> {
-                            iconLayout.setBackgroundColor(Color.GREEN)
+                            if(respondToDrag) {
+                                iconLayout.setBackgroundColor(enteredColor)
+                            }
                         }
                         DragEvent.ACTION_DRAG_EXITED -> {
-                            iconLayout.setBackgroundResource(R.drawable.icon_drag_target)
+                            if(respondToDrag) {
+                                iconLayout.setBackgroundResource(R.drawable.icon_drag_target)
+                            }
                         }
                         DragEvent.ACTION_DRAG_ENDED -> {
                             iconLayout.setBackgroundColor(Color.TRANSPARENT)
                         }
                         DragEvent.ACTION_DROP -> {
-                            val id = dragEvent.clipData.getItemAt(0).text.toString()
-                            launchInfo = dragAndDropData.retrieve(id)
-                            dragAndDropData.reset()
-                            setupIcon()
-                            listener.onIconChanged()
+                            if(respondToDrag) {
+                                val id = dragEvent.clipData.getItemAt(0).text.toString()
+                                launchInfo = dragAndDropData.retrieveLaunchInfo(id)
+                                setupIcon()
+                                listener.onIconChanged()
+                            }
                         }
                     }
                 }
@@ -104,13 +125,11 @@ class Icon(private val con: Context,
 
             icon.setOnLongClickListener { view ->
                 val id = System.currentTimeMillis().toString()
-                val passedLaunchInfo = launchInfo
-                dragAndDropData.add(passedLaunchInfo, id)
+                val passedLaunchInfo = launchInfo.copy()
+                dragAndDropData.addLaunchInfo(passedLaunchInfo, id)
                 var clipData = ClipData.newPlainText("launchInfo", id)
 
-
                 listener.onDragStarted(view, clipData)
-
 
                 if (blankOnDrag) {
                     launchInfo.setActivityName("")
@@ -123,6 +142,14 @@ class Icon(private val con: Context,
                 true
             }
         } else {
+            icon.setOnLongClickListener { view ->
+                listener.onLongClick()
+                true
+            }
+            label.setOnLongClickListener { view ->
+                listener.onLongClick()
+                true
+            }
             icon.setImageDrawable(ColorDrawable(Color.TRANSPARENT))
             label.text = ""
         }
@@ -147,5 +174,6 @@ class Icon(private val con: Context,
         fun onIconChanged()
         fun onDragStarted(view: View, clipData: ClipData)
         fun onLaunch(launchInfo: LaunchInfo, displayId: Int)
+        fun onLongClick()
     }
 }

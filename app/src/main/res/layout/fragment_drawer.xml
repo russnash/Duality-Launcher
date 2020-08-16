@@ -15,17 +15,25 @@
 
         <Button
             android:id="@+id/buttonApps"
+            style="@style/Widget.AppCompat.Button.ButtonBar.AlertDialog"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="40dp"
+            android:layout_margin="5dp"
             android:layout_weight="1"
-            android:text="Apps" />
+            android:background="@drawable/icon_drag_target"
+            android:text="@string/button_personal"
+            android:textAllCaps="false" />
 
         <Button
             android:id="@+id/buttonWork"
+            style="@style/Widget.AppCompat.Button.ButtonBar.AlertDialog"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="40dp"
+            android:layout_margin="5dp"
             android:layout_weight="1"
-            android:text="Work Apps" />
+            android:background="@drawable/icon_drag_target"
+            android:text="@string/button_work"
+            android:textAllCaps="false" />
     </LinearLayout>
 
     <androidx.recyclerview.widget.RecyclerView

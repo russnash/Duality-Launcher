@@ -116,11 +116,4 @@ class DrawerFragment : Fragment(), SharedPreferences.OnSharedPreferenceChangeLis
             ++i
         }
     }
-
-    companion object {
-        @JvmStatic
-        fun newInstance(): DrawerFragment {
-            return DrawerFragment()
-        }
-    }
 }
