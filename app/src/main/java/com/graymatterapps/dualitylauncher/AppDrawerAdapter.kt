@@ -3,6 +3,7 @@ package com.graymatterapps.dualitylauncher
 import android.content.ClipData
 import android.content.Context
 import android.content.SharedPreferences
+import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import androidx.preference.PreferenceManager
@@ -14,10 +15,7 @@ class AppDrawerAdapter (private val context: Context, private val apps: MutableL
     private lateinit var listener: DrawerAdapterInterface
     val settingsPreferences: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
     var filteredList: MutableList<AppList.AppListDataType> = ArrayList()
-
-    init {
-        //filterWork(false)
-    }
+    var filteredWork: Boolean = false
 
     fun filterWork(work: Boolean){
         val currentUser = android.os.Process.myUserHandle()
@@ -27,6 +25,8 @@ class AppDrawerAdapter (private val context: Context, private val apps: MutableL
         } else {
             filteredList = apps.filter { it.handle.equals(currentUser) } as MutableList<AppList.AppListDataType>
         }
+
+        filteredWork = work
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AppDrawerHolder {
@@ -38,6 +38,7 @@ class AppDrawerAdapter (private val context: Context, private val apps: MutableL
     }
 
     override fun getItemCount(): Int {
+        Log.d(TAG, "getItemCount: ${filteredList.size}")
         return filteredList.size
     }
 

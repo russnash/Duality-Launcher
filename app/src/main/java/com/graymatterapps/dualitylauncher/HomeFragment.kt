@@ -184,6 +184,9 @@ class HomeFragment : Fragment(), SharedPreferences.OnSharedPreferenceChangeListe
             if(key == "home_text_color"){
                 homePagerAdapter.notifyDataSetChanged()
             }
+            if(key == "widget_visible"){
+                widgetVisible()
+            }
         }
     }
 
@@ -205,5 +208,15 @@ class HomeFragment : Fragment(), SharedPreferences.OnSharedPreferenceChangeListe
         val widgetLayout = view.findViewById<GridLayout>(R.id.widgetLayout)
         val widgetContainer = activity?.applicationContext?.let { WidgetContainer(it, appWidgetId, appWidgetProviderInfo) }
         widgetLayout.addView(widgetContainer)
+    }
+
+    fun widgetVisible(){
+        val view = homePager.findViewWithTag<View>(homePager.currentItem)
+        val widgetLayout = view.findViewById<GridLayout>(R.id.widgetLayout)
+        if(settingsPreferences.getBoolean("widget_visible", false)){
+            widgetLayout.visibility = View.VISIBLE
+        } else {
+            widgetLayout.visibility = View.INVISIBLE
+        }
     }
 }

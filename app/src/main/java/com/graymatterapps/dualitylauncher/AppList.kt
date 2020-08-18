@@ -14,12 +14,12 @@ import android.os.UserHandle
 import android.os.UserManager
 import java.util.concurrent.locks.ReentrantLock
 
-class AppList (){
+class AppList() {
     val apps: ArrayList<AppListDataType> = ArrayList()
     var ready: Boolean = false
     val lock = ReentrantLock()
 
-    init{
+    init {
         updateApps()
     }
 
@@ -68,9 +68,9 @@ class AppList (){
         }).start()
     }
 
-    fun getIconFromApps(launchInfo: LaunchInfo) : Drawable {
+    fun getIconFromApps(launchInfo: LaunchInfo): Drawable {
         lock.lock()
-        val app = apps.find{
+        val app = apps.find {
             it.activityName == launchInfo.getActivityName() && it.packageName == launchInfo.getPackageName() && it.userSerial == launchInfo.getUserSerial()
         }
         lock.unlock()
@@ -83,13 +83,13 @@ class AppList (){
         }
     }
 
-    fun getLabelFromApps(launchInfo: LaunchInfo) : String {
+    fun getLabelFromApps(launchInfo: LaunchInfo): String {
         lock.lock()
-        val app = apps.find{
+        val app = apps.find {
             it.activityName == launchInfo.getActivityName() && it.packageName == launchInfo.getPackageName() && it.userSerial == launchInfo.getUserSerial()
         }
         lock.unlock()
-        if(app != null) {
+        if (app != null) {
             return app.name
         } else {
             return "?Unknown?"
@@ -100,7 +100,8 @@ class AppList (){
         try {
             val launcher: LauncherApps =
                 mainContext.getSystemService(Context.LAUNCHER_APPS_SERVICE) as LauncherApps
-            val userManager: UserManager = mainContext.getSystemService(Context.USER_SERVICE) as UserManager
+            val userManager: UserManager =
+                mainContext.getSystemService(Context.USER_SERVICE) as UserManager
             val options = ActivityOptions.makeBasic()
             options.launchDisplayId = display
             val componentName =
@@ -113,10 +114,11 @@ class AppList (){
     }
 
     fun launchAppInfo(packageName: String, display: Int) {
-        try{
+        try {
             val options = ActivityOptions.makeBasic()
             options.launchDisplayId = display
-            val intent: Intent = Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
+            val intent: Intent =
+                Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
             intent.data = Uri.parse("package:$packageName")
             MainActivity.context.startActivity(intent, options.toBundle())
         } catch (e: Exception) {
@@ -124,5 +126,12 @@ class AppList (){
         }
     }
 
-    data class AppListDataType(var name: String, var icon: Drawable, var activityName: String, var packageName: String, var handle: UserHandle, var userSerial: Long)
+    data class AppListDataType(
+        var name: String,
+        var icon: Drawable,
+        var activityName: String,
+        var packageName: String,
+        var handle: UserHandle,
+        var userSerial: Long
+    )
 }

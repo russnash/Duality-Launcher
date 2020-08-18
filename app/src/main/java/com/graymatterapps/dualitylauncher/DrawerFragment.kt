@@ -44,24 +44,19 @@ class DrawerFragment : Fragment(), SharedPreferences.OnSharedPreferenceChangeLis
         buttonWork = view.findViewById(R.id.buttonWork)
         buttonApps.alpha = 1.0f
         buttonWork.alpha = 0.5f
-        buttonApps.setOnClickListener(object: View.OnClickListener{
-            override fun onClick(p0: View?) {
-                adapter.filterWork(false)
-                buttonApps.alpha = 1.0f
-                buttonWork.alpha = 0.5f
-                notifyDataSetChanged()
-            }
+        buttonApps.setOnClickListener {
+            adapter.filterWork(false)
+            buttonApps.alpha = 1.0f
+            buttonWork.alpha = 0.5f
+            notifyDataSetChanged()
+        }
 
-        })
-
-        buttonWork.setOnClickListener(object: View.OnClickListener{
-            override fun onClick(p0: View?) {
-                adapter.filterWork(true)
-                buttonApps.alpha = 0.5f
-                buttonWork.alpha = 1.0f
-                notifyDataSetChanged()
-            }
-        })
+        buttonWork.setOnClickListener {
+            adapter.filterWork(true)
+            buttonApps.alpha = 0.5f
+            buttonWork.alpha = 1.0f
+            notifyDataSetChanged()
+        }
 
         setDrawerBackground()
         notifyDataSetChanged()
@@ -75,37 +70,44 @@ class DrawerFragment : Fragment(), SharedPreferences.OnSharedPreferenceChangeLis
         super.onDestroy()
     }
 
-    private fun setDrawerBackground(){
-        var basicColor = MainActivity.colorPrefToColor(settingsPreferences.getString("app_drawer_background", "Black"))
+    private fun setDrawerBackground() {
+        var basicColor = MainActivity.colorPrefToColor(
+            settingsPreferences.getString(
+                "app_drawer_background",
+                "Black"
+            )
+        )
         var alpha = settingsPreferences.getInt("app_drawer_background_alpha", 80)
         var color = ColorUtils.setAlphaComponent(basicColor, alpha)
         drawerLayout.setBackgroundColor(color)
     }
 
     override fun onSharedPreferenceChanged(sharedPrefs: SharedPreferences?, key: String?) {
-        if(key == "apps"){
+        if (key == "apps") {
             notifyDataSetChanged()
         }
 
-        if(key == "app_drawer_background"){
+        if (key == "app_drawer_background") {
             setDrawerBackground()
         }
 
-        if(key == "app_drawer_background_alpha"){
+        if (key == "app_drawer_background_alpha") {
             setDrawerBackground()
         }
 
-        if(key == "app_drawer_text"){
+        if (key == "app_drawer_text") {
             changeTextColors()
         }
     }
 
-    fun notifyDataSetChanged(){
+    fun notifyDataSetChanged() {
+        adapter.filterWork(adapter.filteredWork)
         adapter.notifyDataSetChanged()
     }
 
     fun changeTextColors() {
-        val color = MainActivity.colorPrefToColor(settingsPreferences.getString("app_drawer_text", "White"))
+        val color =
+            MainActivity.colorPrefToColor(settingsPreferences.getString("app_drawer_text", "White"))
 
         var x: Int = drawer.childCount
         var i = 0

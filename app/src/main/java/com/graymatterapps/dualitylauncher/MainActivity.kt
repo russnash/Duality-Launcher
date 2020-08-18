@@ -97,6 +97,8 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
         intentFilter.addAction(Intent.ACTION_PACKAGE_ADDED)
         intentFilter.addAction(Intent.ACTION_PACKAGE_REMOVED)
         intentFilter.addAction(Intent.ACTION_PACKAGE_CHANGED)
+        intentFilter.addAction(Intent.ACTION_MANAGED_PROFILE_ADDED)
+        intentFilter.addAction(Intent.ACTION_MANAGED_PROFILE_REMOVED)
         intentFilter.addDataScheme("package")
         registerReceiver(broadcastReceiver, intentFilter)
     }

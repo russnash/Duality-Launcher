@@ -1,17 +1,25 @@
-Version 2020.8.16.1-internal
+Version 2020.8.17.1-internal
 Changes:
-- Launcher supports personal and work apps.
-- Changed drop target highlight to something less blinding.
-- Swipe down opens notification panel. Long-click for launcher settings.
-- Option to change text color of home screen icons.
-- Portrait only home screen for now.
+- Removed add widget option from settings.
 
 Bug fixes:
-- Memory leaks.
-- Home screen grid size not updating until drag and drop.
-- Needing to use back twice to exit settings.
-- Home screen pager ghost.
-- Inconsistent dock background alpha.
+- Fixed newly installed or uninstalled apps not updating in the app drawer.
+
+Version 2020.8.16.1-internal
+Changes:
+- Implemented multi-profile support, launcher will now recongnize and launch both personal and work apps. App drawer seperates the two.
+- Changed drop target highlight to something less blinding.
+- Swipe down on home screen now pulls down the notification panel. To access launcher settings, long-click on an empty area of the home screen.
+- Option to change text color of home screen icons.
+- Restriced home screen to portrait only, this is temporary until proper landscape orientation can be implemented.
+
+Bugs fixes:
+- Fixed several memory leaks.
+- Fixed home screen grid size not updating until drag and drop.
+- Fixed sometimes needing to use back arrow in actionbar or nav back twice to exit settings.
+- Fixed dropping icon from home screen onto dock clears the dock icon.
+- Fixed toggling navigation mode leaving a ghost behind the home screen icons and pager.
+- Fixed inconsistent dock background alpha.
 
 Version 2020.8.10.1-internal
 Changes:

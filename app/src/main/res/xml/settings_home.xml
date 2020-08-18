@@ -71,18 +71,4 @@
             android:defaultValue="White"/>
     </PreferenceCategory>
 
-    <PreferenceCategory
-        android:title="App Widgets">
-
-        <Preference
-            android:key="widget_add"
-            android:title="Add home screen widget"
-            android:summary="Add an app widget to your home screen">
-            <intent android:targetPackage="com.graymatterapps.dualitylauncher"
-                android:targetClass="com.graymatterapps.dualitylauncher.WidgetActivity"
-                android:action="android.intent.action.ATTACH_DATA"/>
-        </Preference>
-
-    </PreferenceCategory>
-
 </PreferenceScreen>
