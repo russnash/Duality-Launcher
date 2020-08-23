@@ -7,12 +7,16 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.graymatterapps.graymatterutils.GrayMatterUtils.colorPrefToColor
 
-class WidgetChooserAdapter(private val context: Context, private val widgets: MutableList<AppWidgetProviderInfo>): RecyclerView.Adapter<WidgetChooserAdapter.WidgetChooserHolder>() {
+class WidgetChooserAdapter(
+    private val context: Context,
+    private val widgets: MutableList<AppWidgetProviderInfo>
+) : RecyclerView.Adapter<WidgetChooserAdapter.WidgetChooserHolder>() {
 
     private lateinit var listener: WidgetChooserInterface
 
-    class WidgetChooserHolder(view: View): RecyclerView.ViewHolder(view) {
+    class WidgetChooserHolder(view: View) : RecyclerView.ViewHolder(view) {
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): WidgetChooserHolder {
@@ -25,16 +29,12 @@ class WidgetChooserAdapter(private val context: Context, private val widgets: Mu
         val icon = rowView.findViewById<ImageView>(R.id.widgetIcon)
         val preview = rowView.findViewById<ImageView>(R.id.widgetPreview)
         val description = rowView.findViewById<TextView>(R.id.widgetDescription)
-        val textColor = MainActivity.colorPrefToColor(com.graymatterapps.dualitylauncher.settingsPreferences.getString("app_drawer_text", "White"))
+        val textColor = colorPrefToColor(settingsPreferences.getString("app_drawer_text", "White"))
         icon.setImageDrawable(widgets[position].loadIcon(context, -1))
         preview.setImageDrawable(widgets[position].loadPreviewImage(context, -1))
         description.text = widgets[position].loadLabel(context.packageManager)
         description.setTextColor(textColor)
-        preview.setOnClickListener(object: View.OnClickListener{
-            override fun onClick(p0: View?) {
-                listener.onWidgetChosen(position)
-            }
-        })
+        preview.setOnClickListener { listener.onWidgetChosen(position) }
     }
 
     override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
@@ -46,7 +46,7 @@ class WidgetChooserAdapter(private val context: Context, private val widgets: Mu
         return widgets.size
     }
 
-    fun setListener(ear: WidgetChooserInterface){
+    fun setListener(ear: WidgetChooserInterface) {
         listener = ear as WidgetChooserInterface
     }
 

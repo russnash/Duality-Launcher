@@ -8,22 +8,29 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.RecyclerView
+import com.graymatterapps.graymatterutils.GrayMatterUtils.colorPrefToColor
 
 
-class AppDrawerAdapter (private val context: Context, private val apps: MutableList<AppList.AppListDataType>): RecyclerView.Adapter<AppDrawerAdapter.AppDrawerHolder>(), Icon.IconInterface {
+class AppDrawerAdapter(
+    private val context: Context,
+    private val apps: MutableList<AppList.AppListDataType>
+) : RecyclerView.Adapter<AppDrawerAdapter.AppDrawerHolder>(), Icon.IconInterface {
 
     private lateinit var listener: DrawerAdapterInterface
-    val settingsPreferences: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
+    val settingsPreferences: SharedPreferences =
+        PreferenceManager.getDefaultSharedPreferences(context)
     var filteredList: MutableList<AppList.AppListDataType> = ArrayList()
     var filteredWork: Boolean = false
 
-    fun filterWork(work: Boolean){
+    fun filterWork(work: Boolean) {
         val currentUser = android.os.Process.myUserHandle()
 
-        if(work){
-            filteredList = apps.filter { it.handle != currentUser } as MutableList<AppList.AppListDataType>
+        if (work) {
+            filteredList =
+                apps.filter { it.handle != currentUser } as MutableList<AppList.AppListDataType>
         } else {
-            filteredList = apps.filter { it.handle.equals(currentUser) } as MutableList<AppList.AppListDataType>
+            filteredList =
+                apps.filter { it.handle.equals(currentUser) } as MutableList<AppList.AppListDataType>
         }
 
         filteredWork = work
@@ -34,7 +41,7 @@ class AppDrawerAdapter (private val context: Context, private val apps: MutableL
         return AppDrawerHolder(inflatedView)
     }
 
-    class AppDrawerHolder(view: View): RecyclerView.ViewHolder(view) {
+    class AppDrawerHolder(view: View) : RecyclerView.ViewHolder(view) {
     }
 
     override fun getItemCount(): Int {
@@ -45,8 +52,19 @@ class AppDrawerAdapter (private val context: Context, private val apps: MutableL
     override fun onBindViewHolder(holder: AppDrawerHolder, position: Int) {
         val rowView = holder.itemView
         val icon = rowView.findViewById<Icon>(R.id.icon)
-        icon.label.setTextColor(MainActivity.colorPrefToColor(settingsPreferences.getString("app_drawer_text", "White")))
-        icon.setLaunchInfo(filteredList[position].activityName, filteredList[position].packageName, filteredList[position].userSerial)
+        icon.label.setTextColor(
+            colorPrefToColor(
+                settingsPreferences.getString(
+                    "app_drawer_text",
+                    "White"
+                )
+            )
+        )
+        icon.setLaunchInfo(
+            filteredList[position].activityName,
+            filteredList[position].packageName,
+            filteredList[position].userSerial
+        )
         icon.setListener(this)
     }
 

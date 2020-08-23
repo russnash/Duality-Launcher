@@ -7,13 +7,14 @@ import android.content.Context
 import android.view.GestureDetector
 import android.view.MotionEvent
 import android.widget.FrameLayout
+import android.widget.TableLayout
 import androidx.gridlayout.widget.GridLayout
 import com.graymatterapps.dualitylauncher.MainActivity.Companion.dragAndDropData
 
 class WidgetContainer(context: Context, private val appWidgetId: Int, private val appWidgetProviderInfo: AppWidgetProviderInfo): FrameLayout(context), GestureDetector.OnGestureListener{
 
     lateinit var appWidget: AppWidgetHostView
-    lateinit var parentLayout: GridLayout
+    lateinit var parentLayout: TableLayout
     lateinit var gestureDetector: GestureDetector
     var cellWidth: Int = 0
     var cellHeight: Int = 0
@@ -21,7 +22,7 @@ class WidgetContainer(context: Context, private val appWidgetId: Int, private va
     override fun onAttachedToWindow() {
         gestureDetector = GestureDetector(context, this)
 
-        parentLayout = this.parent as GridLayout
+        parentLayout = this.parent as TableLayout
         cellWidth = parentLayout.width / 8
         cellHeight = parentLayout.height / 8
 
@@ -41,6 +42,14 @@ class WidgetContainer(context: Context, private val appWidgetId: Int, private va
         this.addView(appWidget)
 
         super.onAttachedToWindow()
+    }
+
+    fun convertToIcon(launchInfo: LaunchInfo){
+        val icon = Icon(mainContext, null)
+        icon.setLaunchInfo(launchInfo)
+        icon.setBlankOnDrag(true)
+        parentLayout.addView(icon)
+        parentLayout.removeView(this)
     }
 
     override fun onInterceptTouchEvent(event: MotionEvent?): Boolean {

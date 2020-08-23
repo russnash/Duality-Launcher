@@ -6,17 +6,22 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
+import com.graymatterapps.graymatterutils.GrayMatterUtils.getVersionCode
+import com.graymatterapps.graymatterutils.GrayMatterUtils.getVersionName
 
 class SettingsActivity : AppCompatActivity(), PreferenceFragmentCompat.OnPreferenceStartFragmentCallback {
     var settingsFragment = SettingsFragment()
-    lateinit var version: TextView
+    lateinit var versionName: TextView
+    lateinit var versionCode: TextView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_settings)
 
-        version = findViewById(R.id.version)
-        version.text = "Version: " + BuildConfig.VERSION_NAME
+        versionName = findViewById(R.id.versionName)
+        versionName.text = "VersionName: ${getVersionName(this)}"
+        versionCode = findViewById(R.id.versionCode)
+        versionCode.text = "VersionCode: ${getVersionCode(this)}"
 
         supportFragmentManager
             .beginTransaction()

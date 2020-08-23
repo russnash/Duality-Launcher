@@ -1,5 +1,6 @@
 package com.graymatterapps.dualitylauncher
 
+import android.appwidget.AppWidgetProviderInfo
 import android.content.ClipData
 import android.content.Context
 import android.graphics.Color
@@ -10,8 +11,10 @@ import android.view.View
 import android.view.WindowManager
 import android.widget.ImageView
 import android.widget.LinearLayout
+import android.widget.TableLayout
 import android.widget.TextView
 import androidx.core.graphics.ColorUtils
+import androidx.gridlayout.widget.GridLayout
 import com.graymatterapps.dualitylauncher.MainActivity.Companion.appList
 import com.graymatterapps.dualitylauncher.MainActivity.Companion.dragAndDropData
 
@@ -27,10 +30,11 @@ class Icon(private val con: Context,
     constructor(con: Context, attrs: AttributeSet?, activityInfo: String, packageInfo: String, userSerial: Long) : this(con, attrs, activityInfo, packageInfo, userSerial, true, false)
 
     private lateinit var listener: IconInterface
+    var parentLayout: TableLayout
     var iconLayout: LinearLayout
     var icon: ImageView
     var label: TextView
-    var launchInfo = LaunchInfo()
+    private var launchInfo = LaunchInfo()
     private val displayId: Int
     private var dragTarget = true
     private var blankOnDrag = false
@@ -38,6 +42,7 @@ class Icon(private val con: Context,
 
     init {
         inflate(context, R.layout.icon, this)
+        parentLayout = this.parent as TableLayout
         val wm = context.getSystemService(Context.WINDOW_SERVICE) as WindowManager
         displayId = wm.defaultDisplay.displayId
 
@@ -166,8 +171,23 @@ class Icon(private val con: Context,
         setupIcon()
     }
 
+    fun setLaunchInfo(launchInfos: LaunchInfo){
+        launchInfo = launchInfos
+        setupIcon()
+    }
+
+    fun getLaunchInfo(): LaunchInfo {
+        return launchInfo
+    }
+
     fun setBlankOnDrag(state: Boolean){
         blankOnDrag = state
+    }
+
+    fun convertToWidget(appWidgetId: Int, appWidgetProviderInfo: AppWidgetProviderInfo){
+        val widgetContainer = WidgetContainer(mainContext, appWidgetId, appWidgetProviderInfo)
+        parentLayout.addView(widgetContainer)
+        parentLayout.removeView(this)
     }
 
     interface IconInterface{

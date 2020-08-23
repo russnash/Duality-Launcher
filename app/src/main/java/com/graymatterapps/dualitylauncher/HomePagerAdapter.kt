@@ -9,17 +9,19 @@ import androidx.gridlayout.widget.GridLayout
 import android.widget.TableLayout
 import android.widget.TableRow
 import androidx.recyclerview.widget.RecyclerView
+import com.graymatterapps.graymatterutils.GrayMatterUtils.colorPrefToColor
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 
-class HomePagerAdapter (private val context: Context): RecyclerView.Adapter<HomePagerAdapter.HomePagerHolder>(), Icon.IconInterface {
+class HomePagerAdapter(private val context: Context) :
+    RecyclerView.Adapter<HomePagerAdapter.HomePagerHolder>(), Icon.IconInterface {
 
     var homeIconsGrid = HomeIconsGrid()
     var numRows: Int = 0
     var numCols: Int = 0
     private lateinit var listener: HomeIconsInterface
 
-    class HomePagerHolder(view: View): RecyclerView.ViewHolder(view) {
+    class HomePagerHolder(view: View) : RecyclerView.ViewHolder(view) {
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): HomePagerHolder {
@@ -43,21 +45,27 @@ class HomePagerAdapter (private val context: Context): RecyclerView.Adapter<Home
         numCols = Integer.parseInt(numColsString)
         val numRowsString = settingsPreferences.getString("home_grid_rows", "7")
         numRows = Integer.parseInt(numRowsString)
-        val textColor = MainActivity.colorPrefToColor(settingsPreferences.getString("home_text_color", "White"))
+        val textColor = colorPrefToColor(settingsPreferences.getString("home_text_color", "White"))
 
         homeIconsTable.removeAllViews()
 
-        var rowParams = TableLayout.LayoutParams(TableLayout.LayoutParams.MATCH_PARENT, TableLayout.LayoutParams.MATCH_PARENT)
+        var rowParams = TableLayout.LayoutParams(
+            TableLayout.LayoutParams.MATCH_PARENT,
+            TableLayout.LayoutParams.MATCH_PARENT
+        )
         rowParams.weight = 1.0f
         rowParams.gravity = Gravity.CENTER
-        var iconParams = TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.MATCH_PARENT)
+        var iconParams = TableRow.LayoutParams(
+            TableRow.LayoutParams.MATCH_PARENT,
+            TableRow.LayoutParams.MATCH_PARENT
+        )
         iconParams.width = 0
 
-        for(y in 1..numRows){
+        for (y in 1..numRows) {
             var tableRow = TableRow(context)
             tableRow.layoutParams = rowParams
 
-            for(x in 1..numCols){
+            for (x in 1..numCols) {
                 var icon = Icon(context, null)
                 if (icon != null) {
                     icon.layoutParams = iconParams
@@ -65,8 +73,12 @@ class HomePagerAdapter (private val context: Context): RecyclerView.Adapter<Home
                     icon.label.setTextColor(textColor)
                     icon.setListener(this)
                     icon.setBlankOnDrag(true)
-                    val launchInfo = homeIconsGrid.get(x-1, y-1)
-                    icon.setLaunchInfo(launchInfo.getActivityName(), launchInfo.getPackageName(), launchInfo.getUserSerial())
+                    val launchInfo = homeIconsGrid.get(x - 1, y - 1)
+                    icon.setLaunchInfo(
+                        launchInfo.getActivityName(),
+                        launchInfo.getPackageName(),
+                        launchInfo.getUserSerial()
+                    )
                 }
                 tableRow.addView(icon)
             }
@@ -76,9 +88,9 @@ class HomePagerAdapter (private val context: Context): RecyclerView.Adapter<Home
         val widgetLayout = itemView.findViewById<GridLayout>(R.id.widgetLayout)
 
         var params = GridLayout.LayoutParams()
-        for(x in 0..7){
-            for(y in 0..7){
-                val widgetPlaceholder = WidgetPlaceholder(context)
+        for (x in 0..7) {
+            for (y in 0..7) {
+                val widgetPlaceholder = GridPlaceholder(context)
                 params.columnSpec = GridLayout.spec(x)
                 params.rowSpec = GridLayout.spec(y)
                 widgetLayout.addView(widgetPlaceholder, params)
@@ -91,9 +103,9 @@ class HomePagerAdapter (private val context: Context): RecyclerView.Adapter<Home
         return Integer.parseInt(homePagesString)
     }
 
-    fun depersistGrid(position: Int){
+    fun depersistGrid(position: Int) {
         val loadItJson = prefs.getString("homeIconsGrid" + position, "")
-        if(loadItJson != ""){
+        if (loadItJson != "") {
             homeIconsGrid = loadItJson?.let { Json.decodeFromString(it) }!!
         }
     }
@@ -114,7 +126,7 @@ class HomePagerAdapter (private val context: Context): RecyclerView.Adapter<Home
         listener.onLongClick()
     }
 
-    fun setListener(homeIconsInterface: HomeIconsInterface){
+    fun setListener(homeIconsInterface: HomeIconsInterface) {
         listener = homeIconsInterface
     }
 

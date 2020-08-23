@@ -8,6 +8,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.graphics.ColorUtils
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.graymatterapps.graymatterutils.GrayMatterUtils.colorPrefToColor
 
 //const val REQUEST_PERMISSION = 1
 //const val CONFIGURE_WIDGET = 2
@@ -36,7 +37,8 @@ class WidgetActivity : AppCompatActivity(), WidgetChooserAdapter.WidgetChooserIn
         widgetChooser.layoutManager = widgetChooserManager
         widgetChooser.adapter = widgetChooserAdapter
 
-        var basicColor = MainActivity.colorPrefToColor(settingsPreferences.getString("app_drawer_background", "Black"))
+        var basicColor =
+            colorPrefToColor(settingsPreferences.getString("app_drawer_background", "Black"))
         var alpha = settingsPreferences.getInt("app_drawer_background_alpha", 80)
         var backgroundColor = ColorUtils.setAlphaComponent(basicColor, alpha)
         widgetChooser.setBackgroundColor(backgroundColor)
@@ -47,9 +49,10 @@ class WidgetActivity : AppCompatActivity(), WidgetChooserAdapter.WidgetChooserIn
     override fun onWidgetChosen(position: Int) {
         appWidgetProviderInfo = installedProvs[position]
         appWidgetId = appWidgetHost.allocateAppWidgetId()
-        val canBind = appWidgetManager.bindAppWidgetIdIfAllowed(appWidgetId, appWidgetProviderInfo.provider)
+        val canBind =
+            appWidgetManager.bindAppWidgetIdIfAllowed(appWidgetId, appWidgetProviderInfo.provider)
 
-        if(!canBind){
+        if (!canBind) {
             val intent = Intent(AppWidgetManager.ACTION_APPWIDGET_BIND).apply {
                 putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId)
                 putExtra(AppWidgetManager.EXTRA_APPWIDGET_PROVIDER, appWidgetProviderInfo.provider)
@@ -61,7 +64,7 @@ class WidgetActivity : AppCompatActivity(), WidgetChooserAdapter.WidgetChooserIn
     }
 
     fun bindWidget() {
-        if(appWidgetProviderInfo.configure != null){
+        if (appWidgetProviderInfo.configure != null) {
             intent = Intent(AppWidgetManager.ACTION_APPWIDGET_CONFIGURE)
             intent.setComponent(appWidgetProviderInfo.configure)
             intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId)
@@ -77,7 +80,7 @@ class WidgetActivity : AppCompatActivity(), WidgetChooserAdapter.WidgetChooserIn
     }
 
     fun createWidget(data: Intent? = null) {
-        if(data != null) {
+        if (data != null) {
             val extras = data.extras
             if (extras != null) {
                 appWidgetId = extras.getInt(AppWidgetManager.EXTRA_APPWIDGET_ID, -1)
@@ -89,14 +92,14 @@ class WidgetActivity : AppCompatActivity(), WidgetChooserAdapter.WidgetChooserIn
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        if(resultCode == RESULT_OK) {
-            if(requestCode == REQUEST_PERMISSION) {
-                if(resultCode == RESULT_OK) {
+        if (resultCode == RESULT_OK) {
+            if (requestCode == REQUEST_PERMISSION) {
+                if (resultCode == RESULT_OK) {
                     bindWidget()
                 }
             }
 
-            if(requestCode == CONFIGURE_WIDGET) {
+            if (requestCode == CONFIGURE_WIDGET) {
                 createWidget(data)
             }
         } else {

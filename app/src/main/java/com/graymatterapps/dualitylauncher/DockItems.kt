@@ -11,6 +11,7 @@ data class DockItems(var activityNames: ArrayList<String> = ArrayList(),
     }
 
     private fun initialize(){
+        MainActivity.appList.waitForReady()
         MainActivity.appList.lock.lock()
         for(n in 0..7){
             add(MainActivity.appList.apps[n].activityName, MainActivity.appList.apps[n].packageName, MainActivity.appList.apps[n].userSerial)

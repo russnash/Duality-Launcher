@@ -1,3 +1,15 @@
+Version ?
+Changes:
+
+Bug fixes:
+
+Version 2020.8.22.1-internal
+Changes:
+- Added some developer tools to the settings to assist me with debugging.
+
+Bug fixes:
+- Fixed multiple lifecycle related bugs that were causing various crashes when the launcher was paused / resumed / destroyed / recreated / resized by the Android OS.
+
 Version 2020.8.17.1-internal
 Changes:
 - Removed add widget option from settings.

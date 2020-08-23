@@ -2,48 +2,48 @@ package com.graymatterapps.dualitylauncher
 
 import android.content.SharedPreferences
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
-import android.widget.LinearLayout
 import androidx.core.graphics.ColorUtils
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.graymatterapps.dualitylauncher.MainActivity.Companion.appList
+import com.graymatterapps.graymatterutils.GrayMatterUtils.colorPrefToColor
+import kotlinx.android.synthetic.main.fragment_drawer.*
 import kotlinx.android.synthetic.main.icon.view.*
 
 class DrawerFragment : Fragment(), SharedPreferences.OnSharedPreferenceChangeListener {
+
     lateinit var gridLayoutManager: GridLayoutManager
     lateinit var adapter: AppDrawerAdapter
-    lateinit var drawer: RecyclerView
-    lateinit var drawerLayout: LinearLayout
-    lateinit var buttonApps: Button
-    lateinit var buttonWork: Button
+
+    override fun onDestroy() {
+        prefs.unregisterOnSharedPreferenceChangeListener(this)
+        settingsPreferences.unregisterOnSharedPreferenceChangeListener(this)
+        super.onDestroy()
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        prefs.registerOnSharedPreferenceChangeListener(this)
-        settingsPreferences.registerOnSharedPreferenceChangeListener(this)
+        return inflater.inflate(R.layout.fragment_drawer, container, false)
+    }
 
-        val view = inflater.inflate(R.layout.fragment_drawer, container, false)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
-        drawer = view.findViewById(R.id.drawer)
         gridLayoutManager = GridLayoutManager(context?.applicationContext, 6)
         drawer.layoutManager = gridLayoutManager
         adapter = AppDrawerAdapter(requireContext(), appList.apps)
         drawer.adapter = adapter
         adapter.filterWork(false)
-
-        drawerLayout = view.findViewById(R.id.drawerLayout)
-
-        buttonApps = view.findViewById(R.id.buttonApps)
-        buttonWork = view.findViewById(R.id.buttonWork)
         buttonApps.alpha = 1.0f
         buttonWork.alpha = 0.5f
+
         buttonApps.setOnClickListener {
             adapter.filterWork(false)
             buttonApps.alpha = 1.0f
@@ -61,17 +61,12 @@ class DrawerFragment : Fragment(), SharedPreferences.OnSharedPreferenceChangeLis
         setDrawerBackground()
         notifyDataSetChanged()
 
-        return view
-    }
-
-    override fun onDestroy() {
-        prefs.unregisterOnSharedPreferenceChangeListener(this)
-        settingsPreferences.unregisterOnSharedPreferenceChangeListener(this)
-        super.onDestroy()
+        prefs.registerOnSharedPreferenceChangeListener(this)
+        settingsPreferences.registerOnSharedPreferenceChangeListener(this)
     }
 
     private fun setDrawerBackground() {
-        var basicColor = MainActivity.colorPrefToColor(
+        var basicColor = colorPrefToColor(
             settingsPreferences.getString(
                 "app_drawer_background",
                 "Black"
@@ -107,7 +102,7 @@ class DrawerFragment : Fragment(), SharedPreferences.OnSharedPreferenceChangeLis
 
     fun changeTextColors() {
         val color =
-            MainActivity.colorPrefToColor(settingsPreferences.getString("app_drawer_text", "White"))
+            colorPrefToColor(settingsPreferences.getString("app_drawer_text", "White"))
 
         var x: Int = drawer.childCount
         var i = 0

@@ -16,7 +16,17 @@
     </FrameLayout>
 
     <TextView
-        android:id="@+id/version"
+        android:id="@+id/versionName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="0"
+        android:paddingEnd="15dp"
+        android:paddingBottom="10dp"
+        android:textAlignment="textEnd">
+
+    </TextView>
+    <TextView
+        android:id="@+id/versionCode"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_weight="0"

@@ -12,15 +12,26 @@ import android.graphics.drawable.shapes.OvalShape
 import android.net.Uri
 import android.os.UserHandle
 import android.os.UserManager
+import com.graymatterapps.graymatterutils.GrayMatterUtils.longToast
 import java.util.concurrent.locks.ReentrantLock
 
-class AppList() {
+class AppList() : LauncherApps.Callback() {
     val apps: ArrayList<AppListDataType> = ArrayList()
     var ready: Boolean = false
     val lock = ReentrantLock()
+    var launcher: LauncherApps =
+        mainContext.getSystemService(Context.LAUNCHER_APPS_SERVICE) as LauncherApps
+    val userManager = mainContext.getSystemService(Context.USER_SERVICE) as UserManager
 
     init {
         updateApps()
+        launcher.registerCallback(this)
+    }
+
+    fun waitForReady(){
+        while (!ready) {
+            Thread.sleep(100)
+        }
     }
 
     fun updateApps() {
@@ -28,10 +39,7 @@ class AppList() {
             lock.lock()
             apps.clear()
 
-            val launcher: LauncherApps =
-                mainContext.getSystemService(Context.LAUNCHER_APPS_SERVICE) as LauncherApps
             val handles = launcher.profiles
-            val userMananger = mainContext.getSystemService(Context.USER_SERVICE) as UserManager
 
             handles.forEach { handle ->
                 val appList = launcher.getActivityList(null, handle)
@@ -41,7 +49,7 @@ class AppList() {
                     val packageName = apps.applicationInfo.packageName
                     val activityName = apps.componentName.className
                     val handle = apps.user
-                    val userSerial = userMananger.getSerialNumberForUser(handle)
+                    val userSerial = userManager.getSerialNumberForUser(handle)
                     this.apps.add(
                         AppListDataType(
                             name,
@@ -98,10 +106,6 @@ class AppList() {
 
     fun launchPackage(launchInfo: LaunchInfo, display: Int) {
         try {
-            val launcher: LauncherApps =
-                mainContext.getSystemService(Context.LAUNCHER_APPS_SERVICE) as LauncherApps
-            val userManager: UserManager =
-                mainContext.getSystemService(Context.USER_SERVICE) as UserManager
             val options = ActivityOptions.makeBasic()
             options.launchDisplayId = display
             val componentName =
@@ -109,20 +113,20 @@ class AppList() {
             val handle = userManager.getUserForSerialNumber(launchInfo.getUserSerial())
             launcher.startMainActivity(componentName, handle, null, options.toBundle())
         } catch (e: Exception) {
-            MainActivity.longToast("App failed to launch (" + e.message + ")")
+            longToast(mainContext, "App failed to launch (" + e.message + ")")
         }
     }
 
-    fun launchAppInfo(packageName: String, display: Int) {
+    fun launchAppInfo(launchInfo: LaunchInfo, display: Int) {
         try {
             val options = ActivityOptions.makeBasic()
             options.launchDisplayId = display
-            val intent: Intent =
-                Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
-            intent.data = Uri.parse("package:$packageName")
-            MainActivity.context.startActivity(intent, options.toBundle())
+            val componentName =
+                ComponentName(launchInfo.getPackageName(), launchInfo.getActivityName())
+            val handle = userManager.getUserForSerialNumber(launchInfo.getUserSerial())
+            launcher.startAppDetailsActivity(componentName, handle, null, options.toBundle())
         } catch (e: Exception) {
-            MainActivity.longToast("App Info failed to launch")
+            longToast(mainContext, "App Info failed to launch")
         }
     }
 
@@ -134,4 +138,24 @@ class AppList() {
         var handle: UserHandle,
         var userSerial: Long
     )
+
+    override fun onPackageRemoved(p0: String?, p1: UserHandle?) {
+        updateApps()
+    }
+
+    override fun onPackageAdded(p0: String?, p1: UserHandle?) {
+        updateApps()
+    }
+
+    override fun onPackageChanged(p0: String?, p1: UserHandle?) {
+        updateApps()
+    }
+
+    override fun onPackagesAvailable(p0: Array<out String>?, p1: UserHandle?, p2: Boolean) {
+        updateApps()
+    }
+
+    override fun onPackagesUnavailable(p0: Array<out String>?, p1: UserHandle?, p2: Boolean) {
+        updateApps()
+    }
 }

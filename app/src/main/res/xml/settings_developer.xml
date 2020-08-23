@@ -1,0 +1,8 @@
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <CheckBoxPreference
+        android:key="show_active_fragments"
+        android:title="Show active fragments"
+        android:defaultValue="false"/>
+
+</PreferenceScreen>

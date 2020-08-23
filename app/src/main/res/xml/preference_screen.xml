@@ -4,23 +4,30 @@
 
     <Preference
         android:title="Home Screen"
-        android:summary="Set home screen customizations"
+        android:summary="Customize the home screen"
         app:fragment="com.graymatterapps.dualitylauncher.SettingsHomeFragment" />
     <Preference
         android:title="App Drawer"
-        android:summary="Set app drawer customizations"
+        android:summary="Customize the app drawer"
         app:fragment="com.graymatterapps.dualitylauncher.SettingsDrawerFragment" />
     <Preference
         android:title="Status Bar"
-        android:summary="Set status bar customizations"
+        android:summary="Customize the status bar"
         app:fragment="com.graymatterapps.dualitylauncher.SettingsStatusBarFragment" />
     <Preference
         android:title="Navigation Bar"
-        android:summary="Set navigation bar customizations"
+        android:summary="Customize the navigation bar"
         app:fragment="com.graymatterapps.dualitylauncher.SettingsNavBarFragment" />
     <Preference
         android:title="Wallpaper"
         android:summary="Set the wallpaper"
         app:fragment="com.graymatterapps.dualitylauncher.SettingsWallpaperFragment" />
+
+    <PreferenceCategory>
+        <Preference
+            android:title="Developer Tools"
+            android:summary="Here be dragons..."
+            app:fragment="com.graymatterapps.dualitylauncher.SettingsDeveloper"/>
+    </PreferenceCategory>
 
 </androidx.preference.PreferenceScreen>

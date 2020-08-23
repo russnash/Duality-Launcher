@@ -12,13 +12,15 @@ import android.widget.TableRow
 import androidx.core.graphics.ColorUtils
 import androidx.preference.PreferenceManager
 import com.graymatterapps.dualitylauncher.MainActivity.Companion.appList
+import com.graymatterapps.graymatterutils.GrayMatterUtils.colorPrefToColor
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
-class Dock(context: Context, attrs: AttributeSet): LinearLayout(context, attrs),
+class Dock(context: Context, attrs: AttributeSet) : LinearLayout(context, attrs),
     SharedPreferences.OnSharedPreferenceChangeListener, Icon.IconInterface {
-    val settingsPreferences: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
+    val settingsPreferences: SharedPreferences =
+        PreferenceManager.getDefaultSharedPreferences(context)
     lateinit var listener: DockInterface
     var prefs: SharedPreferences
     var dockItems = DockItems()
@@ -36,15 +38,24 @@ class Dock(context: Context, attrs: AttributeSet): LinearLayout(context, attrs),
         setDockBackground()
     }
 
-    fun populateDock(){
+    fun populateDock() {
         val totalItemsString = settingsPreferences.getString("dock_icons", "6")
         val totalItems = Integer.parseInt(totalItemsString)
         dockRow.removeAllViews()
 
         if (totalItems != null) {
-            for(n in 0..(totalItems -1)){
-                var dockIcon = Icon(context, null, dockItems.activityNames[n], dockItems.packageNames[n], dockItems.userSerials[n])
-                var params = TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT)
+            for (n in 0..(totalItems - 1)) {
+                var dockIcon = Icon(
+                    context,
+                    null,
+                    dockItems.activityNames[n],
+                    dockItems.packageNames[n],
+                    dockItems.userSerials[n]
+                )
+                var params = TableRow.LayoutParams(
+                    TableRow.LayoutParams.WRAP_CONTENT,
+                    TableRow.LayoutParams.WRAP_CONTENT
+                )
                 params.width = 0
                 dockIcon.layoutParams = params
                 dockIcon.label.height = 0
@@ -55,13 +66,18 @@ class Dock(context: Context, attrs: AttributeSet): LinearLayout(context, attrs),
         }
     }
 
-    fun persistDock(){
+    fun persistDock() {
         dockItems.activityNames.clear()
         dockItems.packageNames.clear()
         dockItems.userSerials.clear()
-        for(n in 0 until dockRow.childCount){
+        for (n in 0 until dockRow.childCount) {
             val dockIcon: Icon = dockRow.getChildAt(n) as Icon
-            dockItems.add(dockIcon.launchInfo.getActivityName(), dockIcon.launchInfo.getPackageName(), dockIcon.launchInfo.getUserSerial())
+            val launchInfo = dockIcon.getLaunchInfo()
+            dockItems.add(
+                launchInfo.getActivityName(),
+                launchInfo.getPackageName(),
+                launchInfo.getUserSerial()
+            )
         }
         val saveItJson = Json.encodeToString(dockItems)
         val editor = prefs.edit()
@@ -69,21 +85,24 @@ class Dock(context: Context, attrs: AttributeSet): LinearLayout(context, attrs),
         editor.apply()
     }
 
-    fun depersistDock(){
-        while(!appList.ready) {
-            Thread.sleep(100)
-        }
-        val loadItJson = prefs.getString("dockItems","")
-        if(loadItJson != ""){
+    fun depersistDock() {
+        appList.waitForReady()
+        val loadItJson = prefs.getString("dockItems", "")
+        if (loadItJson != "") {
             dockItems = loadItJson?.let { Json.decodeFromString(it) }!!
         }
     }
 
-    fun setDockBackground(){
-        if(!settingsPreferences.getBoolean("dock_background", false)) {
+    fun setDockBackground() {
+        if (!settingsPreferences.getBoolean("dock_background", false)) {
             dockTable.setBackgroundColor(Color.TRANSPARENT)
         } else {
-            var basicColor = MainActivity.colorPrefToColor(this.settingsPreferences.getString("dock_background_color", "Light Gray"))
+            var basicColor = colorPrefToColor(
+                this.settingsPreferences.getString(
+                    "dock_background_color",
+                    "Light Gray"
+                )
+            )
             var alpha = this.settingsPreferences.getInt("dock_background_alpha", 80)
             var color = ColorUtils.setAlphaComponent(basicColor, alpha)
             dockTable.setBackgroundColor(color)
@@ -91,25 +110,25 @@ class Dock(context: Context, attrs: AttributeSet): LinearLayout(context, attrs),
     }
 
     override fun onSharedPreferenceChanged(sharedPrefences: SharedPreferences?, key: String?) {
-        if(key == "dockItems"){
+        if (key == "dockItems") {
             depersistDock()
             populateDock()
         }
 
-        if(key == "dock_icons"){
+        if (key == "dock_icons") {
             depersistDock()
             populateDock()
         }
 
-        if(key == "dock_background"){
+        if (key == "dock_background") {
             setDockBackground()
         }
 
-        if(key == "dock_background_color"){
+        if (key == "dock_background_color") {
             setDockBackground()
         }
 
-        if(key == "dock_background_alpha"){
+        if (key == "dock_background_alpha") {
             setDockBackground()
         }
     }
@@ -118,7 +137,7 @@ class Dock(context: Context, attrs: AttributeSet): LinearLayout(context, attrs),
         listener = mainActivity
     }
 
-    interface DockInterface{
+    interface DockInterface {
         fun onDragStarted(view: View, clipData: ClipData)
     }
 

@@ -4,9 +4,9 @@ import android.app.Activity
 import android.content.Context
 import android.util.AttributeSet
 import android.view.MotionEvent
-import android.widget.LinearLayout
+import androidx.constraintlayout.widget.ConstraintLayout
 
-class GestureLayout(context: Context, attributeSet: AttributeSet): LinearLayout(context, attributeSet) {
+class GestureLayout(context: Context, attributeSet: AttributeSet): ConstraintLayout(context, attributeSet) {
 
     lateinit var listener: GestureEvents
     private var areGesturesOn: Boolean = false
