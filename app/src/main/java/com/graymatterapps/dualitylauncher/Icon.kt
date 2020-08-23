@@ -11,10 +11,9 @@ import android.view.View
 import android.view.WindowManager
 import android.widget.ImageView
 import android.widget.LinearLayout
-import android.widget.TableLayout
+import android.widget.TableRow
 import android.widget.TextView
 import androidx.core.graphics.ColorUtils
-import androidx.gridlayout.widget.GridLayout
 import com.graymatterapps.dualitylauncher.MainActivity.Companion.appList
 import com.graymatterapps.dualitylauncher.MainActivity.Companion.dragAndDropData
 
@@ -30,7 +29,7 @@ class Icon(private val con: Context,
     constructor(con: Context, attrs: AttributeSet?, activityInfo: String, packageInfo: String, userSerial: Long) : this(con, attrs, activityInfo, packageInfo, userSerial, true, false)
 
     private lateinit var listener: IconInterface
-    var parentLayout: TableLayout
+    lateinit var parentLayout: TableRow
     var iconLayout: LinearLayout
     var icon: ImageView
     var label: TextView
@@ -42,7 +41,7 @@ class Icon(private val con: Context,
 
     init {
         inflate(context, R.layout.icon, this)
-        parentLayout = this.parent as TableLayout
+
         val wm = context.getSystemService(Context.WINDOW_SERVICE) as WindowManager
         displayId = wm.defaultDisplay.displayId
 
@@ -110,6 +109,13 @@ class Icon(private val con: Context,
                 }
                 true
             }
+        }
+    }
+
+    override fun onAttachedToWindow() {
+        super.onAttachedToWindow()
+        if(this.parent is TableRow){
+            parentLayout = this.parent as TableRow
         }
     }
 

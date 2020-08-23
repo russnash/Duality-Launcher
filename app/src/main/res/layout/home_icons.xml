@@ -27,18 +27,4 @@
 
     </FrameLayout>
 
-    <androidx.gridlayout.widget.GridLayout
-        android:id="@+id/widgetLayout"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:visibility="invisible"
-        app:columnCount="8"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:rowCount="8">
-
-    </androidx.gridlayout.widget.GridLayout>
-
 </androidx.constraintlayout.widget.ConstraintLayout>

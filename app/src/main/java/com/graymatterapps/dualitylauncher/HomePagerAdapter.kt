@@ -84,18 +84,6 @@ class HomePagerAdapter(private val context: Context) :
             }
             homeIconsTable.addView(tableRow)
         }
-
-        val widgetLayout = itemView.findViewById<GridLayout>(R.id.widgetLayout)
-
-        var params = GridLayout.LayoutParams()
-        for (x in 0..7) {
-            for (y in 0..7) {
-                val widgetPlaceholder = GridPlaceholder(context)
-                params.columnSpec = GridLayout.spec(x)
-                params.rowSpec = GridLayout.spec(y)
-                widgetLayout.addView(widgetPlaceholder, params)
-            }
-        }
     }
 
     override fun getItemCount(): Int {
