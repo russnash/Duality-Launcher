@@ -4,21 +4,29 @@ import android.annotation.SuppressLint
 import android.appwidget.AppWidgetHost
 import android.appwidget.AppWidgetManager
 import android.appwidget.AppWidgetProviderInfo
-import android.content.*
+import android.content.ClipData
+import android.content.Context
+import android.content.Intent
+import android.content.SharedPreferences
 import android.graphics.Color
+import android.graphics.drawable.Drawable
 import android.hardware.display.DisplayManager
 import android.os.Bundle
-import android.view.View
-import android.view.WindowManager
+import android.view.*
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
 import android.widget.ArrayAdapter
+import android.widget.Button
+import android.widget.PopupWindow
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.graphics.ColorUtils
 import androidx.customview.widget.ExploreByTouchHelper
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentManager
 import androidx.preference.PreferenceManager
 import com.graymatterapps.graymatterutils.GrayMatterUtils.colorPrefToColor
 import com.graymatterapps.graymatterutils.GrayMatterUtils.getVersionCode
+import com.graymatterapps.graymatterutils.GrayMatterUtils.shortToast
 import com.graymatterapps.graymatterutils.GrayMatterUtils.showOkDialog
 import kotlinx.android.synthetic.main.activity_main.*
 
@@ -41,6 +49,7 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
     lateinit var homeFragment: HomeFragment
     lateinit var drawerFragment: DrawerFragment
     lateinit var settingsFragment: SettingsFragment
+    lateinit var displayManager: DisplayManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -49,6 +58,7 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
         prefs = mainContext.getSharedPreferences(PREFS_FILENAME, 0)
         settingsPreferences = PreferenceManager.getDefaultSharedPreferences(this)
         settingsPreferences.registerOnSharedPreferenceChangeListener(this)
+        displayManager = getSystemService(Context.DISPLAY_SERVICE) as DisplayManager
         initCompanion()
         appList.waitForReady()
 
@@ -68,6 +78,56 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
         appWidgetHost = AppWidgetHost(applicationContext, ExploreByTouchHelper.HOST_ID)
         appWidgetManager = AppWidgetManager.getInstance(applicationContext)
         appWidgetHost.startListening()
+        displayManager.registerDisplayListener(object: DisplayManager.DisplayListener{
+            override fun onDisplayAdded(p0: Int) {
+                updateDisplayInfo()
+            }
+
+            override fun onDisplayRemoved(p0: Int) {
+                updateDisplayInfo()
+            }
+
+            override fun onDisplayChanged(p0: Int) {
+                updateDisplayInfo()
+            }
+
+        }, null)
+        supportFragmentManager.registerFragmentLifecycleCallbacks(object:
+            FragmentManager.FragmentLifecycleCallbacks(){
+            override fun onFragmentAttached(fm: FragmentManager, f: Fragment, context: Context) {
+                super.onFragmentAttached(fm, f, context)
+                updateFragmentList()
+            }
+
+            override fun onFragmentCreated(
+                fm: FragmentManager,
+                f: Fragment,
+                savedInstanceState: Bundle?
+            ) {
+                super.onFragmentCreated(fm, f, savedInstanceState)
+                updateFragmentList()
+            }
+
+            override fun onFragmentDestroyed(fm: FragmentManager, f: Fragment) {
+                super.onFragmentDestroyed(fm, f)
+                updateFragmentList()
+            }
+
+            override fun onFragmentDetached(fm: FragmentManager, f: Fragment) {
+                super.onFragmentDetached(fm, f)
+                updateFragmentList()
+            }
+
+            override fun onFragmentStarted(fm: FragmentManager, f: Fragment) {
+                super.onFragmentStarted(fm, f)
+                updateFragmentList()
+            }
+
+            override fun onFragmentStopped(fm: FragmentManager, f: Fragment) {
+                super.onFragmentStopped(fm, f)
+                updateFragmentList()
+            }
+        }, true)
 
         if (savedInstanceState == null) {
             supportFragmentManager
@@ -78,6 +138,7 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
             showHome()
         }
         updateFragmentList()
+        updateDisplayInfo()
 
         prefs = this.getSharedPreferences(PREFS_FILENAME, 0)
 
@@ -96,7 +157,6 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
     }
 
     fun isMainDisplay(): Boolean {
-        val displayManager = getSystemService(Context.DISPLAY_SERVICE) as DisplayManager
         val displays = displayManager.displays
         val currentDisplay = windowManager.getDefaultDisplay().displayId
         return displays[0].displayId == currentDisplay
@@ -166,7 +226,6 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
             .beginTransaction()
             .replace(R.id.fragmentFrame, homeFragment, "home")
             .commit()
-        updateFragmentList()
     }
 
     fun closeAppDrawer() {
@@ -184,7 +243,6 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
         if (settingsFragment.isVisible) {
             showHome()
         }
-        updateFragmentList()
     }
 
     override fun onResume() {
@@ -218,7 +276,30 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
     }
 
     override fun onLongClick() {
-        openSettings()
+        gestureLayout.setGesturesOn(false)
+        val layoutInflater = getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+        val popupView = layoutInflater.inflate(R.layout.home_screen_menu, null)
+        val popupWindow = PopupWindow(popupView,
+            ViewGroup.LayoutParams.WRAP_CONTENT,
+            ViewGroup.LayoutParams.WRAP_CONTENT)
+        val buttonActionSettings = popupView.findViewById<Button>(R.id.buttonActionSettings)
+        buttonActionSettings.setOnClickListener {
+            openSettings()
+            popupWindow.dismiss()
+            gestureLayout.setGesturesOn(true)
+        }
+        val buttonActionWidget = popupView.findViewById<Button>(R.id.buttonActionWidget)
+        buttonActionWidget.setOnClickListener{
+            popupWindow.dismiss()
+            gestureLayout.setGesturesOn(true)
+        }
+        popupWindow.setOnDismissListener {
+            gestureLayout.setGesturesOn(true)
+        }
+        //popupWindow.setBackgroundDrawable(resources.getDrawable(R.drawable.popup_window_background))
+        popupWindow.isOutsideTouchable = true
+        popupWindow.isFocusable = true
+        popupWindow.showAtLocation(gestureLayout, Gravity.CENTER, 0, 0)
     }
 
     override fun onSharedPreferenceChanged(sharedPrefs: SharedPreferences?, key: String?) {
@@ -257,6 +338,10 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
         if (key == "show_active_fragments") {
             updateFragmentList()
         }
+
+        if(key == "show_display_info") {
+            updateDisplayInfo()
+        }
     }
 
     override fun onAnimationRepeat(p0: Animation?) {
@@ -278,7 +363,6 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
             .beginTransaction()
             .replace(R.id.fragmentFrame, drawerFragment, "drawer")
             .commit()
-        updateFragmentList()
         val animation = AnimationUtils.loadAnimation(this@MainActivity, R.anim.slide_up)
         fragmentFrame.startAnimation(animation)
         var basicColor = colorPrefToColor(
@@ -354,6 +438,23 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
         editor.apply()
     }
 
+    fun updateDisplayInfo() {
+        if(settingsPreferences.getBoolean("show_display_info", false)) {
+            displayList.visibility = View.VISIBLE
+            val dispList = displayManager.displays
+            val dispTags = ArrayList<String>()
+            dispTags.add("This display = ID:${windowManager.defaultDisplay.displayId}, Name:${windowManager.defaultDisplay.name}")
+            dispList.forEach {
+                dispTags.add("ID:${it.displayId}, State:${it.state}, Name:${it.name}")
+            }
+            val adapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, dispTags)
+            displayList.adapter = adapter
+            adapter.notifyDataSetChanged()
+        } else {
+            displayList.visibility = View.INVISIBLE
+        }
+    }
+
     fun updateFragmentList() {
         if (settingsPreferences.getBoolean("show_active_fragments", false)) {
             fragmentList.visibility = View.VISIBLE
@@ -368,5 +469,10 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
         } else {
             fragmentList.visibility = View.INVISIBLE
         }
+    }
+
+    override fun updateAppList() {
+        appList.updateApps()
+        shortToast(this, "AppList update forced...")
     }
 }

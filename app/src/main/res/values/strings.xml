@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name">Duality Launcher</string>
     <string name="action_settings">Settings</string>
+    <string name="action_add_widget">Add Widget</string>
     <string name="action_uninstall">Uninstall</string>
     <string name="action_appinfo">App Info</string>
     <string name="pref_app_drawer">App Drawer</string>

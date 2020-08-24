@@ -37,6 +37,7 @@ class Icon(private val con: Context,
     private val displayId: Int
     private var dragTarget = true
     private var blankOnDrag = false
+    private var isDockIcon = false
     private val enteredColor = ColorUtils.setAlphaComponent(Color.GREEN, 80)
 
     init {
@@ -67,12 +68,14 @@ class Icon(private val con: Context,
             icon.setOnDragListener { view, dragEvent ->
                 if (dragEvent != null) {
 
-                    // Check the clip description label and only respond to drag events if its
-                    // a "launchInfo" drag (another Icon)
                     var respondToDrag = false
                     try{
                         if(dragEvent.clipDescription.label.toString().equals("launchInfo")){
                             respondToDrag = true
+                        }
+                        if(dragEvent.clipDescription.label.toString().equals("widget")){
+                            // Dock icons don't respond to widget drags!
+                            respondToDrag = !isDockIcon
                         }
                     } catch (e: Exception) {
                         respondToDrag = false
@@ -188,6 +191,10 @@ class Icon(private val con: Context,
 
     fun setBlankOnDrag(state: Boolean){
         blankOnDrag = state
+    }
+
+    fun setIsDockIcon(state: Boolean){
+        isDockIcon = state
     }
 
     fun convertToWidget(appWidgetId: Int, appWidgetProviderInfo: AppWidgetProviderInfo){

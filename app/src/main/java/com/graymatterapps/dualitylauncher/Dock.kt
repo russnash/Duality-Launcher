@@ -61,6 +61,7 @@ class Dock(context: Context, attrs: AttributeSet) : LinearLayout(context, attrs)
                 dockIcon.label.height = 0
                 dockIcon.setListener(this)
                 dockIcon.setBlankOnDrag(true)
+                dockIcon.setIsDockIcon(true)
                 dockRow.addView(dockIcon)
             }
         }
