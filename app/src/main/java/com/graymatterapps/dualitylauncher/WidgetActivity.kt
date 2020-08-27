@@ -3,7 +3,9 @@ package com.graymatterapps.dualitylauncher
 import android.appwidget.AppWidgetManager
 import android.appwidget.AppWidgetProviderInfo
 import android.content.Intent
+import android.graphics.drawable.Drawable
 import android.os.Bundle
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.graphics.ColorUtils
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -19,6 +21,7 @@ class WidgetActivity : AppCompatActivity(), WidgetChooserAdapter.WidgetChooserIn
     lateinit var widgetChooser: RecyclerView
     lateinit var widgetChooserAdapter: RecyclerView.Adapter<*>
     lateinit var widgetChooserManager: RecyclerView.LayoutManager
+    lateinit var widgetPreviewImage: Drawable
     private var appWidgetId: Int = 0
     private lateinit var appWidgetProviderInfo: AppWidgetProviderInfo
     private lateinit var listener: WidgetInterface
@@ -46,8 +49,9 @@ class WidgetActivity : AppCompatActivity(), WidgetChooserAdapter.WidgetChooserIn
         listener = mainContext as WidgetInterface
     }
 
-    override fun onWidgetChosen(position: Int) {
+    override fun onWidgetChosen(position: Int, view: View) {
         appWidgetProviderInfo = installedProvs[position]
+        widgetPreviewImage = installedProvs[position].loadPreviewImage(mainContext, -1)
         appWidgetId = appWidgetHost.allocateAppWidgetId()
         val canBind =
             appWidgetManager.bindAppWidgetIdIfAllowed(appWidgetId, appWidgetProviderInfo.provider)
@@ -87,7 +91,7 @@ class WidgetActivity : AppCompatActivity(), WidgetChooserAdapter.WidgetChooserIn
                 appWidgetProviderInfo = appWidgetManager.getAppWidgetInfo(appWidgetId)
             }
         }
-        listener.onAddWidget(appWidgetId, appWidgetProviderInfo)
+        listener.onAddWidget(appWidgetId, appWidgetProviderInfo, widgetPreviewImage)
         finish()
     }
 
@@ -110,6 +114,6 @@ class WidgetActivity : AppCompatActivity(), WidgetChooserAdapter.WidgetChooserIn
     }
 
     interface WidgetInterface {
-        fun onAddWidget(widgetView: Int, appWidgetProviderInfo: AppWidgetProviderInfo)
+        fun onAddWidget(widgetView: Int, appWidgetProviderInfo: AppWidgetProviderInfo, widgetPreviewImage: Drawable)
     }
 }

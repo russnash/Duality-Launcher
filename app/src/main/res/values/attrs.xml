@@ -4,4 +4,16 @@
         <attr name="dragTarget" format="boolean"/>
         <attr name="blankOnDrag" format="boolean"/>
     </declare-styleable>
+
+    <declare-styleable name="HomeLayout">
+        <attr name="numColumns" format="integer"/>
+        <attr name="numRows" format="integer"/>
+    </declare-styleable>
+
+    <declare-styleable name="HomeLayout_LayoutParams">
+        <attr name="row" format="integer"/>
+        <attr name="column" format="integer"/>
+        <attr name="rowSpan" format="integer"/>
+        <attr name="columnSpan" format="integer"/>
+    </declare-styleable>
 </resources>

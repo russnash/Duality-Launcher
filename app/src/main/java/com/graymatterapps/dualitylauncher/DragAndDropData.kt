@@ -3,7 +3,7 @@ package com.graymatterapps.dualitylauncher
 class DragAndDropData() {
     var ids: MutableList<String> = ArrayList()
     var launchInfos: MutableList<LaunchInfo> = ArrayList()
-    var widgetIds: MutableList<Int> = ArrayList()
+    var widgets: MutableList<WidgetInfo> = ArrayList()
 
     fun addLaunchInfo(launchInfo: LaunchInfo, id: String){
         reset()
@@ -18,15 +18,15 @@ class DragAndDropData() {
         return launchInfo
     }
 
-    fun addWidget(widgetId: Int, id: String) {
+    fun addWidget(widgetInfo: WidgetInfo, id: String) {
         reset()
         ids.add(id)
-        widgetIds.add(widgetId)
+        widgets.add(widgetInfo)
     }
 
-    fun retrieveWidgetId(id: String) : Int {
+    fun retrieveWidgetId(id: String) : WidgetInfo {
         val position = ids.indexOf(id)
-        val widgetId = widgetIds[position]
+        val widgetId = widgets[position]
         reset()
         return widgetId
     }
@@ -34,6 +34,6 @@ class DragAndDropData() {
     fun reset(){
         ids.clear()
         launchInfos.clear()
-        widgetIds.clear()
+        widgets.clear()
     }
 }

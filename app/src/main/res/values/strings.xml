@@ -15,4 +15,6 @@
     <string name="button_personal">Personal</string>
     <string name="button_work">Work</string>
     <string name="acra_dialog_text">Duality Launcher has crashed, please help the developer by following the prompts to send the crash report via email.  Please add any extra info, such as what you were doing when the crash occurred, to the email body.  Thanks for helping to make Duality Launcher better!</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

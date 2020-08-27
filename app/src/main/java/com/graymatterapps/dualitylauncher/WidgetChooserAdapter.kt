@@ -34,12 +34,10 @@ class WidgetChooserAdapter(
         preview.setImageDrawable(widgets[position].loadPreviewImage(context, -1))
         description.text = widgets[position].loadLabel(context.packageManager)
         description.setTextColor(textColor)
-        preview.setOnClickListener { listener.onWidgetChosen(position) }
-    }
-
-    override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
-        listener = context as WidgetChooserInterface
-        super.onAttachedToRecyclerView(recyclerView)
+        preview.setOnLongClickListener {
+            listener.onWidgetChosen(position, it)
+            true
+        }
     }
 
     override fun getItemCount(): Int {
@@ -47,10 +45,10 @@ class WidgetChooserAdapter(
     }
 
     fun setListener(ear: WidgetChooserInterface) {
-        listener = ear as WidgetChooserInterface
+        listener = ear
     }
 
     interface WidgetChooserInterface {
-        fun onWidgetChosen(position: Int)
+        fun onWidgetChosen(position: Int, view: View)
     }
 }

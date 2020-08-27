@@ -4,18 +4,19 @@ import android.appwidget.AppWidgetProviderInfo
 import android.content.ClipData
 import android.content.SharedPreferences
 import android.graphics.Color
+import android.graphics.drawable.Drawable
 import android.os.Bundle
+import android.util.Log
 import android.view.DragEvent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
-import android.widget.TableLayout
 import android.widget.TableRow
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
-import androidx.gridlayout.widget.GridLayout
 import androidx.viewpager2.widget.ViewPager2
+import com.graymatterapps.dualitylauncher.MainActivity.Companion.dragAndDropData
 import com.graymatterapps.graymatterutils.GrayMatterUtils.colorPrefToColor
 import kotlinx.android.synthetic.main.fragment_home.*
 import kotlinx.serialization.encodeToString
@@ -24,6 +25,7 @@ import kotlinx.serialization.json.Json
 class HomeFragment : Fragment(), SharedPreferences.OnSharedPreferenceChangeListener {
 
     lateinit var homePagerAdapter: HomePagerAdapter
+    val TAG = "HomeFragment"
 
     override fun onDestroy() {
         prefs.unregisterOnSharedPreferenceChangeListener(this)
@@ -131,19 +133,28 @@ class HomeFragment : Fragment(), SharedPreferences.OnSharedPreferenceChangeListe
     }
 
     fun persistGrid(position: Int) {
+        Log.d(TAG, "persistGrid()")
         var homeIconsGrid = HomeIconsGrid()
+        var homeWidgetsGrid = HomeWidgetsGrid()
         val view = homePager.findViewWithTag<View>(position)
-        val homeIconsTable = view.findViewById<TableLayout>(R.id.homeIconsTable)
-        for (y in 0 until homeIconsTable.childCount) {
-            val dockRow: TableRow = homeIconsTable.getChildAt(y) as TableRow
-            for (x in 0 until dockRow.childCount) {
-                val icon: Icon = dockRow.getChildAt(x) as Icon
-                homeIconsGrid.change(x, y, icon.getLaunchInfo())
+        val homeIconsTable = view.findViewById<HomeLayout>(R.id.homeIconsTable)
+        for (n in 0 until homeIconsTable.childCount) {
+            if (homeIconsTable.getChildAt(n) is Icon) {
+                val child = homeIconsTable.getChildAt(n) as Icon
+                val childParams = child.layoutParams as HomeLayout.LayoutParams
+                homeIconsGrid.change(childParams.row, childParams.column, child.getLaunchInfo())
+            }
+            if (homeIconsTable.getChildAt(n) is WidgetContainer) {
+                val child = homeIconsTable.getChildAt(n) as WidgetContainer
+                val childParams = child.layoutParams as HomeLayout.LayoutParams
+                homeWidgetsGrid.change(childParams.row, childParams.column, child.appWidgetId)
             }
         }
-        val saveItJson = Json.encodeToString(homeIconsGrid)
+        var saveItJson = Json.encodeToString(homeIconsGrid)
         val editor = prefs.edit()
         editor.putString("homeIconsGrid" + position, saveItJson)
+        saveItJson = Json.encodeToString(homeWidgetsGrid)
+        editor.putString("homeWidgetsGrid" + position, saveItJson)
         editor.apply()
     }
 
@@ -154,7 +165,7 @@ class HomeFragment : Fragment(), SharedPreferences.OnSharedPreferenceChangeListe
                 homePagerAdapter.notifyDataSetChanged()
             }
             if (key == "apps") {
-                if(dock != null){
+                if (dock != null) {
                     dock.populateDock()
                 }
             }
@@ -183,19 +194,6 @@ class HomeFragment : Fragment(), SharedPreferences.OnSharedPreferenceChangeListe
     fun startDrag(view: View, clipData: ClipData) {
         val dsb = View.DragShadowBuilder(view)
         view.startDrag(clipData, dsb, view, 0)
-    }
-
-    fun addWidget(appWidgetId: Int, appWidgetProviderInfo: AppWidgetProviderInfo, position: Int) {
-        val view = homePager.findViewWithTag<View>(position)
-        //val widgetLayout = view.findViewById<GridLayout>(R.id.widgetLayout)
-        val widgetContainer = activity?.applicationContext?.let {
-            WidgetContainer(
-                it,
-                appWidgetId,
-                appWidgetProviderInfo
-            )
-        }
-        //widgetLayout.addView(widgetContainer)
     }
 
     fun getCurrentHomePagerItem(): Int {

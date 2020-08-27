@@ -1,55 +1,89 @@
 package com.graymatterapps.dualitylauncher
 
 import android.appwidget.AppWidgetHostView
+import android.appwidget.AppWidgetManager
 import android.appwidget.AppWidgetProviderInfo
 import android.content.ClipData
 import android.content.Context
+import android.content.Intent
 import android.view.GestureDetector
 import android.view.MotionEvent
 import android.widget.FrameLayout
-import android.widget.TableLayout
-import androidx.gridlayout.widget.GridLayout
 import com.graymatterapps.dualitylauncher.MainActivity.Companion.dragAndDropData
 
-class WidgetContainer(context: Context, private val appWidgetId: Int, private val appWidgetProviderInfo: AppWidgetProviderInfo): FrameLayout(context), GestureDetector.OnGestureListener{
+class WidgetContainer(
+    context: Context,
+    var appWidgetId: Int,
+    private var appWidgetProviderInfo: AppWidgetProviderInfo,
+    val bind: Boolean = false
+) : FrameLayout(context), GestureDetector.OnGestureListener {
 
-    lateinit var appWidget: AppWidgetHostView
-    lateinit var parentLayout: TableLayout
+    lateinit var appWidgetHostView: AppWidgetHostView
     lateinit var gestureDetector: GestureDetector
-    var cellWidth: Int = 0
-    var cellHeight: Int = 0
+    lateinit var parentLayout: HomeLayout
+    var neededWidth: Int = 0
+    var neededHeight: Int = 0
+    var isWaitingForPermission: Boolean = false
+    lateinit var listener: WidgetInterface
+
+    init {
+        if(bind){
+            if(appWidgetManager.bindAppWidgetIdIfAllowed(appWidgetId, appWidgetProviderInfo.provider)){
+                bindWidget()
+            } else {
+                listener = mainContext as WidgetInterface
+                isWaitingForPermission = true
+                listener.needPermissionToBind(appWidgetId, appWidgetProviderInfo)
+            }
+        }
+        appWidgetHostView = appWidgetHost.createView(appContext, appWidgetId, appWidgetProviderInfo)
+        neededWidth =
+            appWidgetProviderInfo.minWidth + appWidgetHostView.paddingLeft + appWidgetHostView.paddingRight
+        neededHeight =
+            appWidgetProviderInfo.minHeight + appWidgetHostView.paddingTop + appWidgetHostView.paddingBottom
+        appWidgetHostView.minimumWidth = neededWidth
+        appWidgetHostView.minimumHeight = neededHeight
+        appWidgetHostView.setPadding(0, 0, 0, 0)
+        appWidgetHostView.updateAppWidgetSize(
+            null,
+            appWidgetProviderInfo.minWidth,
+            appWidgetProviderInfo.minHeight,
+            appWidgetProviderInfo.minWidth,
+            appWidgetProviderInfo.minHeight
+        )
+        this.addView(appWidgetHostView)
+    }
 
     override fun onAttachedToWindow() {
+        parentLayout = this.parent as HomeLayout
         gestureDetector = GestureDetector(context, this)
-
-        parentLayout = this.parent as TableLayout
-        cellWidth = parentLayout.width / 8
-        cellHeight = parentLayout.height / 8
-
-        appWidget = appWidgetHost.createView(context, appWidgetId, appWidgetProviderInfo)
-        val neededWidth = appWidgetProviderInfo.minWidth + appWidget.paddingLeft + appWidget.paddingRight
-        val neededHeight = appWidgetProviderInfo.minHeight + appWidget.paddingTop + appWidget.paddingBottom
-        val neededColumns = (neededWidth + cellWidth -1) / cellWidth
-        val neededRows = (neededHeight + cellHeight -1) / cellHeight
-        val params = GridLayout.LayoutParams()
-        params.columnSpec = GridLayout.spec(0, neededColumns)
-        params.rowSpec = GridLayout.spec(0, neededRows)
-        this.layoutParams = params
-        appWidget.minimumWidth = neededWidth
-        appWidget.minimumHeight = neededHeight
-        appWidget.setPadding(0, 0, 0, 0)
-        appWidget.updateAppWidgetSize(null, appWidgetProviderInfo.minWidth, appWidgetProviderInfo.minHeight, appWidgetProviderInfo.minWidth, appWidgetProviderInfo.minHeight)
-        this.addView(appWidget)
-
         super.onAttachedToWindow()
     }
 
-    fun convertToIcon(launchInfo: LaunchInfo){
+    fun bindWidget(data: Intent? = null){
+        isWaitingForPermission = false
+        if(data != null){
+            val extras = data.extras
+            if (extras != null) {
+                appWidgetId = extras.getInt(AppWidgetManager.EXTRA_APPWIDGET_ID, -1)
+                appWidgetProviderInfo = appWidgetManager.getAppWidgetInfo(appWidgetId)
+            }
+        }
+    }
+
+    fun convertToIcon() {
         val icon = Icon(mainContext, null)
+        val launchInfo = LaunchInfo()
         icon.setLaunchInfo(launchInfo)
         icon.setBlankOnDrag(true)
-        parentLayout.addView(icon)
+        val params = this.layoutParams as HomeLayout.LayoutParams
+        icon.layoutParams = params
+        parentLayout.addView(icon, params)
         parentLayout.removeView(this)
+    }
+
+    override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
+        setMeasuredDimension(neededWidth, neededHeight)
     }
 
     override fun onInterceptTouchEvent(event: MotionEvent?): Boolean {
@@ -75,15 +109,20 @@ class WidgetContainer(context: Context, private val appWidgetId: Int, private va
 
     override fun onLongPress(p0: MotionEvent?) {
         val id = System.currentTimeMillis().toString()
-        dragAndDropData.addWidget(appWidgetId, id)
-        val clipData = ClipData.newPlainText("widget", appWidgetId.toString())
+        val widgetInfo = WidgetInfo(appWidgetId, appWidgetProviderInfo, null)
+        dragAndDropData.addWidget(widgetInfo, id)
+        val clipData = ClipData.newPlainText("widget", id)
         val dsb = DragShadowBuilder(this)
-        this.startDrag(clipData, dsb, this, 0)
-        parentLayout.removeView(this)
+        this.startDragAndDrop(clipData, dsb, this, 0)
+        this.convertToIcon()
         true
     }
 
     override fun onFling(p0: MotionEvent?, p1: MotionEvent?, p2: Float, p3: Float): Boolean {
         return false
+    }
+
+    interface WidgetInterface {
+        fun needPermissionToBind(widgetId: Int, widgetProviderInfo: AppWidgetProviderInfo)
     }
 }

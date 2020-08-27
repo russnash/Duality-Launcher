@@ -6,6 +6,7 @@ import android.content.Context
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.util.AttributeSet
+import android.util.Log
 import android.view.DragEvent
 import android.view.View
 import android.view.WindowManager
@@ -17,19 +18,27 @@ import androidx.core.graphics.ColorUtils
 import com.graymatterapps.dualitylauncher.MainActivity.Companion.appList
 import com.graymatterapps.dualitylauncher.MainActivity.Companion.dragAndDropData
 
-class Icon(private val con: Context,
-           attrs: AttributeSet?,
-           activityInfo: String,
-           packageInfo: String,
-           userSerial: Long,
-           isDragTarget: Boolean,
-           isBlankOnDrag: Boolean): LinearLayout(con, attrs) {
+class Icon(
+    private val con: Context,
+    attrs: AttributeSet?,
+    activityInfo: String,
+    packageInfo: String,
+    userSerial: Long,
+    isDragTarget: Boolean,
+    isBlankOnDrag: Boolean
+) : LinearLayout(con, attrs) {
 
-    constructor(con: Context, attrs: AttributeSet?) : this(con, attrs, "", "",0, true, false)
-    constructor(con: Context, attrs: AttributeSet?, activityInfo: String, packageInfo: String, userSerial: Long) : this(con, attrs, activityInfo, packageInfo, userSerial, true, false)
+    constructor(con: Context, attrs: AttributeSet?) : this(con, attrs, "", "", 0, true, false)
+    constructor(
+        con: Context,
+        attrs: AttributeSet?,
+        activityInfo: String,
+        packageInfo: String,
+        userSerial: Long
+    ) : this(con, attrs, activityInfo, packageInfo, userSerial, true, false)
 
     private lateinit var listener: IconInterface
-    lateinit var parentLayout: TableRow
+    lateinit var parentLayout: HomeLayout
     var iconLayout: LinearLayout
     var icon: ImageView
     var label: TextView
@@ -39,6 +48,7 @@ class Icon(private val con: Context,
     private var blankOnDrag = false
     private var isDockIcon = false
     private val enteredColor = ColorUtils.setAlphaComponent(Color.GREEN, 80)
+    val TAG = "Icon"
 
     init {
         inflate(context, R.layout.icon, this)
@@ -64,18 +74,26 @@ class Icon(private val con: Context,
 
         setupIcon()
 
-        if(dragTarget){
+        if (dragTarget) {
             icon.setOnDragListener { view, dragEvent ->
                 if (dragEvent != null) {
 
+                    if (isDockIcon == false) {
+                        Log.d(TAG, "${launchInfo.getActivityName()} is not a dockIcon!")
+                    }
+
                     var respondToDrag = false
-                    try{
-                        if(dragEvent.clipDescription.label.toString().equals("launchInfo")){
+                    try {
+                        if (dragEvent.clipDescription.label.toString().equals("launchInfo")) {
                             respondToDrag = true
                         }
-                        if(dragEvent.clipDescription.label.toString().equals("widget")){
+                        if (dragEvent.clipDescription.label.toString().equals("widget")) {
                             // Dock icons don't respond to widget drags!
-                            respondToDrag = !isDockIcon
+                            if (isDockIcon) {
+                                respondToDrag = false
+                            } else {
+                                respondToDrag = true
+                            }
                         }
                     } catch (e: Exception) {
                         respondToDrag = false
@@ -83,17 +101,17 @@ class Icon(private val con: Context,
 
                     when (dragEvent.action) {
                         DragEvent.ACTION_DRAG_STARTED -> {
-                            if(respondToDrag) {
+                            if (respondToDrag) {
                                 iconLayout.setBackgroundResource(R.drawable.icon_drag_target)
                             }
                         }
                         DragEvent.ACTION_DRAG_ENTERED -> {
-                            if(respondToDrag) {
+                            if (respondToDrag) {
                                 iconLayout.setBackgroundColor(enteredColor)
                             }
                         }
                         DragEvent.ACTION_DRAG_EXITED -> {
-                            if(respondToDrag) {
+                            if (respondToDrag) {
                                 iconLayout.setBackgroundResource(R.drawable.icon_drag_target)
                             }
                         }
@@ -101,11 +119,21 @@ class Icon(private val con: Context,
                             iconLayout.setBackgroundColor(Color.TRANSPARENT)
                         }
                         DragEvent.ACTION_DROP -> {
-                            if(respondToDrag) {
-                                val id = dragEvent.clipData.getItemAt(0).text.toString()
-                                launchInfo = dragAndDropData.retrieveLaunchInfo(id)
-                                setupIcon()
-                                listener.onIconChanged()
+                            if (respondToDrag) {
+                                if (dragEvent.clipDescription.label.toString().equals("launchInfo")
+                                ) {
+                                    val id = dragEvent.clipData.getItemAt(0).text.toString()
+                                    launchInfo = dragAndDropData.retrieveLaunchInfo(id)
+                                    setupIcon()
+                                    listener.onIconChanged()
+                                }
+                                if (dragEvent.clipDescription.label.toString().equals("widget")) {
+                                    val id = dragEvent.clipData.getItemAt(0).text.toString()
+                                    val widgetInfo = dragAndDropData.retrieveWidgetId(id)
+                                    convertToWidget(widgetInfo)
+                                    listener.onIconChanged()
+                                }
+
                             }
                         }
                     }
@@ -117,12 +145,12 @@ class Icon(private val con: Context,
 
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
-        if(this.parent is TableRow){
-            parentLayout = this.parent as TableRow
+        if (this.parent is HomeLayout) {
+            parentLayout = this.parent as HomeLayout
         }
     }
 
-    private fun setupAttrs(attrs: AttributeSet){
+    private fun setupAttrs(attrs: AttributeSet) {
         val array = context.theme.obtainStyledAttributes(attrs, R.styleable.Icon, 0, 0)
         dragTarget = array.getBoolean(R.styleable.Icon_dragTarget, true)
         blankOnDrag = array.getBoolean(R.styleable.Icon_blankOnDrag, false)
@@ -169,18 +197,18 @@ class Icon(private val con: Context,
         }
     }
 
-    fun setListener(iconInterface: IconInterface){
+    fun setListener(iconInterface: IconInterface) {
         listener = iconInterface
     }
 
-    fun setLaunchInfo(appActivityName: String, packageName:String, userSerial: Long){
+    fun setLaunchInfo(appActivityName: String, packageName: String, userSerial: Long) {
         launchInfo.setActivityName(appActivityName)
         launchInfo.setPackageName(packageName)
         launchInfo.setUserSerial(userSerial)
         setupIcon()
     }
 
-    fun setLaunchInfo(launchInfos: LaunchInfo){
+    fun setLaunchInfo(launchInfos: LaunchInfo) {
         launchInfo = launchInfos
         setupIcon()
     }
@@ -189,21 +217,29 @@ class Icon(private val con: Context,
         return launchInfo
     }
 
-    fun setBlankOnDrag(state: Boolean){
+    fun setBlankOnDrag(state: Boolean) {
         blankOnDrag = state
     }
 
-    fun setIsDockIcon(state: Boolean){
+    fun setDockIcon(state: Boolean) {
         isDockIcon = state
     }
 
-    fun convertToWidget(appWidgetId: Int, appWidgetProviderInfo: AppWidgetProviderInfo){
-        val widgetContainer = WidgetContainer(mainContext, appWidgetId, appWidgetProviderInfo)
+    fun convertToWidget(widgetInfo: WidgetInfo) {
+        val bind = widgetInfo.getPreviewView() != null
+        val widgetContainer = WidgetContainer(
+            mainContext,
+            widgetInfo.getAppWidgetId(),
+            widgetInfo.getAppWidgetProviderInfo(),
+            bind
+        )
+        val params = this.layoutParams as HomeLayout.LayoutParams
+        widgetContainer.layoutParams = params
         parentLayout.addView(widgetContainer)
         parentLayout.removeView(this)
     }
 
-    interface IconInterface{
+    interface IconInterface {
         fun onIconChanged()
         fun onDragStarted(view: View, clipData: ClipData)
         fun onLaunch(launchInfo: LaunchInfo, displayId: Int)
