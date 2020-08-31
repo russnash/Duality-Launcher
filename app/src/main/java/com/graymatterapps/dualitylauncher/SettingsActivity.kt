@@ -23,10 +23,19 @@ class SettingsActivity : AppCompatActivity(), PreferenceFragmentCompat.OnPrefere
         versionCode = findViewById(R.id.versionCode)
         versionCode.text = "VersionCode: ${getVersionCode(this)}"
 
-        supportFragmentManager
-            .beginTransaction()
-            .replace(R.id.frameLayout, settingsFragment, "settings")
-            .commit()
+        if(intent.getStringExtra("setting").equals("wallpaper")){
+            val settingsWallpaperFragment = SettingsWallpaperFragment()
+            supportFragmentManager
+                .beginTransaction()
+                .replace(R.id.frameLayout, settingsWallpaperFragment, "wallpaper")
+                .commit()
+        } else {
+            supportFragmentManager
+                .beginTransaction()
+                .replace(R.id.frameLayout, settingsFragment, "settings")
+                .commit()
+        }
+
         supportActionBar?.title = "Duality Settings"
     }
 

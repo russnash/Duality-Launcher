@@ -1,6 +1,7 @@
 package com.graymatterapps.dualitylauncher
 
 import android.appwidget.AppWidgetProviderInfo
+import android.content.ClipData
 import android.graphics.drawable.Drawable
 import android.os.Bundle
 import androidx.fragment.app.Fragment
@@ -30,7 +31,7 @@ class WidgetFragment : Fragment(), WidgetChooserAdapter.WidgetChooserInterface {
         installedProvs.sortBy {
             it.provider.packageName
         }
-        listener = mainContext as WidgetInterface
+        listener = activity as WidgetInterface
     }
 
     override fun onCreateView(
@@ -65,13 +66,16 @@ class WidgetFragment : Fragment(), WidgetChooserAdapter.WidgetChooserInterface {
     override fun onWidgetChosen(position: Int, view: View) {
         appWidgetProviderInfo = installedProvs[position]
         appWidgetId = appWidgetHost.allocateAppWidgetId()
-        listener.onAddWidget(appWidgetId, appWidgetProviderInfo, view)
+        val id = System.currentTimeMillis().toString()
+        val widgetInfo = WidgetInfo(appWidgetId, appWidgetProviderInfo, view)
+        MainActivity.dragAndDropData.addWidget(widgetInfo, id)
+        val clipData = ClipData.newPlainText("widget", id)
+        listener.onAddWidget(clipData, view)
     }
 
     interface WidgetInterface {
         fun onAddWidget(
-            appWidgetId: Int,
-            appWidgetProviderInfo: AppWidgetProviderInfo,
+            clipData: ClipData,
             view: View
         )
     }

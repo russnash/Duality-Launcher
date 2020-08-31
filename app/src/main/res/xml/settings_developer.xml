@@ -1,15 +1,35 @@
-<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+<PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
 
     <CheckBoxPreference
+        android:defaultValue="false"
         android:key="show_display_info"
         android:title="Show display info"
-        android:defaultValue="false"/>
+        app:icon="@android:drawable/ic_menu_view" />
     <CheckBoxPreference
+        android:defaultValue="false"
         android:key="show_active_fragments"
         android:title="Show active fragments"
-        android:defaultValue="false"/>
+        app:icon="@android:drawable/ic_menu_view" />
     <Preference
         android:key="update_app_list"
-        android:title="Force appList update"/>
+        android:title="Force appList update"
+        app:icon="@android:drawable/ic_menu_upload" />
+    <Preference
+        android:key="clear_icon_grid"
+        android:title="Clear home icon grid persistence"
+        app:icon="@android:drawable/ic_menu_delete" />
+    <Preference
+        android:key="clear_widget_grid"
+        android:title="Clear home widget grid persistence"
+        app:icon="@android:drawable/ic_menu_delete" />
+    <Preference
+        android:key="clear_dock"
+        android:title="Clear dock persistence"
+        app:icon="@android:drawable/ic_menu_delete" />
+    <Preference
+        android:key="clear_appwidgethosts"
+        android:title="Clear AppWidgetHost data for Duality Launcher"
+        app:icon="@android:drawable/ic_menu_delete" />
 
 </PreferenceScreen>

@@ -1,10 +1,8 @@
 package com.graymatterapps.dualitylauncher
 
-import android.appwidget.AppWidgetProviderInfo
 import android.content.ClipData
 import android.content.SharedPreferences
 import android.graphics.Color
-import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.util.Log
 import android.view.DragEvent
@@ -15,6 +13,7 @@ import android.widget.ImageView
 import android.widget.TableRow
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
+import androidx.viewpager.widget.ViewPager
 import androidx.viewpager2.widget.ViewPager2
 import com.graymatterapps.dualitylauncher.MainActivity.Companion.dragAndDropData
 import com.graymatterapps.graymatterutils.GrayMatterUtils.colorPrefToColor
@@ -47,7 +46,8 @@ class HomeFragment : Fragment(), SharedPreferences.OnSharedPreferenceChangeListe
         dock.populateDock()
         dock.setListener(activity as MainActivity)
 
-        homePagerAdapter = HomePagerAdapter(context as AppCompatActivity)
+        homePager.offscreenPageLimit = ViewPager2.OFFSCREEN_PAGE_LIMIT_DEFAULT
+        homePagerAdapter = HomePagerAdapter(context as AppCompatActivity, frameLayout)
         homePager.adapter = homePagerAdapter
         homePager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
             override fun onPageScrollStateChanged(state: Int) {
@@ -55,7 +55,7 @@ class HomeFragment : Fragment(), SharedPreferences.OnSharedPreferenceChangeListe
                 setupHomePageIndicator()
             }
         })
-        homePagerAdapter.setListener(mainContext as HomePagerAdapter.HomeIconsInterface)
+        homePagerAdapter.setListener(activity as HomePagerAdapter.HomeIconsInterface)
 
         homePager.adapter?.notifyDataSetChanged()
 
@@ -91,9 +91,9 @@ class HomeFragment : Fragment(), SharedPreferences.OnSharedPreferenceChangeListe
                             homeDelete.alpha = 0f
                             homeDelete.setBackgroundColor(Color.TRANSPARENT)
                             if (dragEvent.clipDescription.label.toString().equals("widget")) {
-                                val widgetId: Int =
-                                    Integer.parseInt(dragEvent.clipData.getItemAt(0).toString())
-                                appWidgetHost.deleteAppWidgetId(widgetId)
+                                val id = dragEvent.clipData.getItemAt(0).text.toString()
+                                val widgetInfo = dragAndDropData.retrieveWidgetId(id)
+                                appWidgetHost.deleteAppWidgetId(widgetInfo.getAppWidgetId())
                             }
                         }
                     }
@@ -142,12 +142,12 @@ class HomeFragment : Fragment(), SharedPreferences.OnSharedPreferenceChangeListe
             if (homeIconsTable.getChildAt(n) is Icon) {
                 val child = homeIconsTable.getChildAt(n) as Icon
                 val childParams = child.layoutParams as HomeLayout.LayoutParams
-                homeIconsGrid.change(childParams.row, childParams.column, child.getLaunchInfo())
+                homeIconsGrid.changeLaunchInfo(childParams.row, childParams.column, child.getLaunchInfo())
             }
             if (homeIconsTable.getChildAt(n) is WidgetContainer) {
                 val child = homeIconsTable.getChildAt(n) as WidgetContainer
                 val childParams = child.layoutParams as HomeLayout.LayoutParams
-                homeWidgetsGrid.change(childParams.row, childParams.column, child.appWidgetId)
+                homeWidgetsGrid.changeWidgetId(childParams.row, childParams.column, child.appWidgetId)
             }
         }
         var saveItJson = Json.encodeToString(homeIconsGrid)
@@ -162,6 +162,9 @@ class HomeFragment : Fragment(), SharedPreferences.OnSharedPreferenceChangeListe
 
         if (key != null) {
             if (key.contains("homeIconsGrid")) {
+                homePagerAdapter.notifyDataSetChanged()
+            }
+            if (key.contains("homeWidgetsGrid")) {
                 homePagerAdapter.notifyDataSetChanged()
             }
             if (key == "apps") {

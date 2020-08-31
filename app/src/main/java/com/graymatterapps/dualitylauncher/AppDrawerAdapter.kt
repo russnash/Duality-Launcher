@@ -95,7 +95,7 @@ class AppDrawerAdapter(
         listener.onLaunch(launchInfo, displayId)
     }
 
-    override fun onLongClick() {
+    override fun onLongClick(view: View) {
         // Do nothing
     }
 }

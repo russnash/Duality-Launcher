@@ -154,7 +154,7 @@ class Dock(context: Context, attrs: AttributeSet) : LinearLayout(context, attrs)
         appList.launchPackage(launchInfo, displayId)
     }
 
-    override fun onLongClick() {
+    override fun onLongClick(view: View) {
         // Do nothing
     }
 

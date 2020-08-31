@@ -1,7 +1,10 @@
-Version ?
+Version 2020.8.31.1-internal
 Changes:
+- Basic implementation of widgets, cannot resize!
+- Implemented long-click popup menu on home screen with shortcuts for settings, widgets & wallpaper.
 
 Bug fixes:
+- Changed build target SDK to 29 (Q) from 30 (R) for stability.  MinSDK version is still 28 (Pie) for compatibility with G8X's on Pie.
 
 Version 2020.8.22.1-internal
 Changes:

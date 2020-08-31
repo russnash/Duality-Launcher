@@ -3,6 +3,7 @@ package com.graymatterapps.dualitylauncher
 import android.app.Activity
 import android.content.Context
 import android.util.AttributeSet
+import android.util.Log
 import android.view.MotionEvent
 import androidx.constraintlayout.widget.ConstraintLayout
 
@@ -11,8 +12,10 @@ class GestureLayout(context: Context, attributeSet: AttributeSet): ConstraintLay
     lateinit var listener: GestureEvents
     private var areGesturesOn: Boolean = false
     private val touchSlop: Int = android.view.ViewConfiguration.get(context).scaledTouchSlop
+    val TAG = "GestureLayout"
 
     override fun onInterceptTouchEvent(event: MotionEvent?): Boolean {
+        //Log.d(TAG, "areGesturesOn:$areGesturesOn")
         if(areGesturesOn) {
             if (event != null) {
                 when (event.action) {

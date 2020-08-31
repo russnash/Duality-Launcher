@@ -87,12 +87,20 @@ class HomeLayout(context: Context, attributeSet: AttributeSet?) : ViewGroup(
         //view.layoutParams.height = (rowSpan * cellHeight)
     }
 
-    private fun widthToCells(width: Int) : Int{
+    fun widthToCells(width: Int) : Int{
         return (width + cellWidth -1) / cellWidth
     }
 
-    private fun heightToCells(height: Int) : Int{
+    fun heightToCells(height: Int) : Int{
         return (height + cellHeight -1) / cellHeight
+    }
+
+    fun getCellWidth() : Int {
+        return cellWidth
+    }
+
+    fun getCellHeight() : Int {
+        return cellHeight
     }
 
     override fun checkLayoutParams(p: ViewGroup.LayoutParams?): Boolean {

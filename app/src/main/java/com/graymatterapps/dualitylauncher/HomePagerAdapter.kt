@@ -3,6 +3,7 @@ package com.graymatterapps.dualitylauncher
 import android.content.ClipData
 import android.content.Context
 import android.util.Log
+import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
@@ -10,7 +11,7 @@ import com.graymatterapps.graymatterutils.GrayMatterUtils.colorPrefToColor
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 
-class HomePagerAdapter(private val context: Context) :
+class HomePagerAdapter(private val context: Context, private val container: ViewGroup) :
     RecyclerView.Adapter<HomePagerAdapter.HomePagerHolder>(), Icon.IconInterface {
 
     var homeIconsGrid = HomeIconsGrid()
@@ -25,7 +26,7 @@ class HomePagerAdapter(private val context: Context) :
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): HomePagerHolder {
-        val inflatedView = parent.inflate(R.layout.home_icons, false)
+        val inflatedView = LayoutInflater.from(container.context).inflate(R.layout.home_icons, container, false)
         return HomePagerHolder(inflatedView)
     }
 
@@ -36,7 +37,7 @@ class HomePagerAdapter(private val context: Context) :
         val homeIconsTable = itemView.findViewById<HomeLayout>(R.id.homeIconsTable)
 
         itemView.setOnLongClickListener { view ->
-            listener.onLongClick()
+            listener.onLongClick(view)
             true
         }
         homeIconsGrid = HomeIconsGrid()
@@ -52,7 +53,7 @@ class HomePagerAdapter(private val context: Context) :
 
         for (row in 0 until numRows) {
             for (column in 0 until numCols) {
-                val appWidgetId = homeWidgetsGrid.get(row, column)
+                val appWidgetId = homeWidgetsGrid.getWidgetId(row, column)
                 if (appWidgetId != 0) {
                     var widgetParams = HomeLayout.LayoutParams(
                         ViewGroup.LayoutParams.WRAP_CONTENT,
@@ -63,12 +64,14 @@ class HomePagerAdapter(private val context: Context) :
                     widgetParams.rowSpan = 1
                     widgetParams.columnSpan = 1
                     val appWidgetProviderInfo = appWidgetManager.getAppWidgetInfo(appWidgetId)
-                    var widget = WidgetContainer(
-                        mainContext,
-                        homeWidgetsGrid.get(row, column),
-                        appWidgetProviderInfo
-                    )
-                    homeIconsTable.addView(widget, widgetParams)
+                    if (appWidgetProviderInfo != null) {
+                        var widget = WidgetContainer(
+                            mainContext,
+                            homeWidgetsGrid.getWidgetId(row, column),
+                            appWidgetProviderInfo
+                        )
+                        homeIconsTable.addView(widget, widgetParams)
+                    }
                 } else {
                     var icon = Icon(context, null)
                     var iconParams = HomeLayout.LayoutParams(
@@ -85,7 +88,7 @@ class HomePagerAdapter(private val context: Context) :
                     icon.setListener(this)
                     icon.setBlankOnDrag(true)
                     icon.setDockIcon(false)
-                    val launchInfo = homeIconsGrid.get(row, column)
+                    val launchInfo = homeIconsGrid.getLaunchInfo(row, column)
                     icon.setLaunchInfo(
                         launchInfo.getActivityName(),
                         launchInfo.getPackageName(),
@@ -126,8 +129,8 @@ class HomePagerAdapter(private val context: Context) :
         listener.onLaunch(launchInfo, displayId)
     }
 
-    override fun onLongClick() {
-        listener.onLongClick()
+    override fun onLongClick(view: View) {
+        listener.onLongClick(view)
     }
 
     fun setListener(homeIconsInterface: HomeIconsInterface) {
@@ -138,6 +141,6 @@ class HomePagerAdapter(private val context: Context) :
         fun onDragStarted(view: View, clipData: ClipData)
         fun onLaunch(launchInfo: LaunchInfo, displayId: Int)
         fun onIconChanged()
-        fun onLongClick()
+        fun onLongClick(view: View)
     }
 }

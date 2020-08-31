@@ -1,7 +1,6 @@
 package com.graymatterapps.dualitylauncher
 
 import android.annotation.SuppressLint
-import android.appwidget.AppWidgetHost
 import android.appwidget.AppWidgetManager
 import android.appwidget.AppWidgetProviderInfo
 import android.content.ClipData
@@ -9,8 +8,12 @@ import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.graphics.Color
+import android.graphics.Point
+import android.graphics.drawable.ColorDrawable
 import android.hardware.display.DisplayManager
 import android.os.Bundle
+import android.util.DisplayMetrics
+import android.util.Log
 import android.view.*
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
@@ -19,7 +22,6 @@ import android.widget.Button
 import android.widget.PopupWindow
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.graphics.ColorUtils
-import androidx.customview.widget.ExploreByTouchHelper
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.preference.PreferenceManager
@@ -29,14 +31,13 @@ import com.graymatterapps.graymatterutils.GrayMatterUtils.shortToast
 import com.graymatterapps.graymatterutils.GrayMatterUtils.showOkDialog
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.fragment_home.*
+import kotlinx.android.synthetic.main.home_screen_menu.*
 
 const val PREFS_FILENAME = "com.graymatterapps.dualitylauncher.prefs"
 lateinit var settingsPreferences: SharedPreferences
 lateinit var prefs: SharedPreferences
 lateinit var mainContext: Context
 lateinit var appContext: Context
-lateinit var appWidgetHost: AppWidgetHost
-lateinit var appWidgetManager: AppWidgetManager
 const val REQUEST_PERMISSION = 1
 const val CONFIGURE_WIDGET = 2
 
@@ -82,9 +83,9 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
         setNavBarBackground()
         gestureLayout.setListener(this)
         gestureLayout.setGesturesOn(true)
-        appWidgetHost = AppWidgetHost(applicationContext, ExploreByTouchHelper.HOST_ID)
-        appWidgetManager = AppWidgetManager.getInstance(applicationContext)
-        appWidgetHost.startListening()
+        setupHomeMenu()
+        showHomeMenu(false)
+
         displayManager.registerDisplayListener(object : DisplayManager.DisplayListener {
             override fun onDisplayAdded(p0: Int) {
                 updateDisplayInfo()
@@ -140,7 +141,7 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
             supportFragmentManager
                 .beginTransaction()
                 .add(R.id.fragmentFrame, homeFragment)
-                .commit()
+                .commitNow()
         } else {
             showHomeFragment()
         }
@@ -158,9 +159,30 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
         }
     }
 
-    override fun onDestroy() {
-        appWidgetHost.stopListening()
-        super.onDestroy()
+    fun setupHomeMenu(){
+        buttonActionSettings.setOnClickListener {
+            openSettings()
+            showHomeMenu(false)
+        }
+        buttonActionWidget.setOnClickListener {
+            showWidgetFragment()
+            showHomeMenu(false)
+        }
+        buttonActionWallpaper.setOnClickListener {
+            openSettings("wallpaper")
+            showHomeMenu(false)
+        }
+        homeMenuBackground.setOnClickListener {
+            showHomeMenu(false)
+        }
+    }
+
+    fun showHomeMenu(state: Boolean) {
+        if(state){
+            homeMenu.visibility = View.VISIBLE
+        } else {
+            homeMenu.visibility = View.INVISIBLE
+        }
     }
 
     fun isMainDisplay(): Boolean {
@@ -233,7 +255,7 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
         supportFragmentManager
             .beginTransaction()
             .replace(R.id.fragmentFrame, homeFragment, "home")
-            .commitNow()
+            .commitNowAllowingStateLoss()
     }
 
     fun closeAppDrawer() {
@@ -251,6 +273,10 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
         if (settingsFragment.isVisible) {
             showHomeFragment()
         }
+
+        if(widgetFragment.isVisible) {
+            showHomeFragment()
+        }
     }
 
     override fun onResume() {
@@ -262,7 +288,6 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
         setStatusBars()
         setNavBarBackground()
         homeFragment.startDrag(view, clipData)
-        gestureLayout.setGesturesOn(true)
         if (drawerFragment.isVisible) {
             showHomeFragment()
         }
@@ -283,39 +308,16 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
         supportFragmentManager
             .beginTransaction()
             .replace(R.id.fragmentFrame, widgetFragment, "widget")
-            .commitNow()
+            .commitNowAllowingStateLoss()
     }
 
     override fun onIconChanged() {
         homeFragment.persistGrid(homeFragment.getCurrentHomePagerItem())
     }
 
-    override fun onLongClick() {
-        gestureLayout.setGesturesOn(false)
-        val layoutInflater = getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-        val popupView = layoutInflater.inflate(R.layout.home_screen_menu, null)
-        val popupWindow = PopupWindow(
-            popupView,
-            ViewGroup.LayoutParams.WRAP_CONTENT,
-            ViewGroup.LayoutParams.WRAP_CONTENT
-        )
-        val buttonActionSettings = popupView.findViewById<Button>(R.id.buttonActionSettings)
-        buttonActionSettings.setOnClickListener {
-            openSettings()
-            popupWindow.dismiss()
-            gestureLayout.setGesturesOn(true)
-        }
-        val buttonActionWidget = popupView.findViewById<Button>(R.id.buttonActionWidget)
-        buttonActionWidget.setOnClickListener {
-            showWidgetFragment()
-            popupWindow.dismiss()
-        }
-        popupWindow.setOnDismissListener {
-            gestureLayout.setGesturesOn(true)
-        }
-        popupWindow.isOutsideTouchable = true
-        popupWindow.isFocusable = true
-        popupWindow.showAtLocation(gestureLayout, Gravity.CENTER, 0, 0)
+    override fun onLongClick(view: View) {
+        Log.d(TAG, "onLongClick registered at display: ID:${windowManager.defaultDisplay.displayId}, Name:${windowManager.defaultDisplay.name}")
+        showHomeMenu(true)
     }
 
     override fun onSharedPreferenceChanged(sharedPrefs: SharedPreferences?, key: String?) {
@@ -378,7 +380,7 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
         supportFragmentManager
             .beginTransaction()
             .replace(R.id.fragmentFrame, drawerFragment, "drawer")
-            .commitNow()
+            .commitNowAllowingStateLoss()
         val animation = AnimationUtils.loadAnimation(this@MainActivity, R.anim.slide_up)
         fragmentFrame.startAnimation(animation)
         var basicColor = colorPrefToColor(
@@ -396,8 +398,11 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
         }
     }
 
-    fun openSettings() {
+    fun openSettings(setting: String? = null) {
         val intent = Intent(this@MainActivity, SettingsActivity::class.java)
+        if(setting != null) {
+            intent.putExtra("setting", setting)
+        }
         startActivity(intent)
     }
 
@@ -413,18 +418,14 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
         expand.invoke(statusBarService)
     }
 
-    override fun onAddWidget(
-        appWidgetId: Int,
-        appWidgetProviderInfo: AppWidgetProviderInfo,
-        view: View
-    ) {
-        val dsb = View.DragShadowBuilder(view)
-        val id = System.currentTimeMillis().toString()
-        val widgetInfo = WidgetInfo(appWidgetId, appWidgetProviderInfo, view)
-        dragAndDropData.addWidget(widgetInfo, id)
-        val clipData = ClipData.newPlainText("widget", id)
-        fragmentFrame.startDragAndDrop(clipData, dsb, this, 0)
+    override fun onAddWidget(clipData: ClipData, view: View) {
+        val dsb = WidgetDragShadowBuilder(view)
         showHomeFragment()
+        if(homeFragment.homePager.startDragAndDrop(clipData, dsb, false, 0)){
+            Log.d(TAG, "onAddWidget() startDragAndDrop successful")
+        } else {
+            Log.d(TAG, "onAddWidget() startDragAndDrop failed")
+        }
     }
 
     fun postUpdateCheck() {
@@ -508,25 +509,30 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
         startActivityForResult(intent, REQUEST_PERMISSION)
     }
 
+    override fun onWidgetChanged() {
+        homeFragment.persistGrid(homeFragment.getCurrentHomePagerItem())
+    }
+
+    override fun configureWidget(widgetId: Int, widgetProviderInfo: AppWidgetProviderInfo) {
+        intent = Intent(AppWidgetManager.ACTION_APPWIDGET_CONFIGURE)
+        intent.setComponent(widgetProviderInfo.configure)
+        intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, widgetId)
+        try {
+            startActivityForResult(intent, CONFIGURE_WIDGET)
+        } catch(e: Exception) {
+            createWidget(null)
+        }
+
+    }
+
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if(resultCode == RESULT_OK){
             if(requestCode == REQUEST_PERMISSION) {
-                if(appWidgetProviderInfo.configure != null) {
-                    intent = Intent(AppWidgetManager.ACTION_APPWIDGET_CONFIGURE)
-                    intent.setComponent(appWidgetProviderInfo.configure)
-                    intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId)
-                    try {
-                        startActivityForResult(intent, CONFIGURE_WIDGET)
-                    } catch (e: Exception) {
-                        signalWidget()
-                    }
-                } else {
-                    signalWidget()
-                }
+                configureWidgetData(data)
             }
 
             if(requestCode == CONFIGURE_WIDGET){
-                signalWidget(data)
+                createWidget(data)
             }
         } else {
             appWidgetHost.deleteAppWidgetId(appWidgetId)
@@ -534,14 +540,27 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
         super.onActivityResult(requestCode, resultCode, data)
     }
 
-    fun signalWidget(data: Intent? = null){
+    fun configureWidgetData(data: Intent? = null){
         val view = homeFragment.homePager.findViewWithTag<View>(homeFragment.getCurrentHomePagerItem())
         val homeIconsTable = view.findViewById<HomeLayout>(R.id.homeIconsTable)
         for(n in 0 until homeIconsTable.childCount){
             if(homeIconsTable.getChildAt(n) is WidgetContainer){
                 val child = homeIconsTable.getChildAt(n) as WidgetContainer
                 if(child.isWaitingForPermission){
-                    child.bindWidget(data)
+                    child.configureWidget(data)
+                }
+            }
+        }
+    }
+
+    fun createWidget(data: Intent?) {
+        val view = homeFragment.homePager.findViewWithTag<View>(homeFragment.getCurrentHomePagerItem())
+        val homeIconsTable = view.findViewById<HomeLayout>(R.id.homeIconsTable)
+        for(n in 0 until homeIconsTable.childCount){
+            if(homeIconsTable.getChildAt(n) is WidgetContainer){
+                val child = homeIconsTable.getChildAt(n) as WidgetContainer
+                if(child.isWaitingForConfigure){
+                    child.createWidget(data)
                 }
             }
         }

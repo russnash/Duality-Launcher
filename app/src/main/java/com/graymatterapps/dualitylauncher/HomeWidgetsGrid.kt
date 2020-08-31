@@ -15,11 +15,11 @@ class HomeWidgetsGrid {
         arrayOf(0, 0, 0, 0, 0, 0, 0, 0)
     )
 
-    fun change(row: Int, column: Int, widgetId: Int) {
+    fun changeWidgetId(row: Int, column: Int, widgetId: Int) {
         widgitIds[row][column] = widgetId
     }
 
-    fun get(row: Int, column: Int): Int {
+    fun getWidgetId(row: Int, column: Int): Int {
         return widgitIds[row][column]
     }
 }

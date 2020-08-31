@@ -185,11 +185,11 @@ class Icon(
             }
         } else {
             icon.setOnLongClickListener { view ->
-                listener.onLongClick()
+                listener.onLongClick(view)
                 true
             }
             label.setOnLongClickListener { view ->
-                listener.onLongClick()
+                listener.onLongClick(view)
                 true
             }
             icon.setImageDrawable(ColorDrawable(Color.TRANSPARENT))
@@ -226,12 +226,10 @@ class Icon(
     }
 
     fun convertToWidget(widgetInfo: WidgetInfo) {
-        val bind = widgetInfo.getPreviewView() != null
         val widgetContainer = WidgetContainer(
             mainContext,
             widgetInfo.getAppWidgetId(),
-            widgetInfo.getAppWidgetProviderInfo(),
-            bind
+            widgetInfo.getAppWidgetProviderInfo()
         )
         val params = this.layoutParams as HomeLayout.LayoutParams
         widgetContainer.layoutParams = params
@@ -243,6 +241,6 @@ class Icon(
         fun onIconChanged()
         fun onDragStarted(view: View, clipData: ClipData)
         fun onLaunch(launchInfo: LaunchInfo, displayId: Int)
-        fun onLongClick()
+        fun onLongClick(view: View)
     }
 }

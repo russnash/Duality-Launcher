@@ -35,13 +35,13 @@ class HomeIconsGrid {
         longArrayOf(0, 0, 0, 0, 0, 0, 0, 0)
     )
 
-    fun change(row: Int, column: Int, launchInfo: LaunchInfo){
+    fun changeLaunchInfo(row: Int, column: Int, launchInfo: LaunchInfo){
         activities[row][column] = launchInfo.getActivityName()
         packages[row][column] = launchInfo.getPackageName()
         userSerials[row][column] = launchInfo.getUserSerial()
     }
 
-    fun get(row: Int, column: Int): LaunchInfo {
+    fun getLaunchInfo(row: Int, column: Int): LaunchInfo {
         var launchInfo = LaunchInfo()
         launchInfo.setActivityName(activities[row][column])
         launchInfo.setPackageName(packages[row][column])
