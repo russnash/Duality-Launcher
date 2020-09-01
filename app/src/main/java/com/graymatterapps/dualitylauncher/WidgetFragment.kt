@@ -23,6 +23,7 @@ class WidgetFragment : Fragment(), WidgetChooserAdapter.WidgetChooserInterface {
     lateinit var widgetPreviewImage: Drawable
     private var appWidgetId: Int = 0
     private lateinit var appWidgetProviderInfo: AppWidgetProviderInfo
+    val TAG = javaClass.simpleName
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

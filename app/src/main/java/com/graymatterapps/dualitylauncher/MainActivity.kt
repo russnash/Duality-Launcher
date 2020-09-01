@@ -55,7 +55,7 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
     var appWidgetId: Int = 0
     lateinit var appWidgetProviderInfo: AppWidgetProviderInfo
 
-    val TAG = "MainActivity"
+    val TAG = javaClass.simpleName
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

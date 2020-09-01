@@ -1,6 +1,7 @@
 package com.graymatterapps.dualitylauncher
 
 data class LaunchInfo(private var activityName: String = "", private var packageName: String = "", private var userSerial: Long = 0) {
+    val TAG = javaClass.simpleName
 
     fun setActivityName(activity: String) {
         activityName = activity

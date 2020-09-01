@@ -4,6 +4,7 @@ import android.os.Bundle
 import androidx.preference.PreferenceFragmentCompat
 
 class SettingsStatusBarFragment : PreferenceFragmentCompat() {
+    val TAG = javaClass.simpleName
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         setPreferencesFromResource(R.xml.settings_status_bar, rootKey)

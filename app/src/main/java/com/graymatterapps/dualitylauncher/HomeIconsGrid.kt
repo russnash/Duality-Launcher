@@ -34,6 +34,7 @@ class HomeIconsGrid {
         longArrayOf(0, 0, 0, 0, 0, 0, 0, 0),
         longArrayOf(0, 0, 0, 0, 0, 0, 0, 0)
     )
+    val TAG = javaClass.simpleName
 
     fun changeLaunchInfo(row: Int, column: Int, launchInfo: LaunchInfo){
         activities[row][column] = launchInfo.getActivityName()

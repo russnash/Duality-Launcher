@@ -17,6 +17,7 @@ lateinit var appWidgetManager: AppWidgetManager
 @AcraMailSender(mailTo = "russnash37@gmail.com", reportAsFile = true)
 @AcraDialog(resText = R.string.acra_dialog_text)
 class DualityLauncherApplication: Application() {
+    val TAG = javaClass.simpleName
 
     override fun attachBaseContext(newBase: Context?) {
         super.attachBaseContext(newBase)

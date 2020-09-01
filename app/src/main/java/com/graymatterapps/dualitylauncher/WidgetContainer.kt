@@ -26,7 +26,7 @@ class WidgetContainer(
     var isWaitingForPermission: Boolean = false
     var isWaitingForConfigure: Boolean = false
     var listener: WidgetInterface
-    val TAG = "WidgetContainer"
+    val TAG = javaClass.simpleName
 
     init {
         listener = mainContext as WidgetInterface

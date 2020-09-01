@@ -14,6 +14,7 @@ class HomeWidgetsGrid {
         arrayOf(0, 0, 0, 0, 0, 0, 0, 0),
         arrayOf(0, 0, 0, 0, 0, 0, 0, 0)
     )
+    val TAG = javaClass.simpleName
 
     fun changeWidgetId(row: Int, column: Int, widgetId: Int) {
         widgitIds[row][column] = widgetId

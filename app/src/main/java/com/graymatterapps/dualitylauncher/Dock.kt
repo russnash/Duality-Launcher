@@ -26,6 +26,7 @@ class Dock(context: Context, attrs: AttributeSet) : LinearLayout(context, attrs)
     var dockItems = DockItems()
     var dockTable: TableLayout
     var dockRow: TableRow
+    val TAG = javaClass.simpleName
 
     init {
         inflate(context, R.layout.dock, this)

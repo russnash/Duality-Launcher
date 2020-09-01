@@ -19,7 +19,7 @@ class HomePagerAdapter(private val context: Context, private val container: View
     var numRows: Int = 0
     var numCols: Int = 0
     private lateinit var listener: HomeIconsInterface
-    val TAG = "HomePagerAdapter"
+    val TAG = javaClass.simpleName
 
     class HomePagerHolder(view: View) : RecyclerView.ViewHolder(view) {
 

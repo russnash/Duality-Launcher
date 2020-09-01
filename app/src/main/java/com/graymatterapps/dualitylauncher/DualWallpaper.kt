@@ -17,6 +17,7 @@ import java.io.OutputStream
 class DualWallpaper(con: Context){
     private lateinit var wallpaper: Drawable
     private var context: Context
+    val TAG = javaClass.simpleName
 
     init{
         context = con

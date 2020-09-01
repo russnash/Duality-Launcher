@@ -48,7 +48,7 @@ class Icon(
     private var blankOnDrag = false
     private var isDockIcon = false
     private val enteredColor = ColorUtils.setAlphaComponent(Color.GREEN, 80)
-    val TAG = "Icon"
+    val TAG = javaClass.simpleName
 
     init {
         inflate(context, R.layout.icon, this)

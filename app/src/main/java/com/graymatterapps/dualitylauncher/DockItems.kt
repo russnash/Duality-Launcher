@@ -6,6 +6,7 @@ import kotlinx.serialization.Serializable
 data class DockItems(var activityNames: ArrayList<String> = ArrayList(),
                      var packageNames: ArrayList<String> = ArrayList(),
                      var userSerials: ArrayList<Long> = ArrayList()){
+    val TAG = javaClass.simpleName
     init{
         initialize()
     }

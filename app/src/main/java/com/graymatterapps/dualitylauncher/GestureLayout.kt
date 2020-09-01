@@ -12,7 +12,7 @@ class GestureLayout(context: Context, attributeSet: AttributeSet): ConstraintLay
     lateinit var listener: GestureEvents
     private var areGesturesOn: Boolean = false
     private val touchSlop: Int = android.view.ViewConfiguration.get(context).scaledTouchSlop
-    val TAG = "GestureLayout"
+    val TAG = javaClass.simpleName
 
     override fun onInterceptTouchEvent(event: MotionEvent?): Boolean {
         //Log.d(TAG, "areGesturesOn:$areGesturesOn")

@@ -14,7 +14,7 @@ class HomeLayout(context: Context, attributeSet: AttributeSet?) : ViewGroup(
     private var numColumns = 1
     private var cellWidth = 1
     private var cellHeight = 1
-    val TAG = "HomeLayout"
+    val TAG = javaClass.simpleName
 
     init{
         if(attributeSet != null){

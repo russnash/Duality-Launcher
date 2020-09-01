@@ -22,6 +22,7 @@ class AppList() : LauncherApps.Callback() {
     var launcher: LauncherApps =
         mainContext.getSystemService(Context.LAUNCHER_APPS_SERVICE) as LauncherApps
     val userManager = mainContext.getSystemService(Context.USER_SERVICE) as UserManager
+    val TAG = javaClass.simpleName
 
     init {
         updateApps()

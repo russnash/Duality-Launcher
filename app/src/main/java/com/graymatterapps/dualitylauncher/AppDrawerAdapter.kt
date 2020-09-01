@@ -21,7 +21,7 @@ class AppDrawerAdapter(
         PreferenceManager.getDefaultSharedPreferences(context)
     var filteredList: MutableList<AppList.AppListDataType> = ArrayList()
     var filteredWork: Boolean = false
-    val TAG = "AppDrawerAdapter"
+    val TAG = javaClass.simpleName
 
     fun filterWork(work: Boolean) {
         val currentUser = android.os.Process.myUserHandle()

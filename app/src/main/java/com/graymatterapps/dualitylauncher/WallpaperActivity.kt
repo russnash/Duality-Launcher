@@ -23,6 +23,7 @@ class WallpaperActivity : AppCompatActivity() {
     lateinit var imageStream: InputStream
     lateinit var type: String
     lateinit var wallpaperManager: WallpaperManager
+    val TAG = javaClass.simpleName
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

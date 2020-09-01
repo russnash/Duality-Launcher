@@ -9,6 +9,7 @@ import com.graymatterapps.graymatterutils.GrayMatterUtils.shortToast
 class SettingsDeveloper : PreferenceFragmentCompat() {
 
     lateinit var listener: DeveloperInterface
+    val TAG = javaClass.simpleName
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         setPreferencesFromResource(R.xml.settings_developer, rootKey)

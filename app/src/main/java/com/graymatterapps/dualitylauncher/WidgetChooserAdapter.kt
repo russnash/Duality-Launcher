@@ -15,6 +15,7 @@ class WidgetChooserAdapter(
 ) : RecyclerView.Adapter<WidgetChooserAdapter.WidgetChooserHolder>() {
 
     private lateinit var listener: WidgetChooserInterface
+    val TAG = javaClass.simpleName
 
     class WidgetChooserHolder(view: View) : RecyclerView.ViewHolder(view) {
     }

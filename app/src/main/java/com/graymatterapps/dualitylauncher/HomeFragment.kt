@@ -24,7 +24,7 @@ import kotlinx.serialization.json.Json
 class HomeFragment : Fragment(), SharedPreferences.OnSharedPreferenceChangeListener {
 
     lateinit var homePagerAdapter: HomePagerAdapter
-    val TAG = "HomeFragment"
+    val TAG = javaClass.simpleName
 
     override fun onDestroy() {
         prefs.unregisterOnSharedPreferenceChangeListener(this)

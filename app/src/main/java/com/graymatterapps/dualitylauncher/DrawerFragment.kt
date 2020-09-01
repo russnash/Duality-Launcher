@@ -19,6 +19,7 @@ class DrawerFragment : Fragment(), SharedPreferences.OnSharedPreferenceChangeLis
 
     lateinit var gridLayoutManager: GridLayoutManager
     lateinit var adapter: AppDrawerAdapter
+    val TAG = javaClass.simpleName
 
     override fun onDestroy() {
         prefs.unregisterOnSharedPreferenceChangeListener(this)

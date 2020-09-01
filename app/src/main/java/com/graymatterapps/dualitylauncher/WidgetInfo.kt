@@ -8,6 +8,7 @@ class WidgetInfo(
     private var appWidgetProviderInfo: AppWidgetProviderInfo,
     private var previewView: View?
 ) {
+    val TAG = javaClass.simpleName
 
     fun setAppWidgetId(id: Int) {
         appWidgetId = id
