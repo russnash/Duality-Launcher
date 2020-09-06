@@ -11,7 +11,6 @@ import android.widget.TableLayout
 import android.widget.TableRow
 import androidx.core.graphics.ColorUtils
 import androidx.preference.PreferenceManager
-import com.graymatterapps.dualitylauncher.MainActivity.Companion.appList
 import com.graymatterapps.graymatterutils.GrayMatterUtils.colorPrefToColor
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
@@ -41,7 +40,7 @@ class Dock(context: Context, attrs: AttributeSet) : LinearLayout(context, attrs)
 
     fun populateDock() {
         val totalItemsString = settingsPreferences.getString("dock_icons", "6")
-        val totalItems = Integer.parseInt(totalItemsString)
+        val totalItems = Integer.parseInt(totalItemsString.toString())
         dockRow.removeAllViews()
 
         if (totalItems != null) {

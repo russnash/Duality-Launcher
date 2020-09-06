@@ -3,30 +3,28 @@ package com.graymatterapps.dualitylauncher
 import android.app.ActivityOptions
 import android.content.ComponentName
 import android.content.Context
-import android.content.Intent
 import android.content.pm.LauncherApps
 import android.graphics.Color
 import android.graphics.drawable.Drawable
 import android.graphics.drawable.ShapeDrawable
 import android.graphics.drawable.shapes.OvalShape
-import android.net.Uri
 import android.os.UserHandle
 import android.os.UserManager
 import com.graymatterapps.graymatterutils.GrayMatterUtils.longToast
 import java.util.concurrent.locks.ReentrantLock
 
-class AppList() : LauncherApps.Callback() {
+class AppList(val context: Context) : LauncherApps.Callback() {
     val apps: ArrayList<AppListDataType> = ArrayList()
     var ready: Boolean = false
     val lock = ReentrantLock()
-    var launcher: LauncherApps =
-        mainContext.getSystemService(Context.LAUNCHER_APPS_SERVICE) as LauncherApps
-    val userManager = mainContext.getSystemService(Context.USER_SERVICE) as UserManager
+    var launcherApps: LauncherApps =
+        context.getSystemService(Context.LAUNCHER_APPS_SERVICE) as LauncherApps
+    val userManager = context.getSystemService(Context.USER_SERVICE) as UserManager
     val TAG = javaClass.simpleName
 
     init {
         updateApps()
-        launcher.registerCallback(this)
+        launcherApps.registerCallback(this)
     }
 
     fun waitForReady(){
@@ -40,10 +38,10 @@ class AppList() : LauncherApps.Callback() {
             lock.lock()
             apps.clear()
 
-            val handles = launcher.profiles
+            val handles = launcherApps.profiles
 
             handles.forEach { handle ->
-                val appList = launcher.getActivityList(null, handle)
+                val appList = launcherApps.getActivityList(null, handle)
                 appList.forEach { apps ->
                     val name = apps.label.toString()
                     val icon = apps.getBadgedIcon(0)
@@ -65,7 +63,7 @@ class AppList() : LauncherApps.Callback() {
             }
 
             try {
-                apps.sortBy { it.name }
+                apps.sortBy { it.name.toLowerCase() }
             } catch (e: Exception) {
                 // Do nothing
             }
@@ -77,7 +75,7 @@ class AppList() : LauncherApps.Callback() {
         }).start()
     }
 
-    fun getIconFromApps(launchInfo: LaunchInfo): Drawable {
+    fun getIcon(launchInfo: LaunchInfo): Drawable {
         lock.lock()
         val app = apps.find {
             it.activityName == launchInfo.getActivityName() && it.packageName == launchInfo.getPackageName() && it.userSerial == launchInfo.getUserSerial()
@@ -92,7 +90,7 @@ class AppList() : LauncherApps.Callback() {
         }
     }
 
-    fun getLabelFromApps(launchInfo: LaunchInfo): String {
+    fun getLabel(launchInfo: LaunchInfo): String {
         lock.lock()
         val app = apps.find {
             it.activityName == launchInfo.getActivityName() && it.packageName == launchInfo.getPackageName() && it.userSerial == launchInfo.getUserSerial()
@@ -112,7 +110,7 @@ class AppList() : LauncherApps.Callback() {
             val componentName =
                 ComponentName(launchInfo.getPackageName(), launchInfo.getActivityName())
             val handle = userManager.getUserForSerialNumber(launchInfo.getUserSerial())
-            launcher.startMainActivity(componentName, handle, null, options.toBundle())
+            launcherApps.startMainActivity(componentName, handle, null, options.toBundle())
         } catch (e: Exception) {
             longToast(mainContext, "App failed to launch (" + e.message + ")")
         }
@@ -125,7 +123,7 @@ class AppList() : LauncherApps.Callback() {
             val componentName =
                 ComponentName(launchInfo.getPackageName(), launchInfo.getActivityName())
             val handle = userManager.getUserForSerialNumber(launchInfo.getUserSerial())
-            launcher.startAppDetailsActivity(componentName, handle, null, options.toBundle())
+            launcherApps.startAppDetailsActivity(componentName, handle, null, options.toBundle())
         } catch (e: Exception) {
             longToast(mainContext, "App Info failed to launch")
         }

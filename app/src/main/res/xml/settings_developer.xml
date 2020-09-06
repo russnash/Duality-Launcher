@@ -11,13 +11,18 @@
         android:key="show_active_fragments"
         android:title="Show active fragments"
         app:icon="@android:drawable/ic_menu_view" />
+    <CheckBoxPreference
+        android:defaultValue="false"
+        android:key="show_folder_id"
+        android:title="Show folder ID's"
+        app:icon="@android:drawable/ic_menu_view" />
     <Preference
         android:key="update_app_list"
         android:title="Force appList update"
         app:icon="@android:drawable/ic_menu_upload" />
     <Preference
         android:key="clear_icon_grid"
-        android:title="Clear home icon grid persistence"
+        android:title="Clear home icon / folder grid persistence"
         app:icon="@android:drawable/ic_menu_delete" />
     <Preference
         android:key="clear_widget_grid"
@@ -30,6 +35,10 @@
     <Preference
         android:key="clear_appwidgethosts"
         android:title="Clear AppWidgetHost data for Duality Launcher"
+        app:icon="@android:drawable/ic_menu_delete" />
+    <Preference
+        android:key="clear_folders"
+        android:title="Clear folder data"
         app:icon="@android:drawable/ic_menu_delete" />
 
 </PreferenceScreen>

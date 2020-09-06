@@ -12,12 +12,12 @@ data class DockItems(var activityNames: ArrayList<String> = ArrayList(),
     }
 
     private fun initialize(){
-        MainActivity.appList.waitForReady()
-        MainActivity.appList.lock.lock()
+        appList.waitForReady()
+        appList.lock.lock()
         for(n in 0..7){
-            add(MainActivity.appList.apps[n].activityName, MainActivity.appList.apps[n].packageName, MainActivity.appList.apps[n].userSerial)
+            add(appList.apps[n].activityName, appList.apps[n].packageName, appList.apps[n].userSerial)
         }
-        MainActivity.appList.lock.unlock()
+        appList.lock.unlock()
     }
 
     fun add(activityName: String, packageName: String, userSerial: Long){

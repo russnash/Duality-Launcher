@@ -20,7 +20,7 @@
             android:layout_height="40dp"
             android:layout_margin="5dp"
             android:layout_weight="1"
-            android:background="@drawable/icon_drag_target"
+            android:background="@drawable/rounded_rectangle"
             android:text="@string/button_personal"
             android:textAllCaps="false" />
 
@@ -31,7 +31,7 @@
             android:layout_height="40dp"
             android:layout_margin="5dp"
             android:layout_weight="1"
-            android:background="@drawable/icon_drag_target"
+            android:background="@drawable/rounded_rectangle"
             android:text="@string/button_work"
             android:textAllCaps="false" />
     </LinearLayout>

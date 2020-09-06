@@ -2,12 +2,14 @@ package com.graymatterapps.dualitylauncher
 
 import android.os.Bundle
 import android.view.MenuItem
+import android.view.View
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import com.graymatterapps.graymatterutils.GrayMatterUtils.getVersionCode
 import com.graymatterapps.graymatterutils.GrayMatterUtils.getVersionName
+import kotlinx.android.synthetic.main.activity_settings.*
 
 class SettingsActivity : AppCompatActivity(), PreferenceFragmentCompat.OnPreferenceStartFragmentCallback {
     var settingsFragment = SettingsFragment()

@@ -2,17 +2,20 @@ package com.graymatterapps.dualitylauncher
 
 import android.content.ClipData
 import android.content.Context
+import android.text.Editable
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.graymatterapps.graymatterutils.GrayMatterUtils.colorPrefToColor
+import kotlinx.android.synthetic.main.folder.view.*
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 
 class HomePagerAdapter(private val context: Context, private val container: ViewGroup) :
-    RecyclerView.Adapter<HomePagerAdapter.HomePagerHolder>(), Icon.IconInterface {
+    RecyclerView.Adapter<HomePagerAdapter.HomePagerHolder>(), Icon.IconInterface,
+    Folder.FolderInterface {
 
     var homeIconsGrid = HomeIconsGrid()
     var homeWidgetsGrid = HomeWidgetsGrid()
@@ -26,7 +29,8 @@ class HomePagerAdapter(private val context: Context, private val container: View
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): HomePagerHolder {
-        val inflatedView = LayoutInflater.from(container.context).inflate(R.layout.home_icons, container, false)
+        val inflatedView =
+            LayoutInflater.from(container.context).inflate(R.layout.home_icons, container, false)
         return HomePagerHolder(inflatedView)
     }
 
@@ -41,12 +45,13 @@ class HomePagerAdapter(private val context: Context, private val container: View
             true
         }
         homeIconsGrid = HomeIconsGrid()
+        homeWidgetsGrid = HomeWidgetsGrid()
         depersistGrid(position)
 
         val numColsString = settingsPreferences.getString("home_grid_columns", "6")
-        numCols = Integer.parseInt(numColsString)
+        numCols = Integer.parseInt(numColsString.toString())
         val numRowsString = settingsPreferences.getString("home_grid_rows", "7")
-        numRows = Integer.parseInt(numRowsString)
+        numRows = Integer.parseInt(numRowsString.toString())
         val textColor = colorPrefToColor(settingsPreferences.getString("home_text_color", "White"))
         homeIconsTable.removeAllViews()
         homeIconsTable.setGridSize(numRows, numCols)
@@ -73,28 +78,50 @@ class HomePagerAdapter(private val context: Context, private val container: View
                         homeIconsTable.addView(widget, widgetParams)
                     }
                 } else {
-                    var icon = Icon(context, null)
-                    var iconParams = HomeLayout.LayoutParams(
-                        ViewGroup.LayoutParams.WRAP_CONTENT,
-                        ViewGroup.LayoutParams.WRAP_CONTENT
-                    )
-                    iconParams.row = row
-                    iconParams.column = column
-                    iconParams.rowSpan = 1
-                    iconParams.columnSpan = 1
-                    icon.layoutParams = iconParams
-                    icon.label.maxLines = 1
-                    icon.label.setTextColor(textColor)
-                    icon.setListener(this)
-                    icon.setBlankOnDrag(true)
-                    icon.setDockIcon(false)
                     val launchInfo = homeIconsGrid.getLaunchInfo(row, column)
-                    icon.setLaunchInfo(
-                        launchInfo.getActivityName(),
-                        launchInfo.getPackageName(),
-                        launchInfo.getUserSerial()
-                    )
-                    homeIconsTable.addView(icon, iconParams)
+                    if (launchInfo.getType() == LaunchInfo.ICON) {
+                        var icon = Icon(context, null)
+                        var iconParams = HomeLayout.LayoutParams(
+                            ViewGroup.LayoutParams.WRAP_CONTENT,
+                            ViewGroup.LayoutParams.WRAP_CONTENT
+                        )
+                        iconParams.row = row
+                        iconParams.column = column
+                        iconParams.rowSpan = 1
+                        iconParams.columnSpan = 1
+                        icon.layoutParams = iconParams
+                        icon.label.maxLines = 1
+                        icon.label.setTextColor(textColor)
+                        icon.setListener(this)
+                        icon.setBlankOnDrag(true)
+                        icon.setDockIcon(false)
+                        icon.setLaunchInfo(
+                            launchInfo.getActivityName(),
+                            launchInfo.getPackageName(),
+                            launchInfo.getUserSerial()
+                        )
+                        homeIconsTable.addView(icon, iconParams)
+                    }
+                    if (launchInfo.getType() == LaunchInfo.FOLDER) {
+                        var folder = Folder(
+                            context,
+                            null,
+                            mainContext.getString(R.string.new_folder),
+                            launchInfo
+                        )
+                        folder.setListener(this)
+                        var folderParams = HomeLayout.LayoutParams(
+                            ViewGroup.LayoutParams.WRAP_CONTENT,
+                            ViewGroup.LayoutParams.WRAP_CONTENT
+                        )
+                        folderParams.row = row
+                        folderParams.column = column
+                        folderParams.rowSpan = 1
+                        folderParams.columnSpan = 1
+                        folder.layoutParams = folderParams
+                        folder.folderLabel.setTextColor(textColor)
+                        homeIconsTable.addView(folder, folderParams)
+                    }
                 }
             }
         }
@@ -102,7 +129,7 @@ class HomePagerAdapter(private val context: Context, private val container: View
 
     override fun getItemCount(): Int {
         val homePagesString = settingsPreferences.getString("home_grid_pages", "1")
-        return Integer.parseInt(homePagesString)
+        return Integer.parseInt(homePagesString.toString())
     }
 
     fun depersistGrid(position: Int) {
@@ -142,5 +169,20 @@ class HomePagerAdapter(private val context: Context, private val container: View
         fun onLaunch(launchInfo: LaunchInfo, displayId: Int)
         fun onIconChanged()
         fun onLongClick(view: View)
+        fun onShowFolder(state: Boolean)
+        fun onSetupFolder(apps: ArrayList<LaunchInfo>, name: Editable, folder: Folder)
+        fun onFolderChanged()
+    }
+
+    override fun onShowFolder(state: Boolean) {
+        listener.onShowFolder(state)
+    }
+
+    override fun onSetupFolder(apps: ArrayList<LaunchInfo>, name: Editable, folder: Folder) {
+        listener.onSetupFolder(apps, name, folder)
+    }
+
+    override fun onFolderChanged() {
+        listener.onFolderChanged()
     }
 }

@@ -51,6 +51,8 @@ class GestureLayout(context: Context, attributeSet: AttributeSet): ConstraintLay
                     }
                 }
             }
+        } else {
+            Log.d(TAG, "Gestures are off!!!")
         }
 
         return super.onInterceptTouchEvent(event)

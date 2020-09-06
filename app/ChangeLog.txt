@@ -1,3 +1,14 @@
+Version 2020.9.6.1-internal
+Changes:
+- Improved launcher startup speed.
+- Changed app drawer sort to case insensitive.
+- Changed drag target shape.
+- Added folder support, drag an icon onto another to create a folder.
+
+Bug fixes:
+- Fixed random null reference crashes when dragging to the home screen.
+- Fixed widgets appearing on more than one home screen page.
+
 Version 2020.8.31.1-internal
 Changes:
 - Basic implementation of widgets, cannot resize!

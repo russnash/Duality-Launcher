@@ -1,21 +1,17 @@
 package com.graymatterapps.dualitylauncher
 
-import android.appwidget.AppWidgetProviderInfo
 import android.content.ClipData
 import android.content.Context
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.util.AttributeSet
-import android.util.Log
 import android.view.DragEvent
 import android.view.View
 import android.view.WindowManager
 import android.widget.ImageView
 import android.widget.LinearLayout
-import android.widget.TableRow
 import android.widget.TextView
 import androidx.core.graphics.ColorUtils
-import com.graymatterapps.dualitylauncher.MainActivity.Companion.appList
 import com.graymatterapps.dualitylauncher.MainActivity.Companion.dragAndDropData
 
 class Icon(
@@ -78,10 +74,6 @@ class Icon(
             icon.setOnDragListener { view, dragEvent ->
                 if (dragEvent != null) {
 
-                    if (isDockIcon == false) {
-                        Log.d(TAG, "${launchInfo.getActivityName()} is not a dockIcon!")
-                    }
-
                     var respondToDrag = false
                     try {
                         if (dragEvent.clipDescription.label.toString().equals("launchInfo")) {
@@ -89,11 +81,10 @@ class Icon(
                         }
                         if (dragEvent.clipDescription.label.toString().equals("widget")) {
                             // Dock icons don't respond to widget drags!
-                            if (isDockIcon) {
-                                respondToDrag = false
-                            } else {
-                                respondToDrag = true
-                            }
+                            respondToDrag = !isDockIcon
+                        }
+                        if(isFolderOpen){
+                            respondToDrag = false
                         }
                     } catch (e: Exception) {
                         respondToDrag = false
@@ -122,9 +113,14 @@ class Icon(
                             if (respondToDrag) {
                                 if (dragEvent.clipDescription.label.toString().equals("launchInfo")
                                 ) {
-                                    val id = dragEvent.clipData.getItemAt(0).text.toString()
-                                    launchInfo = dragAndDropData.retrieveLaunchInfo(id)
-                                    setupIcon()
+                                    if(launchInfo.getActivityName() != "") {
+                                        val id = dragEvent.clipData.getItemAt(0).text.toString()
+                                        val info = dragAndDropData.retrieveLaunchInfo(id)
+                                        convertToFolder(info)
+                                    } else {
+                                        val id = dragEvent.clipData.getItemAt(0).text.toString()
+                                        launchInfo = dragAndDropData.retrieveLaunchInfo(id)
+                                    }
                                     listener.onIconChanged()
                                 }
                                 if (dragEvent.clipDescription.label.toString().equals("widget")) {
@@ -133,7 +129,6 @@ class Icon(
                                     convertToWidget(widgetInfo)
                                     listener.onIconChanged()
                                 }
-
                             }
                         }
                     }
@@ -158,8 +153,8 @@ class Icon(
 
     fun setupIcon() {
         if (launchInfo.getActivityName() != "") {
-            icon.setImageDrawable(appList.getIconFromApps(launchInfo))
-            label.text = appList.getLabelFromApps(launchInfo)
+            icon.setImageDrawable(appList.getIcon(launchInfo))
+            label.text = appList.getLabel(launchInfo)
 
             icon.setOnClickListener {
                 listener.onLaunch(launchInfo, displayId)
@@ -171,7 +166,7 @@ class Icon(
                 dragAndDropData.addLaunchInfo(passedLaunchInfo, id)
                 var clipData = ClipData.newPlainText("launchInfo", id)
 
-                listener.onDragStarted(view, clipData)
+                listener.onDragStarted(this, clipData)
 
                 if (blankOnDrag) {
                     launchInfo.setActivityName("")
@@ -225,6 +220,22 @@ class Icon(
         isDockIcon = state
     }
 
+    fun convertToFolder(info: LaunchInfo) {
+        var folder: Folder
+        val params = this.layoutParams as HomeLayout.LayoutParams
+        if(info.getType() == LaunchInfo.ICON) {
+            folder = Folder(mainContext, null, mainContext.getString(R.string.new_folder))
+            folder.addFolderApp(launchInfo)
+            folder.addFolderApp(info)
+        } else {
+            folder = Folder(mainContext, null, info.getFolderName(), info)
+        }
+        folder.layoutParams = params
+        folder.setListener(listener as Folder.FolderInterface)
+        parentLayout.addView(folder)
+        parentLayout.removeView(this)
+    }
+
     fun convertToWidget(widgetInfo: WidgetInfo) {
         val widgetContainer = WidgetContainer(
             mainContext,
@@ -233,6 +244,7 @@ class Icon(
         )
         val params = this.layoutParams as HomeLayout.LayoutParams
         widgetContainer.layoutParams = params
+        widgetContainer.listener = listener as WidgetContainer.WidgetInterface
         parentLayout.addView(widgetContainer)
         parentLayout.removeView(this)
     }

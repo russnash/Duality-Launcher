@@ -29,7 +29,6 @@
         <activity
             android:name=".MainActivity"
             android:launchMode="singleTop"
-            android:screenOrientation="portrait"
             android:resizeableActivity="true"
             android:resumeWhilePausing="true">
             <intent-filter>

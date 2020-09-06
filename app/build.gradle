@@ -5,14 +5,14 @@ apply plugin: 'kotlinx-serialization'
 
 android {
     compileSdkVersion 30
-    buildToolsVersion "30.0.0"
+    buildToolsVersion '30.0.0'
 
     defaultConfig {
         applicationId "com.graymatterapps.dualitylauncher"
         minSdkVersion 28
         targetSdkVersion 29
-        versionCode 13
-        versionName "2020.8.31.1-internal"
+        versionCode 14
+        versionName "2020.9.6.1-internal"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -20,6 +20,10 @@ android {
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    kotlinOptions {
+        jvmTarget = "1.8"
     }
 
     buildTypes {
@@ -31,6 +35,10 @@ android {
 
     dataBinding{
         enabled true
+    }
+    dependenciesInfo {
+        includeInApk true
+        includeInBundle true
     }
 }
 
@@ -50,7 +58,7 @@ dependencies {
     implementation "androidx.preference:preference:1.1.1"
     implementation 'androidx.gridlayout:gridlayout:1.0.0'
     implementation 'androidx.viewpager2:viewpager2:1.0.0'
-    implementation 'com.google.android.material:material:1.2.0'
+    implementation 'com.google.android.material:material:1.2.1'
     testImplementation 'junit:junit:4.13'
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'

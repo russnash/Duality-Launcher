@@ -157,11 +157,4 @@ class WallpaperActivity : AppCompatActivity() {
         drawable.draw(canvas)
         return bitmap
     }
-
-    fun isMainDisplay(): Boolean {
-        val displayManager = getSystemService(Context.DISPLAY_SERVICE) as DisplayManager
-        val displays = displayManager.displays
-        val currentDisplay = windowManager.getDefaultDisplay().displayId
-        return displays[0].displayId == currentDisplay
-    }
 }

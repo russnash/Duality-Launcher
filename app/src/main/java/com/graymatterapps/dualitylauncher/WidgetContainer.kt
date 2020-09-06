@@ -68,11 +68,14 @@ class WidgetContainer(
 
     private fun longClick() {
         val id = System.currentTimeMillis().toString()
-        val widgetInfo = WidgetInfo(appWidgetId, appWidgetProviderInfo, null)
+        var widgetInfo = WidgetInfo(appWidgetId, appWidgetProviderInfo, null)
         dragAndDropData.addWidget(widgetInfo, id)
         val clipData = ClipData.newPlainText("widget", id)
         val dsb = WidgetDragShadowBuilder(this)
-        this.startDragAndDrop(clipData, dsb, this, 0)
+        if(!this.startDragAndDrop(clipData, dsb, this, 0)) {
+            widgetInfo = dragAndDropData.retrieveWidgetId(id)
+            appWidgetHost.deleteAppWidgetId(widgetInfo.getAppWidgetId())
+        }
         this.convertToIcon()
     }
 
