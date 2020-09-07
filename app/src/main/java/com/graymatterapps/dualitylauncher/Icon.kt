@@ -8,6 +8,8 @@ import android.util.AttributeSet
 import android.view.DragEvent
 import android.view.View
 import android.view.WindowManager
+import android.view.animation.Animation
+import android.view.animation.AnimationUtils
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
@@ -43,7 +45,8 @@ class Icon(
     private var dragTarget = true
     private var blankOnDrag = false
     private var isDockIcon = false
-    private val enteredColor = ColorUtils.setAlphaComponent(Color.GREEN, 80)
+    private val enteredColor = ColorUtils.setAlphaComponent(Color.GREEN, 20)
+    private val pulseAnim = AnimationUtils.loadAnimation(context, R.anim.pulse_alpha)
     val TAG = javaClass.simpleName
 
     init {
@@ -83,7 +86,7 @@ class Icon(
                             // Dock icons don't respond to widget drags!
                             respondToDrag = !isDockIcon
                         }
-                        if(isFolderOpen){
+                        if (isFolderOpen) {
                             respondToDrag = false
                         }
                     } catch (e: Exception) {
@@ -94,6 +97,7 @@ class Icon(
                         DragEvent.ACTION_DRAG_STARTED -> {
                             if (respondToDrag) {
                                 iconLayout.setBackgroundResource(R.drawable.icon_drag_target)
+                                //iconLayout.startAnimation(pulseAnim)
                             }
                         }
                         DragEvent.ACTION_DRAG_ENTERED -> {
@@ -104,16 +108,18 @@ class Icon(
                         DragEvent.ACTION_DRAG_EXITED -> {
                             if (respondToDrag) {
                                 iconLayout.setBackgroundResource(R.drawable.icon_drag_target)
+                                //iconLayout.startAnimation(pulseAnim)
                             }
                         }
                         DragEvent.ACTION_DRAG_ENDED -> {
                             iconLayout.setBackgroundColor(Color.TRANSPARENT)
+                            //iconLayout.clearAnimation()
                         }
                         DragEvent.ACTION_DROP -> {
                             if (respondToDrag) {
                                 if (dragEvent.clipDescription.label.toString().equals("launchInfo")
                                 ) {
-                                    if(launchInfo.getActivityName() != "") {
+                                    if (launchInfo.getActivityName() != "") {
                                         val id = dragEvent.clipData.getItemAt(0).text.toString()
                                         val info = dragAndDropData.retrieveLaunchInfo(id)
                                         convertToFolder(info)
@@ -223,7 +229,7 @@ class Icon(
     fun convertToFolder(info: LaunchInfo) {
         var folder: Folder
         val params = this.layoutParams as HomeLayout.LayoutParams
-        if(info.getType() == LaunchInfo.ICON) {
+        if (info.getType() == LaunchInfo.ICON) {
             folder = Folder(mainContext, null, mainContext.getString(R.string.new_folder))
             folder.addFolderApp(launchInfo)
             folder.addFolderApp(info)
@@ -244,7 +250,7 @@ class Icon(
         )
         val params = this.layoutParams as HomeLayout.LayoutParams
         widgetContainer.layoutParams = params
-        widgetContainer.listener = listener as WidgetContainer.WidgetInterface
+        widgetContainer.setListener(homeActivity)
         parentLayout.addView(widgetContainer)
         parentLayout.removeView(this)
     }

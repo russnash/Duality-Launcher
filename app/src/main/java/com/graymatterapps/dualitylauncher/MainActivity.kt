@@ -11,7 +11,6 @@ import android.graphics.Color
 import android.hardware.display.DisplayManager
 import android.os.Bundle
 import android.text.Editable
-import android.text.TextWatcher
 import android.util.Log
 import android.view.DragEvent
 import android.view.View
@@ -32,7 +31,6 @@ import com.graymatterapps.graymatterutils.GrayMatterUtils.getVersionCode
 import com.graymatterapps.graymatterutils.GrayMatterUtils.shortToast
 import com.graymatterapps.graymatterutils.GrayMatterUtils.showOkDialog
 import kotlinx.android.synthetic.main.activity_main.*
-import kotlinx.android.synthetic.main.fragment_drawer.*
 import kotlinx.android.synthetic.main.home_folder.*
 import kotlinx.android.synthetic.main.home_screen_menu.*
 import kotlinx.serialization.encodeToString
@@ -392,7 +390,7 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
 
     fun closeAppDrawer() {
         gestureLayout.setGesturesOn(true)
-        val animation = AnimationUtils.loadAnimation(this@MainActivity, R.anim.slide_down)
+        val animation = AnimationUtils.loadAnimation(this@MainActivity, R.anim.drawer_slide_down)
         animation.setAnimationListener(this)
         fragmentFrame.startAnimation(animation)
     }
@@ -570,7 +568,7 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
             .beginTransaction()
             .replace(R.id.fragmentFrame, drawerFragment, "drawer")
             .commitNowAllowingStateLoss()
-        val animation = AnimationUtils.loadAnimation(this@MainActivity, R.anim.slide_up)
+        val animation = AnimationUtils.loadAnimation(this@MainActivity, R.anim.drawer_slide_up)
         fragmentFrame.startAnimation(animation)
         var basicColor = colorPrefToColor(
             settingsPreferences.getString(

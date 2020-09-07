@@ -75,6 +75,7 @@ class HomePagerAdapter(private val context: Context, private val container: View
                             homeWidgetsGrid.getWidgetId(row, column),
                             appWidgetProviderInfo
                         )
+                        widget.setListener(homeActivity)
                         homeIconsTable.addView(widget, widgetParams)
                     }
                 } else {

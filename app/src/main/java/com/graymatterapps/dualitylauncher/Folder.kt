@@ -12,6 +12,7 @@ import android.util.AttributeSet
 import android.view.DragEvent
 import android.view.View
 import android.view.WindowManager
+import android.view.animation.AnimationUtils
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
@@ -31,15 +32,17 @@ class Folder(
 ) : LinearLayout(con, attrs), SharedPreferences.OnSharedPreferenceChangeListener {
 
     private val displayId: Int
-    private val enteredColor = ColorUtils.setAlphaComponent(Color.GREEN, 80)
+    private val enteredColor = ColorUtils.setAlphaComponent(Color.GREEN, 20)
     private val folderLayout: LinearLayout
     private val folderIcon: ImageView
     private val folderLabel: TextView
+
     @Serializable
     private var folderApps = ArrayList<LaunchInfo>()
     private var launchInfo: LaunchInfo = LaunchInfo()
     private lateinit var listener: FolderInterface
     lateinit var parentLayout: HomeLayout
+    private val pulseAnim = AnimationUtils.loadAnimation(context, R.anim.pulse_alpha)
 
     init {
         val wm = context.getSystemService(Context.WINDOW_SERVICE) as WindowManager
@@ -55,7 +58,7 @@ class Folder(
         folderIcon.setImageResource(R.drawable.ic_folder)
         folderLabel.text = name
 
-        if(info == null) {
+        if (info == null) {
             launchInfo.setType(LaunchInfo.FOLDER)
             launchInfo.setFolderUniqueId(System.currentTimeMillis())
         } else {
@@ -77,6 +80,7 @@ class Folder(
             var clipData = ClipData.newPlainText("launchInfo", id)
             listener.onDragStarted(this, clipData)
             convertToIcon()
+            listener.onFolderChanged()
             true
         }
     }
@@ -105,6 +109,12 @@ class Folder(
                 }
 
                 when (dragEvent.action) {
+                    DragEvent.ACTION_DRAG_STARTED -> {
+                        if (respondToDrag) {
+                            folderLayout.setBackgroundResource(R.drawable.icon_drag_target)
+                            //folderLayout.startAnimation(pulseAnim)
+                        }
+                    }
                     DragEvent.ACTION_DRAG_ENTERED -> {
                         if (respondToDrag) {
                             folderLayout.setBackgroundColor(enteredColor)
@@ -112,11 +122,13 @@ class Folder(
                     }
                     DragEvent.ACTION_DRAG_EXITED -> {
                         if (respondToDrag) {
-                            folderLayout.setBackgroundColor(Color.TRANSPARENT)
+                            folderLayout.setBackgroundResource(R.drawable.icon_drag_target)
+                            //folderLayout.startAnimation(pulseAnim)
                         }
                     }
                     DragEvent.ACTION_DRAG_ENDED -> {
                         folderLayout.setBackgroundColor(Color.TRANSPARENT)
+                        //folderLayout.clearAnimation()
                     }
                     DragEvent.ACTION_DROP -> {
                         if (respondToDrag) {
@@ -141,7 +153,10 @@ class Folder(
         var canvas = Canvas(bitmap!!)
         canvas.drawRect(0F, 0F, canvas.width.toFloat(), canvas.height.toFloat(), clearPaint)
 
-        val firstBitmap = appList.getIcon(folderApps[0]).toBitmap()
+        var firstBitmap = mainContext.resources.getDrawable(R.drawable.ic_folder).toBitmap()
+        if (folderApps.size != 0) {
+            firstBitmap = appList.getIcon(folderApps[0]).toBitmap()
+        }
         var srcRect: Rect = Rect(0, 0, firstBitmap.width, firstBitmap.height)
         var dstRect: Rect = Rect(
             0, 0, (canvas.width * 0.66).toInt(),
@@ -150,8 +165,8 @@ class Folder(
         canvas.drawBitmap(firstBitmap, srcRect, dstRect, null)
 
         var secondBitmap = mainContext.resources.getDrawable(R.drawable.ic_folder).toBitmap()
-        if(folderApps.size != 1) {
-            secondBitmap = appList.getIcon(folderApps[1]).toBitmap()
+        if (folderApps.size != 0) {
+            secondBitmap = appList.getIcon(folderApps[folderApps.size - 1]).toBitmap()
         }
         srcRect = Rect(0, 0, secondBitmap.width, secondBitmap.height)
         dstRect = Rect(canvas.width / 3, canvas.height / 3, canvas.width, canvas.height)
@@ -203,10 +218,12 @@ class Folder(
     }
 
     fun addFolderApp(info: LaunchInfo) {
-        folderApps.add(info)
-        folderApps.sortBy { appList.getLabel(it) }
-        persistFolderApps()
-        folderIcon.setImageBitmap(makeFolderIcon())
+        if (!folderApps.contains(info)) {
+            folderApps.add(info)
+            folderApps.sortBy { appList.getLabel(it) }
+            persistFolderApps()
+            folderIcon.setImageBitmap(makeFolderIcon())
+        }
     }
 
     fun removeFolderApp(info: LaunchInfo) {
@@ -216,7 +233,7 @@ class Folder(
         folderIcon.setImageBitmap(makeFolderIcon())
     }
 
-    private fun showFolder(){
+    private fun showFolder() {
         listener.onShowFolder(true)
         listener.onSetupFolder(folderApps, SpannableStringBuilder(folderLabel.text), this)
     }
@@ -225,7 +242,7 @@ class Folder(
         listener = ear
     }
 
-    fun convertToIcon(){
+    fun convertToIcon() {
         val icon = Icon(mainContext, null)
         val params = this.layoutParams as HomeLayout.LayoutParams
         icon.setLaunchInfo(LaunchInfo())
@@ -243,8 +260,8 @@ class Folder(
     }
 
     override fun onSharedPreferenceChanged(sharedPrefs: SharedPreferences?, key: String?) {
-        if(key != null) {
-            if(key == "folder" + launchInfo.getFolderUniqueId()){
+        if (key != null) {
+            if (key == "folder" + launchInfo.getFolderUniqueId()) {
                 depersistFolderApps()
             }
         }

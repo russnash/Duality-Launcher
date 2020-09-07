@@ -1,3 +1,15 @@
+Version 2020.9.7.2-internal
+Changes:
+- Folder icons now preview the first and last icon in the folder.
+- Prevented duplicate icons in folders.
+
+Bug Fixes:
+- Folder icon creation could fail due to zero icons being in the folder.
+- Folders not showing as possible drag targets.
+- Dragging a folder to the same position caused it to disappear.
+- Fixed a bug that was preventing the addition of new widgets.
+- Fixed an incorrect pointer for communication between widgets and the home screen.
+
 Version 2020.9.6.1-internal
 Changes:
 - Improved launcher startup speed.

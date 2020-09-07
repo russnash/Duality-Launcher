@@ -25,11 +25,10 @@ class WidgetContainer(
     var neededHeight: Int = 0
     var isWaitingForPermission: Boolean = false
     var isWaitingForConfigure: Boolean = false
-    var listener: WidgetInterface
+    private lateinit var listener: WidgetInterface
     val TAG = javaClass.simpleName
 
     init {
-        listener = mainContext as WidgetInterface
         gestureDetector = GestureDetector(mainContext, this)
     }
 
@@ -56,6 +55,10 @@ class WidgetContainer(
 
     override fun onInterceptTouchEvent(ev: MotionEvent?): Boolean {
         return gestureDetector.onTouchEvent(ev)
+    }
+
+    fun setListener(ear: WidgetInterface) {
+        listener = ear
     }
 
     private fun buildWidget() {

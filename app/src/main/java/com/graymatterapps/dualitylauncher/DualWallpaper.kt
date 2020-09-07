@@ -1,7 +1,5 @@
 package com.graymatterapps.dualitylauncher
 
-import android.Manifest
-import android.app.WallpaperManager
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Color
@@ -16,11 +14,10 @@ import java.io.OutputStream
 
 class DualWallpaper(con: Context){
     private lateinit var wallpaper: Drawable
-    private var context: Context
+    private var context: Context = con
     val TAG = javaClass.simpleName
 
     init{
-        context = con
 
         var file = context.filesDir
         file = File(file, "dualwallpaper.jpg")
