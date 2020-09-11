@@ -43,6 +43,7 @@ lateinit var appContext: Context
 const val REQUEST_PERMISSION = 1
 const val CONFIGURE_WIDGET = 2
 var isFolderOpen = false
+var isPaging = false
 
 class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterface,
     SharedPreferences.OnSharedPreferenceChangeListener, Animation.AnimationListener,
@@ -68,14 +69,15 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
         mainContext = this
         appContext = applicationContext
         homeActivity = this
-        prefs.registerOnSharedPreferenceChangeListener(this)
-        settingsPreferences.registerOnSharedPreferenceChangeListener(this)
         displayManager = getSystemService(Context.DISPLAY_SERVICE) as DisplayManager
         initCompanion()
 
         if (isMainDisplay()) {
             postUpdateCheck()
         }
+
+        prefs.registerOnSharedPreferenceChangeListener(this)
+        settingsPreferences.registerOnSharedPreferenceChangeListener(this)
 
         drawerFragment = DrawerFragment()
         widgetFragment = WidgetFragment()
@@ -154,6 +156,7 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
             override fun onPageScrollStateChanged(state: Int) {
                 super.onPageScrollStateChanged(state)
                 setupHomePageIndicator()
+                isPaging = state == ViewPager2.SCROLL_STATE_DRAGGING
             }
         })
         homePagerAdapter.setListener(this)
@@ -163,13 +166,12 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
         setupHomePageIndicator()
 
         homeDelete.setColorFilter(
-            colorPrefToColor(
-                settingsPreferences.getString(
-                    "home_widget_color",
-                    "White"
-                )
+            settingsPreferences.getInt(
+                "home_widget_color",
+                Color.WHITE
             )
         )
+
         homeDelete.alpha = 0f
 
         homeDelete.setOnDragListener(object : View.OnDragListener {
@@ -196,10 +198,10 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
                                 val widgetInfo = dragAndDropData.retrieveWidgetId(id)
                                 appWidgetHost.deleteAppWidgetId(widgetInfo.getAppWidgetId())
                             }
-                            if(dragEvent.clipDescription.label.toString().equals("launchInfo")) {
+                            if (dragEvent.clipDescription.label.toString().equals("launchInfo")) {
                                 val id = dragEvent.clipData.getItemAt(0).text.toString()
                                 val info = dragAndDropData.retrieveLaunchInfo(id)
-                                if(info.getType() == LaunchInfo.FOLDER){
+                                if (info.getType() == LaunchInfo.FOLDER) {
                                     val editor = prefs.edit()
                                     editor.remove("folder" + info.getFolderUniqueId())
                                     editor.apply()
@@ -226,11 +228,9 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
             TableRow.LayoutParams.WRAP_CONTENT,
             TableRow.LayoutParams.WRAP_CONTENT
         )
-        val filterColor = colorPrefToColor(
-            settingsPreferences.getString(
-                "home_widget_color",
-                "White"
-            )
+        val filterColor = settingsPreferences.getInt(
+            "home_widget_color",
+            -1
         )
 
         for (n in 1..homePagerAdapter.itemCount) {
@@ -310,8 +310,12 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
     fun showHomeMenu(state: Boolean) {
         if (state) {
             homeMenu.visibility = View.VISIBLE
+            val animation = AnimationUtils.loadAnimation(this@MainActivity, R.anim.fade_in)
+            homeMenu.startAnimation(animation)
         } else {
             homeMenu.visibility = View.INVISIBLE
+            val animation = AnimationUtils.loadAnimation(this@MainActivity, R.anim.fade_out)
+            homeMenu.startAnimation(animation)
         }
     }
 
@@ -354,14 +358,10 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
     }
 
     fun setStatusBarBackground() {
-        var basicColor = colorPrefToColor(
-            settingsPreferences.getString(
-                "status_background",
-                "Black"
-            )
+        var color = settingsPreferences.getInt(
+            "status_background",
+            Color.BLACK
         )
-        var alpha = settingsPreferences.getInt("status_background_alpha", 80)
-        var color = ColorUtils.setAlphaComponent(basicColor, alpha)
         window.statusBarColor = color
         if (settingsPreferences.getBoolean("status_light", true)) {
             window.decorView.systemUiVisibility =
@@ -372,9 +372,7 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
     }
 
     fun setNavBarBackground() {
-        var basicColor = colorPrefToColor(settingsPreferences.getString("nav_background", "Black"))
-        var alpha = settingsPreferences.getInt("nav_background_alpha", 80)
-        var color = ColorUtils.setAlphaComponent(basicColor, alpha)
+        var color = settingsPreferences.getInt("nav_background", Color.BLACK)
         window.navigationBarColor = color
     }
 
@@ -393,6 +391,8 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
         val animation = AnimationUtils.loadAnimation(this@MainActivity, R.anim.drawer_slide_down)
         animation.setAnimationListener(this)
         fragmentFrame.startAnimation(animation)
+        //val animation2 = AnimationUtils.loadAnimation(this@MainActivity, R.anim.home_slide_down)
+        //gestureLayout.startAnimation(animation2)
     }
 
     override fun onBackPressed() {
@@ -531,11 +531,9 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
             if (key == "home_widget_color") {
                 setupHomePageIndicator()
                 homeDelete.setColorFilter(
-                    colorPrefToColor(
-                        settingsPreferences.getString(
-                            "home_widget_color",
-                            "White"
-                        )
+                    settingsPreferences.getInt(
+                        "home_widget_color",
+                        -1
                     )
                 )
             }
@@ -570,14 +568,12 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
             .commitNowAllowingStateLoss()
         val animation = AnimationUtils.loadAnimation(this@MainActivity, R.anim.drawer_slide_up)
         fragmentFrame.startAnimation(animation)
-        var basicColor = colorPrefToColor(
-            settingsPreferences.getString(
-                "app_drawer_background",
-                "Black"
-            )
+        //val animation2 = AnimationUtils.loadAnimation(this@MainActivity, R.anim.home_slide_up)
+        //gestureLayout.startAnimation(animation2)
+        var color = settingsPreferences.getInt(
+            "app_drawer_background",
+            -16777216
         )
-        var alpha = settingsPreferences.getInt("app_drawer_background_alpha", 80)
-        var color = ColorUtils.setAlphaComponent(basicColor, alpha)
 
         if (settingsPreferences.getBoolean("app_drawer_nav_status_sync", true)) {
             window.statusBarColor = color
@@ -591,6 +587,7 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
             intent.putExtra("setting", setting)
         }
         startActivity(intent)
+        overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left)
     }
 
     override fun onSwipeUp() {
@@ -617,7 +614,7 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
 
     fun postUpdateCheck() {
         val previousVersion = prefs.getInt("previousVersion", 0)
-        val editor = prefs.edit()
+        var editor = prefs.edit()
 
         if (previousVersion < 7) {
             if (prefs.getString("homeIconsGrid0", "") == "") {
@@ -644,7 +641,21 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
                 }
             }
         }
+
         editor.putInt("previousVersion", getVersionCode(this))
+        editor.apply()
+
+        editor = settingsPreferences.edit()
+
+        if (previousVersion < 16) {
+            editor.remove("dock_background_color")
+            editor.remove("home_widget_color")
+            editor.remove("home_text_color")
+            editor.remove("app_drawer_background")
+            editor.remove("app_drawer_text")
+            editor.remove("status_background")
+            editor.remove("nav_background")
+        }
         editor.apply()
     }
 
@@ -762,7 +773,7 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
     override fun onSetupFolder(apps: ArrayList<LaunchInfo>, name: Editable, folder: Folder) {
         folderName.text = name
         folderDebug.text = folder.getLaunchInfo().getFolderUniqueId().toString()
-        if(settingsPreferences.getBoolean("show_folder_id", false)) {
+        if (settingsPreferences.getBoolean("show_folder_id", false)) {
             folderDebug.visibility = View.VISIBLE
         } else {
             folderDebug.visibility = View.INVISIBLE
@@ -796,7 +807,7 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
                 when (dragEvent.action) {
                     DragEvent.ACTION_DRAG_STARTED -> {
                         if (respondToDrag) {
-                            folderGrid.setBackgroundResource(R.drawable.icon_drag_target)
+                            // Do nothing
                         }
                     }
                     DragEvent.ACTION_DRAG_ENTERED -> {
@@ -806,7 +817,7 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
                     }
                     DragEvent.ACTION_DRAG_EXITED -> {
                         if (respondToDrag) {
-                            folderGrid.setBackgroundResource(R.drawable.icon_drag_target)
+                            folderGrid.setBackgroundColor(Color.TRANSPARENT)
                         }
                     }
                     DragEvent.ACTION_DRAG_ENDED -> {

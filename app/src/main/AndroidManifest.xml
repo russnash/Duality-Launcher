@@ -34,7 +34,8 @@
             android:launchMode="singleTop"
             android:resizeableActivity="true"
             android:resumeWhilePausing="true"
-            android:hardwareAccelerated="true">
+            android:hardwareAccelerated="true"
+            android:theme="@style/AppTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.HOME" />

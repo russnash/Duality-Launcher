@@ -2,6 +2,7 @@ package com.graymatterapps.dualitylauncher
 
 import android.appwidget.AppWidgetProviderInfo
 import android.content.ClipData
+import android.graphics.Color
 import android.graphics.drawable.Drawable
 import android.os.Bundle
 import androidx.fragment.app.Fragment
@@ -52,16 +53,11 @@ class WidgetFragment : Fragment(), WidgetChooserAdapter.WidgetChooserInterface {
         widgetChooser.layoutManager = widgetChooserManager
         widgetChooser.adapter = widgetChooserAdapter
 
-        var basicColor =
-            GrayMatterUtils.colorPrefToColor(
-                settingsPreferences.getString(
-                    "app_drawer_background",
-                    "Black"
-                )
-            )
-        var alpha = settingsPreferences.getInt("app_drawer_background_alpha", 80)
-        var backgroundColor = ColorUtils.setAlphaComponent(basicColor, alpha)
-        widgetChooser.setBackgroundColor(backgroundColor)
+        var color = settingsPreferences.getInt(
+            "app_drawer_background",
+            Color.BLACK
+        )
+        widgetChooser.setBackgroundColor(color)
     }
 
     override fun onWidgetChosen(position: Int, view: View) {

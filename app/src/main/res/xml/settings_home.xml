@@ -15,20 +15,11 @@
             android:key="dock_background"
             android:title="@string/pref_dock_background"
             android:defaultValue="false"/>
-        <ListPreference
+        <com.graymatterapps.dualitylauncher.ColorPreference
+            android:defaultValue="-16777216"
             android:key="dock_background_color"
-            android:title="@string/pref_dock_background_color"
-            app:useSimpleSummaryProvider="true"
-            android:entries="@array/android_colors"
-            android:entryValues="@array/android_colors"
-            android:defaultValue="Light Gray"/>
-        <SeekBarPreference
-            android:key="dock_background_alpha"
-            android:title="Background transparency"
-            android:max="255"
-            app:showSeekBarValue="true"
-            app:updatesContinuously="true"
-            android:defaultValue="80"/>
+            android:title="@string/pref_dock_background_color" />
+
     </PreferenceCategory>
 
     <PreferenceCategory
@@ -55,20 +46,14 @@
             android:entries="@array/values_5_to_8"
             android:entryValues="@array/values_5_to_8"
             android:defaultValue="7"/>
-        <ListPreference
+        <com.graymatterapps.dualitylauncher.ColorPreference
             android:key="home_widget_color"
             android:title="Widget color"
-            app:useSimpleSummaryProvider="true"
-            android:entries="@array/android_colors"
-            android:entryValues="@array/android_colors"
-            android:defaultValue="White"/>
-        <ListPreference
+            android:defaultValue="-1" />
+        <com.graymatterapps.dualitylauncher.ColorPreference
             android:key="home_text_color"
             android:title="Text color"
-            app:useSimpleSummaryProvider="true"
-            android:entries="@array/android_colors"
-            android:entryValues="@array/android_colors"
-            android:defaultValue="White"/>
+            android:defaultValue="-1" />
     </PreferenceCategory>
 
 </PreferenceScreen>

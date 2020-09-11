@@ -65,14 +65,10 @@ class DrawerFragment : Fragment(), SharedPreferences.OnSharedPreferenceChangeLis
     }
 
     private fun setDrawerBackground() {
-        var basicColor = colorPrefToColor(
-            settingsPreferences.getString(
-                "app_drawer_background",
-                "Black"
-            )
+        var color = settingsPreferences.getInt(
+            "app_drawer_background",
+            -16777216
         )
-        var alpha = settingsPreferences.getInt("app_drawer_background_alpha", 80)
-        var color = ColorUtils.setAlphaComponent(basicColor, alpha)
         drawerLayout.setBackgroundColor(color)
     }
 
@@ -82,10 +78,6 @@ class DrawerFragment : Fragment(), SharedPreferences.OnSharedPreferenceChangeLis
         }
 
         if (key == "app_drawer_background") {
-            setDrawerBackground()
-        }
-
-        if (key == "app_drawer_background_alpha") {
             setDrawerBackground()
         }
 

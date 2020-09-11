@@ -50,6 +50,23 @@ object GrayMatterUtils {
         }
     }
 
+    fun colorToColorPref(color: Int): String {
+        when(color) {
+            Color.BLACK -> return "Black"
+            Color.WHITE -> return "White"
+            Color.GREEN -> return "Green"
+            Color.BLUE -> return "Blue"
+            Color.CYAN -> return "Cyan"
+            Color.DKGRAY -> return "Dark Gray"
+            Color.GRAY -> return "Gray"
+            Color.LTGRAY -> return "Light Gray"
+            Color.MAGENTA -> return "Magenta"
+            Color.RED -> return "Red"
+            Color.YELLOW -> return "Yellow"
+            else -> return "Custom"
+        }
+    }
+
     fun vibrate(con: Context, millis: Long) {
         val vibe = con.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
         vibe.vibrate(VibrationEffect.createOneShot(millis, VibrationEffect.DEFAULT_AMPLITUDE))

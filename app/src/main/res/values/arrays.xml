@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string-array name="android_colors">
+        <item>Custom</item>
         <item>Black</item>
         <item>White</item>
         <item>Green</item>

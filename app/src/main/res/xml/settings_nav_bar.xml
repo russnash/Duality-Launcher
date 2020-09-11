@@ -1,17 +1,7 @@
 <PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:android="http://schemas.android.com/apk/res/android">
-    <ListPreference
+    <com.graymatterapps.dualitylauncher.ColorPreference
+        android:defaultValue="-16777216"
         android:key="nav_background"
-        android:title="Background color"
-        app:useSimpleSummaryProvider="true"
-        android:entries="@array/android_colors"
-        android:entryValues="@array/android_colors"
-        android:defaultValue="Black"/>
-    <SeekBarPreference
-        android:key="nav_background_alpha"
-        android:title="Background transparency"
-        android:max="255"
-        app:showSeekBarValue="true"
-        app:updatesContinuously="true"
-        android:defaultValue="80"/>
+        android:title="Background color" />
 </PreferenceScreen>

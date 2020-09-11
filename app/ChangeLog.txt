@@ -1,3 +1,12 @@
+Version 2020.9.10.1-internal
+Changes:
+- Switched theme from day/night switching to dark by default.
+- Custom color picker implemented to allow more control over color preferences.
+- Implemented some UI animations.
+
+Bug Fixes:
+- Fixed a bug where dragging one folder onto another caused a crash.
+
 Version 2020.9.7.2-internal
 Changes:
 - Folder icons now preview the first and last icon in the folder.

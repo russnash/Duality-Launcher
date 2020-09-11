@@ -2,6 +2,7 @@ package com.graymatterapps.dualitylauncher
 
 import android.app.Application
 import android.appwidget.AppWidgetHost
+import android.appwidget.AppWidgetHostView
 import android.appwidget.AppWidgetManager
 import android.content.Context
 import android.content.SharedPreferences
@@ -12,11 +13,12 @@ import org.acra.*
 import org.acra.annotation.*
 import org.acra.data.StringFormat
 
-lateinit var appWidgetHost: AppWidgetHost
 lateinit var appWidgetManager: AppWidgetManager
+lateinit var appWidgetHost: AppWidgetHost
 lateinit var settingsPreferences: SharedPreferences
 lateinit var prefs: SharedPreferences
 lateinit var appList: AppList
+lateinit var widgetDB: WidgetDB
 
 @AcraCore(buildConfigClass = org.acra.BuildConfig::class, reportFormat= StringFormat.JSON)
 @AcraMailSender(mailTo = "russnash37@gmail.com", reportAsFile = true)
@@ -34,17 +36,18 @@ class DualityLauncherApplication: Application() {
     }
 
     override fun onCreate() {
+        super.onCreate()
         prefs = this.getSharedPreferences(PREFS_FILENAME, 0)
         settingsPreferences = PreferenceManager.getDefaultSharedPreferences(this)
         appList = AppList(applicationContext)
-        appWidgetHost = AppWidgetHost(applicationContext, 0)
+        widgetDB = WidgetDB(applicationContext)
         appWidgetManager = AppWidgetManager.getInstance(applicationContext)
+        appWidgetHost = AppWidgetHost(applicationContext, 1)
         appWidgetHost.startListening()
-        super.onCreate()
     }
 
     override fun onTerminate() {
-        appWidgetHost.stopListening()
         super.onTerminate()
+        appWidgetHost.stopListening()
     }
 }

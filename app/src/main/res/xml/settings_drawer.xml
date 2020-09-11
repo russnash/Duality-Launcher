@@ -1,26 +1,13 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
-    <ListPreference
-        android:defaultValue="Black"
-        android:entries="@array/android_colors"
-        android:entryValues="@array/android_colors"
+    <com.graymatterapps.dualitylauncher.ColorPreference
+        android:defaultValue="-16777216"
         android:key="app_drawer_background"
-        android:title="@string/pref_app_drawer_background"
-        app:useSimpleSummaryProvider="true" />
-    <SeekBarPreference
-        android:defaultValue="80"
-        android:key="app_drawer_background_alpha"
-        android:max="255"
-        android:title="Background transparency"
-        app:showSeekBarValue="true"
-        app:updatesContinuously="true" />
-    <ListPreference
-        android:defaultValue="White"
-        android:entries="@array/android_colors"
-        android:entryValues="@array/android_colors"
+        android:title="@string/pref_app_drawer_background" />
+    <com.graymatterapps.dualitylauncher.ColorPreference
+        android:defaultValue="-1"
         android:key="app_drawer_text"
-        android:title="@string/pref_app_drawer_text"
-        app:useSimpleSummaryProvider="true" />
+        android:title="@string/pref_app_drawer_text" />
     <CheckBoxPreference
         android:defaultValue="true"
         android:key="app_drawer_nav_status_sync"

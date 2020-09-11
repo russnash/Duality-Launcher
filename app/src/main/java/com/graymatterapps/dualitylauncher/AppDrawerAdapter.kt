@@ -54,11 +54,9 @@ class AppDrawerAdapter(
         val rowView = holder.itemView
         val icon = rowView.findViewById<Icon>(R.id.icon)
         icon.label.setTextColor(
-            colorPrefToColor(
-                settingsPreferences.getString(
-                    "app_drawer_text",
-                    "White"
-                )
+            settingsPreferences.getInt(
+                "app_drawer_text",
+                -1
             )
         )
         icon.setLaunchInfo(

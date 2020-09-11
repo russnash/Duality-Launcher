@@ -68,6 +68,7 @@ class SettingsActivity : AppCompatActivity(), PreferenceFragmentCompat.OnPrefere
         val frag = supportFragmentManager.findFragmentById(R.id.frameLayout)
         if(frag is SettingsFragment) {
             finish()
+            overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left)
         } else {
             supportFragmentManager
                 .beginTransaction()

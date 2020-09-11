@@ -18,4 +18,13 @@
     <string name="new_folder">New Folder</string>
     <string name="developer_warning">PLEASE NOTE: The tools in this menu vary from informational to destructive! Tools with an \'eye\' icon will simply show information, however, other tools change and / or destroy data and may result in loss of information or other undesired results such as crashes and unexpected behavior. Proceed at your own risk!</string>
     <string name="acra_dialog_text">Duality Launcher has crashed, please help the developer by following the prompts to send the crash report via email.  Please add any extra info, such as what you were doing when the crash occurred, to the email body.  Thanks for helping to make Duality Launcher better!</string>
+    <string name="red">Red</string>
+    <string name="green">Green</string>
+    <string name="blue">Blue</string>
+    <string name="alpha">Alpha</string>
+    <string name="color_chooser">Preset:</string>
+    <string name="ok">OK</string>
+    <string name="cancel">Cancel</string>
+    <string name="custom">Custom:</string>
+    <string name="color_chooser_title">Choose a color</string>
 </resources>

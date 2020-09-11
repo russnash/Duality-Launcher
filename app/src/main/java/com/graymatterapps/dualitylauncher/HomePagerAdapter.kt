@@ -52,7 +52,7 @@ class HomePagerAdapter(private val context: Context, private val container: View
         numCols = Integer.parseInt(numColsString.toString())
         val numRowsString = settingsPreferences.getString("home_grid_rows", "7")
         numRows = Integer.parseInt(numRowsString.toString())
-        val textColor = colorPrefToColor(settingsPreferences.getString("home_text_color", "White"))
+        val textColor = settingsPreferences.getInt("home_text_color", -1)
         homeIconsTable.removeAllViews()
         homeIconsTable.setGridSize(numRows, numCols)
 

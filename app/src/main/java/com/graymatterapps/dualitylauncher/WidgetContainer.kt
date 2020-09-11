@@ -1,11 +1,11 @@
 package com.graymatterapps.dualitylauncher
 
-import android.appwidget.AppWidgetHostView
 import android.appwidget.AppWidgetManager
 import android.appwidget.AppWidgetProviderInfo
 import android.content.ClipData
 import android.content.Context
 import android.content.Intent
+import android.util.Log
 import android.view.GestureDetector
 import android.view.Gravity
 import android.view.MotionEvent
@@ -18,7 +18,7 @@ class WidgetContainer(
     private var appWidgetProviderInfo: AppWidgetProviderInfo
 ) : FrameLayout(context), GestureDetector.OnGestureListener {
 
-    lateinit var appWidgetHostView: AppWidgetHostView
+    var widgetDBIndex: Int? = null
     lateinit var parentLayout: HomeLayout
     var gestureDetector: GestureDetector
     var neededWidth: Int = 0
@@ -62,24 +62,34 @@ class WidgetContainer(
     }
 
     private fun buildWidget() {
-        appWidgetHostView = appWidgetHost.createView(mainContext.applicationContext, appWidgetId, appWidgetProviderInfo)
-        appWidgetHostView.setAppWidget(appWidgetId, appWidgetProviderInfo)
+        widgetDBIndex = widgetDB.getWidget(appWidgetId)
+        if (widgetDBIndex == null) {
+            Log.d(TAG, "widgetDBIndex for $appWidgetId is null!!")
+        }
+        widgetDB.widgets[widgetDBIndex!!].appWidgetHostView =
+            appWidgetHost.createView(appContext, appWidgetId, appWidgetProviderInfo)
+        widgetDB.widgets[widgetDBIndex!!].appWidgetHostView.setAppWidget(
+            appWidgetId,
+            appWidgetProviderInfo
+        )
         val options = appWidgetManager.getAppWidgetOptions(appWidgetId)
-        appWidgetHostView.updateAppWidgetOptions(options)
+        widgetDB.widgets[widgetDBIndex!!].appWidgetHostView.updateAppWidgetOptions(options)
         layoutWidget()
     }
 
     private fun longClick() {
-        val id = System.currentTimeMillis().toString()
-        var widgetInfo = WidgetInfo(appWidgetId, appWidgetProviderInfo, null)
-        dragAndDropData.addWidget(widgetInfo, id)
-        val clipData = ClipData.newPlainText("widget", id)
-        val dsb = WidgetDragShadowBuilder(this)
-        if(!this.startDragAndDrop(clipData, dsb, this, 0)) {
-            widgetInfo = dragAndDropData.retrieveWidgetId(id)
-            appWidgetHost.deleteAppWidgetId(widgetInfo.getAppWidgetId())
+        if (!isPaging) {
+            val id = System.currentTimeMillis().toString()
+            var widgetInfo = WidgetInfo(appWidgetId, appWidgetProviderInfo, null)
+            dragAndDropData.addWidget(widgetInfo, id)
+            val clipData = ClipData.newPlainText("widget", id)
+            val dsb = WidgetDragShadowBuilder(this)
+            if (!this.startDragAndDrop(clipData, dsb, this, 0)) {
+                widgetInfo = dragAndDropData.retrieveWidgetId(id)
+                appWidgetHost.deleteAppWidgetId(widgetInfo.getAppWidgetId())
+            }
+            this.convertToIcon()
         }
-        this.convertToIcon()
     }
 
     fun configureWidget(data: Intent? = null) {
@@ -107,13 +117,13 @@ class WidgetContainer(
 
     private fun layoutWidget() {
         val minWidth =
-            appWidgetProviderInfo.minWidth + appWidgetHostView.paddingLeft + appWidgetHostView.paddingRight
+            appWidgetProviderInfo.minWidth + widgetDB.widgets[widgetDBIndex!!].appWidgetHostView.paddingLeft + widgetDB.widgets[widgetDBIndex!!].appWidgetHostView.paddingRight
         val minHeight =
-            appWidgetProviderInfo.minHeight + appWidgetHostView.paddingTop + appWidgetHostView.paddingBottom
+            appWidgetProviderInfo.minHeight + widgetDB.widgets[widgetDBIndex!!].appWidgetHostView.paddingTop + widgetDB.widgets[widgetDBIndex!!].appWidgetHostView.paddingBottom
 
         neededWidth = parentLayout.widthToCells(minWidth) * parentLayout.getCellWidth()
         neededHeight = parentLayout.heightToCells(minHeight) * parentLayout.getCellHeight()
-        appWidgetHostView.setPadding(0, 0, 0, 0)
+        widgetDB.widgets[widgetDBIndex!!].appWidgetHostView.setPadding(0, 0, 0, 0)
         val viewParams = FrameLayout.LayoutParams(
             FrameLayout.LayoutParams.WRAP_CONTENT,
             FrameLayout.LayoutParams.WRAP_CONTENT
@@ -121,13 +131,13 @@ class WidgetContainer(
         viewParams.width = neededWidth
         viewParams.height = neededHeight
         viewParams.gravity = Gravity.CENTER
-        appWidgetHostView.layoutParams = viewParams
+        widgetDB.widgets[widgetDBIndex!!].appWidgetHostView.layoutParams = viewParams
         val widthSpec = MeasureSpec.makeMeasureSpec(neededWidth, MeasureSpec.EXACTLY)
         val heightSpec = MeasureSpec.makeMeasureSpec(neededHeight, MeasureSpec.EXACTLY)
         this.removeAllViews()
-        this.addView(appWidgetHostView, viewParams)
-        appWidgetHostView.measure(widthSpec, heightSpec)
-        appWidgetHostView.updateAppWidgetSize(
+        this.addView(widgetDB.widgets[widgetDBIndex!!].appWidgetHostView, viewParams)
+        widgetDB.widgets[widgetDBIndex!!].appWidgetHostView.measure(widthSpec, heightSpec)
+        widgetDB.widgets[widgetDBIndex!!].appWidgetHostView.updateAppWidgetSize(
             null,
             minWidth,
             minHeight,

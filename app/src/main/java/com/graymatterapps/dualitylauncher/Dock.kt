@@ -98,15 +98,7 @@ class Dock(context: Context, attrs: AttributeSet) : LinearLayout(context, attrs)
         if (!settingsPreferences.getBoolean("dock_background", false)) {
             dockTable.setBackgroundColor(Color.TRANSPARENT)
         } else {
-            var basicColor = colorPrefToColor(
-                this.settingsPreferences.getString(
-                    "dock_background_color",
-                    "Light Gray"
-                )
-            )
-            var alpha = this.settingsPreferences.getInt("dock_background_alpha", 80)
-            var color = ColorUtils.setAlphaComponent(basicColor, alpha)
-            dockTable.setBackgroundColor(color)
+            dockTable.setBackgroundColor(settingsPreferences.getInt("dock_background_color", Color.BLACK))
         }
     }
 

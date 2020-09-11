@@ -16,6 +16,7 @@ import android.view.animation.AnimationUtils
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.core.content.ContextCompat
 import androidx.core.graphics.ColorUtils
 import androidx.core.graphics.drawable.toBitmap
 import com.graymatterapps.dualitylauncher.MainActivity.Companion.dragAndDropData
@@ -112,7 +113,6 @@ class Folder(
                     DragEvent.ACTION_DRAG_STARTED -> {
                         if (respondToDrag) {
                             folderLayout.setBackgroundResource(R.drawable.icon_drag_target)
-                            //folderLayout.startAnimation(pulseAnim)
                         }
                     }
                     DragEvent.ACTION_DRAG_ENTERED -> {
@@ -123,7 +123,6 @@ class Folder(
                     DragEvent.ACTION_DRAG_EXITED -> {
                         if (respondToDrag) {
                             folderLayout.setBackgroundResource(R.drawable.icon_drag_target)
-                            //folderLayout.startAnimation(pulseAnim)
                         }
                     }
                     DragEvent.ACTION_DRAG_ENDED -> {
@@ -135,7 +134,9 @@ class Folder(
                             if (dragEvent.clipDescription.label.toString().equals("launchInfo")) {
                                 val id = dragEvent.clipData.getItemAt(0).text.toString()
                                 val info = MainActivity.dragAndDropData.retrieveLaunchInfo(id)
-                                addFolderApp(info)
+                                if(info.getType() == LaunchInfo.ICON) {
+                                    addFolderApp(info)
+                                }
                             }
                         }
                     }
@@ -148,12 +149,12 @@ class Folder(
     private fun makeFolderIcon(): Bitmap {
         val clearPaint = Paint().apply { xfermode = PorterDuffXfermode(PorterDuff.Mode.CLEAR) }
         val drawable: Drawable =
-            mainContext.resources.getDrawable(R.drawable.ic_launcher_background)
+            ContextCompat.getDrawable(mainContext, R.drawable.ic_launcher_background)!!
         var bitmap = drawableToBitmap(drawable)
         var canvas = Canvas(bitmap!!)
         canvas.drawRect(0F, 0F, canvas.width.toFloat(), canvas.height.toFloat(), clearPaint)
 
-        var firstBitmap = mainContext.resources.getDrawable(R.drawable.ic_folder).toBitmap()
+        var firstBitmap = ContextCompat.getDrawable(mainContext, R.drawable.ic_folder)!!.toBitmap()
         if (folderApps.size != 0) {
             firstBitmap = appList.getIcon(folderApps[0]).toBitmap()
         }
@@ -164,7 +165,7 @@ class Folder(
         )
         canvas.drawBitmap(firstBitmap, srcRect, dstRect, null)
 
-        var secondBitmap = mainContext.resources.getDrawable(R.drawable.ic_folder).toBitmap()
+        var secondBitmap = ContextCompat.getDrawable(mainContext, R.drawable.ic_folder)!!.toBitmap()
         if (folderApps.size != 0) {
             secondBitmap = appList.getIcon(folderApps[folderApps.size - 1]).toBitmap()
         }
