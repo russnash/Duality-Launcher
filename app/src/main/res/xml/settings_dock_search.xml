@@ -1,0 +1,27 @@
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <CheckBoxPreference
+        android:defaultValue="false"
+        android:key="dock_search"
+        android:title="@string/dock_search" />
+    <ListPreference
+        android:defaultValue="Above dock"
+        android:entries="@array/search_position"
+        android:entryValues="@array/search_position"
+        android:key="dock_search_position"
+        android:title="Position of the search widget"
+        app:useSimpleSummaryProvider="true" />
+    <ListPreference
+        android:defaultValue="Google"
+        android:entries="@array/search_providers"
+        android:entryValues="@array/search_providers"
+        android:key="dock_search_provider"
+        android:title="Search provider"
+        app:useSimpleSummaryProvider="true" />
+    <com.graymatterapps.dualitylauncher.ColorPreference
+        android:defaultValue="-16777216"
+        android:key="dock_search_color"
+        android:title="@string/dock_search_color" />
+
+</PreferenceScreen>

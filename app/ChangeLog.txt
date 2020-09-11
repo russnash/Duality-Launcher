@@ -1,3 +1,13 @@
+Version 2020.9.11.3-internal
+Changes:
+- Added more animations.
+- Added a customizable dock search widget.
+- Increased size and width of trashcan.
+
+Bug Fixes:
+- Issues with app icon retrieval were causing folder crashes.
+- Fixed new color chooser causing a crash after setting nav bar colors.
+
 Version 2020.9.10.1-internal
 Changes:
 - Switched theme from day/night switching to dark by default.

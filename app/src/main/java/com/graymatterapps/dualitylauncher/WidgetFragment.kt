@@ -31,7 +31,7 @@ class WidgetFragment : Fragment(), WidgetChooserAdapter.WidgetChooserInterface {
 
         installedProvs = appWidgetManager.installedProviders
         installedProvs.sortBy {
-            it.provider.packageName
+            it.provider.className
         }
         listener = activity as WidgetInterface
     }

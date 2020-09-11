@@ -6,6 +6,7 @@ import android.content.SharedPreferences
 import android.graphics.Color
 import android.util.AttributeSet
 import android.view.View
+import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.TableLayout
 import android.widget.TableRow
@@ -25,17 +26,43 @@ class Dock(context: Context, attrs: AttributeSet) : LinearLayout(context, attrs)
     var dockItems = DockItems()
     var dockTable: TableLayout
     var dockRow: TableRow
+    var searchRowTop: LinearLayout
+    var searchRowBottom: LinearLayout
+    var dockSearchWidget: DockSearchWidget = DockSearchWidget(context)
     val TAG = javaClass.simpleName
 
     init {
         inflate(context, R.layout.dock, this)
         dockTable = findViewById(R.id.dockTable)
         dockRow = findViewById(R.id.dockRow)
+        searchRowTop = findViewById(R.id.searchRowTop)
+        searchRowBottom = findViewById(R.id.searchRowBottom)
         prefs = context.getSharedPreferences(PREFS_FILENAME, 0)
         prefs.registerOnSharedPreferenceChangeListener(this)
         settingsPreferences.registerOnSharedPreferenceChangeListener(this)
         dockRow.setBackgroundColor(Color.TRANSPARENT)
+        setupDockSearch()
+
         setDockBackground()
+    }
+
+    fun clearSearchFocus() {
+        dockSearchWidget.clearSearchFocus()
+    }
+
+    fun setupDockSearch(){
+        val params = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT)
+
+        searchRowTop.removeAllViews()
+        searchRowBottom.removeAllViews()
+
+        if(settingsPreferences.getBoolean("dock_search", false)){
+            if(settingsPreferences.getString("dock_search_position", "Above dock").equals("Above dock")){
+                searchRowTop.addView(dockSearchWidget, params)
+            } else {
+                searchRowBottom.addView(dockSearchWidget, params)
+            }
+        }
     }
 
     fun populateDock() {
@@ -123,6 +150,22 @@ class Dock(context: Context, attrs: AttributeSet) : LinearLayout(context, attrs)
 
         if (key == "dock_background_alpha") {
             setDockBackground()
+        }
+
+        if (key == "dock_search") {
+            setupDockSearch()
+        }
+
+        if(key == "dock_search_position") {
+            setupDockSearch()
+        }
+
+        if(key == "dock_search_provider") {
+            setupDockSearch()
+        }
+
+        if(key == "dock_search_color") {
+            setupDockSearch()
         }
     }
 

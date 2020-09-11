@@ -7,6 +7,10 @@
         android:summary="Customize the home screen"
         app:fragment="com.graymatterapps.dualitylauncher.SettingsHomeFragment" />
     <Preference
+        android:title="Dock Search"
+        android:summary="Display a custom search widget in the dock"
+        app:fragment="com.graymatterapps.dualitylauncher.SettingsDockSearch" />
+    <Preference
         android:title="App Drawer"
         android:summary="Customize the app drawer"
         app:fragment="com.graymatterapps.dualitylauncher.SettingsDrawerFragment" />

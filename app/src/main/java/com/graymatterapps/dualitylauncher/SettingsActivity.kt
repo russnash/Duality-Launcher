@@ -3,12 +3,15 @@ package com.graymatterapps.dualitylauncher
 import android.os.Bundle
 import android.view.MenuItem
 import android.view.View
+import android.view.animation.AnimationUtils
+import android.widget.FrameLayout
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import com.graymatterapps.graymatterutils.GrayMatterUtils.getVersionCode
 import com.graymatterapps.graymatterutils.GrayMatterUtils.getVersionName
+import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.activity_settings.*
 
 class SettingsActivity : AppCompatActivity(), PreferenceFragmentCompat.OnPreferenceStartFragmentCallback {
@@ -52,6 +55,8 @@ class SettingsActivity : AppCompatActivity(), PreferenceFragmentCompat.OnPrefere
         supportFragmentManager.beginTransaction()
             .replace(R.id.frameLayout, fragment)
             .commit()
+        val animation = AnimationUtils.loadAnimation(this, R.anim.slide_in_left)
+        findViewById<FrameLayout>(R.id.frameLayout).startAnimation(animation)
         supportActionBar?.title = pref.title
         return true
     }
@@ -74,6 +79,8 @@ class SettingsActivity : AppCompatActivity(), PreferenceFragmentCompat.OnPrefere
                 .beginTransaction()
                 .replace(R.id.frameLayout, settingsFragment, "settings")
                 .commit()
+            val animation = AnimationUtils.loadAnimation(this, R.anim.slide_in_left)
+            findViewById<FrameLayout>(R.id.frameLayout).startAnimation(animation)
             supportActionBar?.title = "Duality Settings"
         }
     }

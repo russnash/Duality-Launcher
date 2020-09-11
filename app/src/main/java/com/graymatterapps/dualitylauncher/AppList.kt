@@ -10,6 +10,7 @@ import android.graphics.drawable.ShapeDrawable
 import android.graphics.drawable.shapes.OvalShape
 import android.os.UserHandle
 import android.os.UserManager
+import androidx.core.content.ContextCompat
 import com.graymatterapps.graymatterutils.GrayMatterUtils.longToast
 import java.util.concurrent.locks.ReentrantLock
 
@@ -84,9 +85,7 @@ class AppList(val context: Context) : LauncherApps.Callback() {
         if (app != null) {
             return app.icon
         } else {
-            val shapeDrawable = ShapeDrawable(OvalShape())
-            shapeDrawable.paint.color = Color.TRANSPARENT
-            return shapeDrawable
+            return ContextCompat.getDrawable(mainContext, R.drawable.ic_launcher_foreground)!!
         }
     }
 

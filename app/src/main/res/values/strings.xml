@@ -27,4 +27,6 @@
     <string name="cancel">Cancel</string>
     <string name="custom">Custom:</string>
     <string name="color_chooser_title">Choose a color</string>
+    <string name="dock_search">Show a search widget in the dock</string>
+    <string name="dock_search_color">Color scheme</string>
 </resources>

@@ -1,5 +1,6 @@
 package com.graymatterapps.graymatterutils
 
+import android.app.Activity
 import android.app.AlertDialog
 import android.content.Context
 import android.content.DialogInterface
@@ -7,6 +8,8 @@ import android.content.pm.PackageManager
 import android.graphics.Color
 import android.os.VibrationEffect
 import android.os.Vibrator
+import android.view.View
+import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import com.graymatterapps.dualitylauncher.mainContext
 
@@ -104,5 +107,10 @@ object GrayMatterUtils {
 
     fun shortToast(con: Context, message: String) {
         Toast.makeText(con, message, Toast.LENGTH_SHORT).show()
+    }
+
+    fun hideKeyboardFrom(con: Context, view: View) {
+        val imm = con.getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
+        imm.hideSoftInputFromWindow(view.windowToken, 0)
     }
 }

@@ -59,7 +59,7 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
     var appWidgetId: Int = 0
     lateinit var appWidgetProviderInfo: AppWidgetProviderInfo
     lateinit var homePagerAdapter: HomePagerAdapter
-    private val enteredColor = ColorUtils.setAlphaComponent(Color.GREEN, 80)
+    private val enteredColor = ColorUtils.setAlphaComponent(Color.GREEN, 20)
 
     val TAG = javaClass.simpleName
 
@@ -310,11 +310,11 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
     fun showHomeMenu(state: Boolean) {
         if (state) {
             homeMenu.visibility = View.VISIBLE
-            val animation = AnimationUtils.loadAnimation(this@MainActivity, R.anim.fade_in)
+            val animation = AnimationUtils.loadAnimation(this@MainActivity, R.anim.grow_fade_in_center)
             homeMenu.startAnimation(animation)
         } else {
             homeMenu.visibility = View.INVISIBLE
-            val animation = AnimationUtils.loadAnimation(this@MainActivity, R.anim.fade_out)
+            val animation = AnimationUtils.loadAnimation(this@MainActivity, R.anim.shrink_fade_out_center)
             homeMenu.startAnimation(animation)
         }
     }
@@ -322,8 +322,12 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
     fun showHomeFolder(state: Boolean) {
         if (state) {
             homeFolder.visibility = View.VISIBLE
+            val animation = AnimationUtils.loadAnimation(this@MainActivity, R.anim.grow_fade_in_center)
+            homeFolder.startAnimation(animation)
         } else {
             homeFolder.visibility = View.INVISIBLE
+            val animation = AnimationUtils.loadAnimation(this@MainActivity, R.anim.shrink_fade_out_center)
+            homeFolder.startAnimation(animation)
         }
         isFolderOpen = state
     }
@@ -561,6 +565,7 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
     }
 
     fun showDrawerFragment() {
+        dock.clearSearchFocus()
         gestureLayout.setGesturesOn(false)
         supportFragmentManager
             .beginTransaction()
