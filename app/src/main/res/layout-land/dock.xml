@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/dockLayout"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <LinearLayout
+        android:id="@+id/searchRowTop"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="start"
+        android:layout_weight="1"
+        android:orientation="horizontal" >
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/searchRowBottom"
+        android:layout_width="400dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="start"
+        android:layout_weight="0"
+        android:orientation="horizontal" />
+
+    <TableLayout
+        android:id="@+id/dockTable"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end"
+        android:layout_weight="1"
+        android:stretchColumns="*">
+
+        <TableRow
+            android:id="@+id/dockRow"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+    </TableLayout>
+
+</LinearLayout>

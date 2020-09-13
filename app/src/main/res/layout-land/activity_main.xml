@@ -6,6 +6,22 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <ImageView
+        android:id="@+id/homeDelete"
+        android:layout_width="25dp"
+        android:layout_height="0dp"
+        android:layout_gravity="center"
+        android:layout_weight="0"
+        android:src="@drawable/delete"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <com.graymatterapps.dualitylauncher.Dock
+        android:id="@+id/dock"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        app:layout_constraintBottom_toBottomOf="parent" />
+
     <LinearLayout
         android:id="@+id/frameLayout"
         android:layout_width="match_parent"
@@ -13,22 +29,11 @@
         android:orientation="vertical"
         tools:context=".HomeFragment">
 
-        <ImageView
-            android:id="@+id/homeDelete"
-            android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:layout_gravity="center"
-            android:layout_weight="0"
-            android:paddingLeft="10dp"
-            android:paddingTop="5dp"
-            android:paddingRight="10dp"
-            android:paddingBottom="5dp"
-            android:src="@drawable/delete" />
-
         <androidx.viewpager2.widget.ViewPager2
             android:id="@+id/homePager"
-            android:layout_width="match_parent"
+            android:layout_width="400dp"
             android:layout_height="wrap_content"
+            android:layout_gravity="center"
             android:layout_weight="1">
 
         </androidx.viewpager2.widget.ViewPager2>
@@ -40,13 +45,6 @@
 
             <TableRow android:id="@+id/homePageIndicator" />
         </TableLayout>
-
-        <com.graymatterapps.dualitylauncher.Dock
-            android:id="@+id/dock"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="bottom"
-            android:layout_weight="0" />
 
     </LinearLayout>
 
@@ -78,7 +76,7 @@
     <include
         android:id="@+id/homeFolder"
         layout="@layout/home_folder"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="match_parent"
         android:visibility="invisible"
         app:layout_constraintBottom_toBottomOf="parent"

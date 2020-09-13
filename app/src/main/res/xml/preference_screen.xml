@@ -11,6 +11,10 @@
         android:summary="Display a custom search widget in the dock"
         app:fragment="com.graymatterapps.dualitylauncher.SettingsDockSearch" />
     <Preference
+        android:title="Folders"
+        android:summary="Customize folders"
+        app:fragment="com.graymatterapps.dualitylauncher.SettingsFolder" />
+    <Preference
         android:title="App Drawer"
         android:summary="Customize the app drawer"
         app:fragment="com.graymatterapps.dualitylauncher.SettingsDrawerFragment" />

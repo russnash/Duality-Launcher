@@ -8,6 +8,7 @@
     <string name="pref_app_drawer">App Drawer</string>
     <string name="pref_app_drawer_background">Background color</string>
     <string name="pref_app_drawer_text">Text color</string>
+    <string name="pref_app_drawer_text_shadow">Text shadow color</string>
     <string name="pref_dock">Dock</string>
     <string name="pref_dock_background">Show background</string>
     <string name="pref_dock_background_color">Background color</string>

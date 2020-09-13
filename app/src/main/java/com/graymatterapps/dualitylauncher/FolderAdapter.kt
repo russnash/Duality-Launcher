@@ -3,6 +3,7 @@ package com.graymatterapps.dualitylauncher
 import android.content.ClipData
 import android.content.Context
 import android.content.SharedPreferences
+import android.graphics.Color
 import android.view.View
 import android.view.ViewGroup
 import android.widget.BaseAdapter
@@ -31,6 +32,11 @@ class FolderAdapter(var context: Context, var apps: ArrayList<LaunchInfo>, val f
         icon.setLaunchInfo(apps[position])
         icon.setDockIcon(true)
         icon.setListener(this)
+        val textColor = settingsPreferences.getInt("folder_text", Color.WHITE)
+        val textShadowColor = settingsPreferences.getInt("folder_text_shadow", Color.BLACK)
+        icon.label.setTextColor(textColor)
+        icon.label.setShadowLayer(6F, 0F, 0F, textShadowColor)
+        icon.setPadding(0, 0, 0, 25)
         return icon
     }
 

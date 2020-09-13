@@ -16,8 +16,6 @@ class SettingsDeveloper : PreferenceFragmentCompat() {
         setPreferencesFromResource(R.xml.settings_developer, rootKey)
         listener = mainContext as DeveloperInterface
 
-        showOkDialog(requireActivity(), getString(R.string.developer_warning))
-
         preferenceManager.findPreference<Preference>("update_app_list")?.setOnPreferenceClickListener {
             listener.updateAppList()
             true
@@ -31,7 +29,7 @@ class SettingsDeveloper : PreferenceFragmentCompat() {
             editor.remove("homeIconsGrid3")
             editor.remove("homeIconsGrid4")
             editor.apply()
-            shortToast(mainContext, "Home icon / folder grid persistence cleared...")
+            shortToast(requireActivity(), "Home icon / folder grid persistence cleared...")
             true
         }
 
@@ -39,7 +37,7 @@ class SettingsDeveloper : PreferenceFragmentCompat() {
             val editor = prefs.edit()
             editor.remove("dockItems")
             editor.apply()
-            shortToast(mainContext, "Dock persistence cleared...")
+            shortToast(requireActivity(), "Dock persistence cleared...")
             true
         }
 
@@ -51,13 +49,13 @@ class SettingsDeveloper : PreferenceFragmentCompat() {
             editor.remove("homeWidgetsGrid3")
             editor.remove("homeWidgetsGrid4")
             editor.apply()
-            shortToast(mainContext, "Home widget grid persistence cleared...")
+            shortToast(requireActivity(), "Home widget grid persistence cleared...")
             true
         }
 
         preferenceManager.findPreference<Preference>("clear_appwidgethosts")?.setOnPreferenceClickListener {
             AppWidgetHost.deleteAllHosts()
-            shortToast(mainContext, "AppWidgetHost data for Duality Launcher cleared...")
+            shortToast(requireActivity(), "AppWidgetHost data for Duality Launcher cleared...")
             true
         }
 
@@ -72,9 +70,15 @@ class SettingsDeveloper : PreferenceFragmentCompat() {
             editor.apply()
             true
         }
+
+        preferenceManager.findPreference<Preference>("log_recents")?.setOnPreferenceClickListener {
+            listener.logRecents()
+            true
+        }
     }
 
     interface DeveloperInterface {
         fun updateAppList()
+        fun logRecents()
     }
 }

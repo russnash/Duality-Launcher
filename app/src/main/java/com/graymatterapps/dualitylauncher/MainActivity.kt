@@ -1,12 +1,15 @@
 package com.graymatterapps.dualitylauncher
 
 import android.annotation.SuppressLint
+import android.app.ActivityManager
+import android.app.usage.UsageStatsManager
 import android.appwidget.AppWidgetManager
 import android.appwidget.AppWidgetProviderInfo
 import android.content.ClipData
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
+import android.content.res.ColorStateList
 import android.graphics.Color
 import android.hardware.display.DisplayManager
 import android.os.Bundle
@@ -21,6 +24,7 @@ import android.widget.ArrayAdapter
 import android.widget.ImageView
 import android.widget.TableRow
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.getSystemService
 import androidx.core.graphics.ColorUtils
 import androidx.core.view.ViewCompat.startDragAndDrop
 import androidx.fragment.app.Fragment
@@ -544,6 +548,9 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
             if (key == "home_text_color") {
                 homePagerAdapter.notifyDataSetChanged()
             }
+            if (key == "home_text_shadow_color") {
+                homePagerAdapter.notifyDataSetChanged()
+            }
         }
     }
 
@@ -577,7 +584,7 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
         //gestureLayout.startAnimation(animation2)
         var color = settingsPreferences.getInt(
             "app_drawer_background",
-            -16777216
+            Color.BLACK
         )
 
         if (settingsPreferences.getBoolean("app_drawer_nav_status_sync", true)) {
@@ -776,7 +783,13 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
     }
 
     override fun onSetupFolder(apps: ArrayList<LaunchInfo>, name: Editable, folder: Folder) {
+        val textColor = settingsPreferences.getInt("folder_text", Color.WHITE)
+        val textShadowColor = settingsPreferences.getInt("folder_text_shadow", Color.BLACK)
         folderName.text = name
+        folderName.setTextColor(textColor)
+        folderName.setShadowLayer(6F, 0F, 0F, textShadowColor)
+        folderWindow.backgroundTintList =
+            ColorStateList.valueOf(settingsPreferences.getInt("folder_background", Color.BLACK))
         folderDebug.text = folder.getLaunchInfo().getFolderUniqueId().toString()
         if (settingsPreferences.getBoolean("show_folder_id", false)) {
             folderDebug.visibility = View.VISIBLE
@@ -844,5 +857,14 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
 
     override fun onFolderChanged() {
         persistGrid(getCurrentHomePagerItem())
+    }
+
+    override fun logRecents() {
+        val usageStatsManager = getSystemService(Context.USAGE_STATS_SERVICE) as UsageStatsManager
+        val time = System.currentTimeMillis()
+        val stats = usageStatsManager.queryUsageStats(UsageStatsManager.INTERVAL_DAILY, time - android.os.SystemClock.uptimeMillis(), time)
+        stats.forEach{
+            Log.d(TAG, it.packageName)
+        }
     }
 }

@@ -8,6 +8,10 @@
         android:defaultValue="-1"
         android:key="app_drawer_text"
         android:title="@string/pref_app_drawer_text" />
+    <com.graymatterapps.dualitylauncher.ColorPreference
+        android:defaultValue="-16777216"
+        android:key="app_drawer_text_shadow"
+        android:title="@string/pref_app_drawer_text_shadow" />
     <CheckBoxPreference
         android:defaultValue="true"
         android:key="app_drawer_nav_status_sync"

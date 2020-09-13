@@ -1,3 +1,11 @@
+Version 2020.9.12.1-internal
+Changes:
+- Individual layouts for landscape / desktop mode orientation.
+- Shrunk height of home page indicator to give more space to the home icon / widget grid.
+- Folder colors can now be customized.
+- Added text shadows with configurable colors to home screen, app drawer and folders.
+- Relocated developer settings warning after I hit Ok followed by Clear folder data by mistake.
+
 Version 2020.9.11.3-internal
 Changes:
 - Added more animations.

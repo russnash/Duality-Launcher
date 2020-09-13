@@ -54,6 +54,10 @@
             android:key="home_text_color"
             android:title="Text color"
             android:defaultValue="-1" />
+        <com.graymatterapps.dualitylauncher.ColorPreference
+            android:key="home_text_shadow_color"
+            android:title="Text shadow color"
+            android:defaultValue="-16777216" />
     </PreferenceCategory>
 
 </PreferenceScreen>

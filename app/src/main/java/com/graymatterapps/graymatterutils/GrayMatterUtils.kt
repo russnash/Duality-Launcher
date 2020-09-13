@@ -6,11 +6,15 @@ import android.content.Context
 import android.content.DialogInterface
 import android.content.pm.PackageManager
 import android.graphics.Color
+import android.hardware.display.DisplayManager
 import android.os.VibrationEffect
 import android.os.Vibrator
+import android.util.DisplayMetrics
 import android.view.View
+import android.view.WindowManager
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
+import com.graymatterapps.dualitylauncher.homeActivity
 import com.graymatterapps.dualitylauncher.mainContext
 
 object GrayMatterUtils {
@@ -112,5 +116,15 @@ object GrayMatterUtils {
     fun hideKeyboardFrom(con: Context, view: View) {
         val imm = con.getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
         imm.hideSoftInputFromWindow(view.windowToken, 0)
+    }
+
+    fun isLandscape(con: Context): Boolean {
+        val displayManager = con.getSystemService(Context.DISPLAY_SERVICE) as DisplayManager
+        val displays = displayManager.displays
+        val currentDisplay = homeActivity.windowManager.getDefaultDisplay().displayId
+        val display = displays.find { it.displayId == currentDisplay }
+        var realMetrics = DisplayMetrics()
+        display!!.getRealMetrics(realMetrics)
+        return realMetrics.widthPixels > realMetrics.heightPixels
     }
 }

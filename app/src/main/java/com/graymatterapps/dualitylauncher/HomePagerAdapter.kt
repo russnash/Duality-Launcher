@@ -2,6 +2,7 @@ package com.graymatterapps.dualitylauncher
 
 import android.content.ClipData
 import android.content.Context
+import android.graphics.Color
 import android.text.Editable
 import android.util.Log
 import android.view.LayoutInflater
@@ -52,7 +53,8 @@ class HomePagerAdapter(private val context: Context, private val container: View
         numCols = Integer.parseInt(numColsString.toString())
         val numRowsString = settingsPreferences.getString("home_grid_rows", "7")
         numRows = Integer.parseInt(numRowsString.toString())
-        val textColor = settingsPreferences.getInt("home_text_color", -1)
+        val textColor = settingsPreferences.getInt("home_text_color", Color.WHITE)
+        val textShadowColor = settingsPreferences.getInt("home_text_shadow_color", Color.BLACK)
         homeIconsTable.removeAllViews()
         homeIconsTable.setGridSize(numRows, numCols)
 
@@ -93,6 +95,7 @@ class HomePagerAdapter(private val context: Context, private val container: View
                         icon.layoutParams = iconParams
                         icon.label.maxLines = 1
                         icon.label.setTextColor(textColor)
+                        icon.label.setShadowLayer(6F, 0F, 0F, textShadowColor)
                         icon.setListener(this)
                         icon.setBlankOnDrag(true)
                         icon.setDockIcon(false)
@@ -121,6 +124,7 @@ class HomePagerAdapter(private val context: Context, private val container: View
                         folderParams.columnSpan = 1
                         folder.layoutParams = folderParams
                         folder.folderLabel.setTextColor(textColor)
+                        folder.folderLabel.setShadowLayer(6F, 0F, 0F, textShadowColor)
                         homeIconsTable.addView(folder, folderParams)
                     }
                 }

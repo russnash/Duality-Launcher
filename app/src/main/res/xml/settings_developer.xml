@@ -1,6 +1,10 @@
 <PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:android="http://schemas.android.com/apk/res/android">
 
+    <Preference
+        android:key="warning"
+        android:title="WARNING!!"
+        android:summary="@string/developer_warning"/>
     <CheckBoxPreference
         android:defaultValue="false"
         android:key="show_display_info"
@@ -15,6 +19,10 @@
         android:defaultValue="false"
         android:key="show_folder_id"
         android:title="Show folder ID's"
+        app:icon="@android:drawable/ic_menu_view" />
+    <Preference
+        android:key="log_recents"
+        android:title="Recents to logcat"
         app:icon="@android:drawable/ic_menu_view" />
     <Preference
         android:key="update_app_list"

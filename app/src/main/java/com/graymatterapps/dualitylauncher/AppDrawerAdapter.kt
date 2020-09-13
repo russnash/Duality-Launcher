@@ -3,6 +3,7 @@ package com.graymatterapps.dualitylauncher
 import android.content.ClipData
 import android.content.Context
 import android.content.SharedPreferences
+import android.graphics.Color
 import android.util.Log
 import android.view.View
 import android.view.ViewGroup
@@ -56,9 +57,11 @@ class AppDrawerAdapter(
         icon.label.setTextColor(
             settingsPreferences.getInt(
                 "app_drawer_text",
-                -1
+                Color.WHITE
             )
         )
+        val textShadowColor = settingsPreferences.getInt("app_drawer_text_shadow", Color.BLACK)
+        icon.label.setShadowLayer(6f, 0f, 0f, textShadowColor)
         icon.setLaunchInfo(
             filteredList[position].activityName,
             filteredList[position].packageName,
