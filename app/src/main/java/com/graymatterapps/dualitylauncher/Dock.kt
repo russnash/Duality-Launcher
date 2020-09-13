@@ -17,7 +17,7 @@ import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
-class Dock(context: Context, attrs: AttributeSet) : LinearLayout(context, attrs),
+class Dock(val parentActivity: MainActivity, attrs: AttributeSet?) : LinearLayout(parentActivity, attrs),
     SharedPreferences.OnSharedPreferenceChangeListener, Icon.IconInterface {
     val settingsPreferences: SharedPreferences =
         PreferenceManager.getDefaultSharedPreferences(context)
@@ -73,7 +73,7 @@ class Dock(context: Context, attrs: AttributeSet) : LinearLayout(context, attrs)
         if (totalItems != null) {
             for (n in 0..(totalItems - 1)) {
                 var dockIcon = Icon(
-                    context,
+                    parentActivity,
                     null,
                     dockItems.activityNames[n],
                     dockItems.packageNames[n],

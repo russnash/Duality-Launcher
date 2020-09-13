@@ -18,7 +18,7 @@ lateinit var appWidgetHost: AppWidgetHost
 lateinit var settingsPreferences: SharedPreferences
 lateinit var prefs: SharedPreferences
 lateinit var appList: AppList
-lateinit var widgetDB: WidgetDB
+lateinit var appContext: Context
 
 @AcraCore(buildConfigClass = org.acra.BuildConfig::class, reportFormat= StringFormat.JSON)
 @AcraMailSender(mailTo = "russnash37@gmail.com", reportAsFile = true)
@@ -37,17 +37,18 @@ class DualityLauncherApplication: Application() {
 
     override fun onCreate() {
         super.onCreate()
+        appContext = this
         prefs = this.getSharedPreferences(PREFS_FILENAME, 0)
         settingsPreferences = PreferenceManager.getDefaultSharedPreferences(this)
         appList = AppList(applicationContext)
-        widgetDB = WidgetDB(applicationContext)
         appWidgetManager = AppWidgetManager.getInstance(applicationContext)
         appWidgetHost = AppWidgetHost(applicationContext, 1)
+        appWidgetHost.stopListening()
         appWidgetHost.startListening()
     }
 
     override fun onTerminate() {
         super.onTerminate()
-        appWidgetHost.stopListening()
+        //appWidgetHost.stopListening()
     }
 }

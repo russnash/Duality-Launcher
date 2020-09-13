@@ -8,7 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.BaseAdapter
 
-class FolderAdapter(var context: Context, var apps: ArrayList<LaunchInfo>, val folder: Folder) : BaseAdapter(), Icon.IconInterface, SharedPreferences.OnSharedPreferenceChangeListener{
+class FolderAdapter(var parentActivity: MainActivity, var apps: ArrayList<LaunchInfo>, val folder: Folder) : BaseAdapter(), Icon.IconInterface, SharedPreferences.OnSharedPreferenceChangeListener{
     private lateinit var listener: FolderAdapterInterface
 
     init {
@@ -28,7 +28,7 @@ class FolderAdapter(var context: Context, var apps: ArrayList<LaunchInfo>, val f
     }
 
     override fun getView(position: Int, view: View?, viewGroup: ViewGroup?): View {
-        val icon = Icon(context, null)
+        val icon = Icon(parentActivity, null)
         icon.setLaunchInfo(apps[position])
         icon.setDockIcon(true)
         icon.setListener(this)

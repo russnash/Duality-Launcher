@@ -30,6 +30,7 @@ import androidx.core.view.ViewCompat.startDragAndDrop
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.viewpager2.widget.ViewPager2
+import com.graymatterapps.graymatterutils.GrayMatterUtils
 import com.graymatterapps.graymatterutils.GrayMatterUtils.colorPrefToColor
 import com.graymatterapps.graymatterutils.GrayMatterUtils.getVersionCode
 import com.graymatterapps.graymatterutils.GrayMatterUtils.shortToast
@@ -41,13 +42,11 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
 const val PREFS_FILENAME = "com.graymatterapps.dualitylauncher.prefs"
-lateinit var mainContext: Context
-lateinit var homeActivity: MainActivity
-lateinit var appContext: Context
 const val REQUEST_PERMISSION = 1
 const val CONFIGURE_WIDGET = 2
 var isFolderOpen = false
 var isPaging = false
+lateinit var generalContext: Context
 
 class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterface,
     SharedPreferences.OnSharedPreferenceChangeListener, Animation.AnimationListener,
@@ -56,6 +55,9 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
     SettingsDeveloper.DeveloperInterface, WidgetContainer.WidgetInterface,
     FolderAdapter.FolderAdapterInterface {
 
+    lateinit var homeActivity: MainActivity
+    var displayId: Int = 99999
+
     lateinit var drawerFragment: DrawerFragment
     lateinit var widgetFragment: WidgetFragment
     lateinit var settingsFragment: SettingsFragment
@@ -63,6 +65,7 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
     var appWidgetId: Int = 0
     lateinit var appWidgetProviderInfo: AppWidgetProviderInfo
     lateinit var homePagerAdapter: HomePagerAdapter
+    lateinit var dock: Dock
     private val enteredColor = ColorUtils.setAlphaComponent(Color.GREEN, 20)
 
     val TAG = javaClass.simpleName
@@ -70,11 +73,11 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        mainContext = this
-        appContext = applicationContext
+        generalContext = this
         homeActivity = this
+        displayId = windowManager.getDefaultDisplay().displayId
         displayManager = getSystemService(Context.DISPLAY_SERVICE) as DisplayManager
-        initCompanion()
+        initCompanion(this)
 
         if (isMainDisplay()) {
             postUpdateCheck()
@@ -83,8 +86,8 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
         prefs.registerOnSharedPreferenceChangeListener(this)
         settingsPreferences.registerOnSharedPreferenceChangeListener(this)
 
-        drawerFragment = DrawerFragment()
-        widgetFragment = WidgetFragment()
+        drawerFragment = DrawerFragment(this)
+        widgetFragment = WidgetFragment(this)
         settingsFragment = SettingsFragment()
 
         setContentView(R.layout.activity_main)
@@ -149,12 +152,14 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
 
         appList.waitForReady()
 
+        dock = Dock(this, null)
+        dockContainer.addView(dock)
         dock.depersistDock()
         dock.populateDock()
         dock.setListener(this)
 
         homePager.offscreenPageLimit = 5
-        homePagerAdapter = HomePagerAdapter(this as AppCompatActivity, frameLayout)
+        homePagerAdapter = HomePagerAdapter(this, frameLayout)
         homePager.adapter = homePagerAdapter
         homePager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
             override fun onPageScrollStateChanged(state: Int) {
@@ -289,7 +294,7 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
         val editor = prefs.edit()
         editor.putString("homeIconsGrid" + position, saveItJson)
         saveItJson = Json.encodeToString(homeWidgetsGrid)
-        editor.putString("homeWidgetsGrid" + position, saveItJson)
+        editor.putString("homeWidgetsGrid" + displayId + ":" + position, saveItJson)
         editor.apply()
     }
 
@@ -388,9 +393,9 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
         var dragAndDropData = DragAndDropData()
         lateinit var dualWallpaper: DualWallpaper
 
-        fun initCompanion() {
+        fun initCompanion(con: Context) {
             Log.d("COMPANION", "Initialize companion...")
-            dualWallpaper = DualWallpaper(mainContext)
+            dualWallpaper = DualWallpaper(con)
         }
     }
 
@@ -523,7 +528,7 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
             if (key.contains("homeIconsGrid")) {
                 homePagerAdapter.notifyDataSetChanged()
             }
-            if (key.contains("homeWidgetsGrid")) {
+            if (key.contains("homeWidgetsGrid" + displayId)) {
                 homePagerAdapter.notifyDataSetChanged()
             }
             if (key == "apps") {
@@ -796,7 +801,7 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
         } else {
             folderDebug.visibility = View.INVISIBLE
         }
-        val folderAdapter = FolderAdapter(this as AppCompatActivity, apps, folder)
+        val folderAdapter = FolderAdapter(this, apps, folder)
         folderAdapter.setListener(this)
         folderGrid.adapter = folderAdapter
         folderAdapter.notifyDataSetChanged()

@@ -26,11 +26,11 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
 class Folder(
-    private val con: Context,
+    private val parentActivity: MainActivity,
     attrs: AttributeSet?,
     name: String,
     info: LaunchInfo? = null
-) : LinearLayout(con, attrs), SharedPreferences.OnSharedPreferenceChangeListener {
+) : LinearLayout(parentActivity, attrs), SharedPreferences.OnSharedPreferenceChangeListener {
 
     private val displayId: Int
     private val enteredColor = ColorUtils.setAlphaComponent(Color.GREEN, 20)
@@ -51,7 +51,7 @@ class Folder(
 
         prefs.registerOnSharedPreferenceChangeListener(this)
 
-        inflate(con, R.layout.folder, this)
+        inflate(parentActivity, R.layout.folder, this)
         folderLayout = findViewById(R.id.folderLayout)
         folderIcon = findViewById(R.id.folderImage)
         folderLabel = findViewById(R.id.folderLabel)
@@ -149,12 +149,12 @@ class Folder(
     private fun makeFolderIcon(): Bitmap {
         val clearPaint = Paint().apply { xfermode = PorterDuffXfermode(PorterDuff.Mode.CLEAR) }
         val drawable: Drawable =
-            ContextCompat.getDrawable(mainContext, R.drawable.ic_launcher_background)!!
+            ContextCompat.getDrawable(parentActivity, R.drawable.ic_launcher_background)!!
         var bitmap = drawableToBitmap(drawable)
         var canvas = Canvas(bitmap!!)
         canvas.drawRect(0F, 0F, canvas.width.toFloat(), canvas.height.toFloat(), clearPaint)
 
-        var firstBitmap = ContextCompat.getDrawable(mainContext, R.drawable.ic_folder)!!.toBitmap()
+        var firstBitmap = ContextCompat.getDrawable(parentActivity, R.drawable.ic_folder)!!.toBitmap()
         if (folderApps.size != 0) {
             firstBitmap = appList.getIcon(folderApps[0]).toBitmap()
         }
@@ -165,7 +165,7 @@ class Folder(
         )
         canvas.drawBitmap(firstBitmap, srcRect, dstRect, null)
 
-        var secondBitmap = ContextCompat.getDrawable(mainContext, R.drawable.ic_folder)!!.toBitmap()
+        var secondBitmap = ContextCompat.getDrawable(parentActivity, R.drawable.ic_folder)!!.toBitmap()
         if (folderApps.size != 0) {
             secondBitmap = appList.getIcon(folderApps[folderApps.size - 1]).toBitmap()
         }
@@ -244,7 +244,7 @@ class Folder(
     }
 
     fun convertToIcon() {
-        val icon = Icon(mainContext, null)
+        val icon = Icon(parentActivity, null)
         val params = this.layoutParams as HomeLayout.LayoutParams
         icon.setLaunchInfo(LaunchInfo())
         icon.layoutParams = params

@@ -16,8 +16,8 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <com.graymatterapps.dualitylauncher.Dock
-        android:id="@+id/dock"
+    <FrameLayout
+        android:id="@+id/dockContainer"
         android:layout_width="match_parent"
         android:layout_height="56dp"
         app:layout_constraintBottom_toBottomOf="parent" />

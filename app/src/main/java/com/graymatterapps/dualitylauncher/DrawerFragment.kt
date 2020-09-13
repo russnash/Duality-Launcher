@@ -13,7 +13,7 @@ import com.graymatterapps.graymatterutils.GrayMatterUtils.colorPrefToColor
 import kotlinx.android.synthetic.main.fragment_drawer.*
 import kotlinx.android.synthetic.main.icon.view.*
 
-class DrawerFragment : Fragment(), SharedPreferences.OnSharedPreferenceChangeListener {
+class DrawerFragment(val parent: MainActivity) : Fragment(), SharedPreferences.OnSharedPreferenceChangeListener {
 
     lateinit var gridLayoutManager: GridLayoutManager
     lateinit var adapter: AppDrawerAdapter
@@ -35,14 +35,14 @@ class DrawerFragment : Fragment(), SharedPreferences.OnSharedPreferenceChangeLis
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        gridLayoutManager = if(GrayMatterUtils.isLandscape(requireActivity().baseContext)){
+        gridLayoutManager = if(GrayMatterUtils.isLandscape(parent)){
             GridLayoutManager(context?.applicationContext, 12)
         } else {
             GridLayoutManager(context?.applicationContext, 6)
         }
 
         drawer.layoutManager = gridLayoutManager
-        adapter = AppDrawerAdapter(requireContext(), appList.apps)
+        adapter = AppDrawerAdapter(parent, appList.apps)
         drawer.adapter = adapter
         adapter.filterWork(false)
         buttonApps.alpha = 1.0f

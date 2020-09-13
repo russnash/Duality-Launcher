@@ -1,5 +1,6 @@
 package com.graymatterapps.dualitylauncher
 
+import android.appwidget.AppWidgetHostView
 import android.appwidget.AppWidgetManager
 import android.appwidget.AppWidgetProviderInfo
 import android.content.ClipData
@@ -13,13 +14,14 @@ import android.widget.FrameLayout
 import com.graymatterapps.dualitylauncher.MainActivity.Companion.dragAndDropData
 
 class WidgetContainer(
-    context: Context,
+    val parentActivity: MainActivity,
     var appWidgetId: Int,
     private var appWidgetProviderInfo: AppWidgetProviderInfo
-) : FrameLayout(context), GestureDetector.OnGestureListener {
+) : FrameLayout(parentActivity), GestureDetector.OnGestureListener {
 
     var widgetDBIndex: Int? = null
     lateinit var parentLayout: HomeLayout
+    lateinit var appWidgetHostView: AppWidgetHostView
     var gestureDetector: GestureDetector
     var neededWidth: Int = 0
     var neededHeight: Int = 0
@@ -29,7 +31,7 @@ class WidgetContainer(
     val TAG = javaClass.simpleName
 
     init {
-        gestureDetector = GestureDetector(mainContext, this)
+        gestureDetector = GestureDetector(parentActivity, this)
     }
 
     override fun onAttachedToWindow() {
@@ -62,18 +64,14 @@ class WidgetContainer(
     }
 
     private fun buildWidget() {
-        widgetDBIndex = widgetDB.getWidget(appWidgetId)
-        if (widgetDBIndex == null) {
-            Log.d(TAG, "widgetDBIndex for $appWidgetId is null!!")
-        }
-        widgetDB.widgets[widgetDBIndex!!].appWidgetHostView =
+        appWidgetHostView =
             appWidgetHost.createView(appContext, appWidgetId, appWidgetProviderInfo)
-        widgetDB.widgets[widgetDBIndex!!].appWidgetHostView.setAppWidget(
+        appWidgetHostView.setAppWidget(
             appWidgetId,
             appWidgetProviderInfo
         )
         val options = appWidgetManager.getAppWidgetOptions(appWidgetId)
-        widgetDB.widgets[widgetDBIndex!!].appWidgetHostView.updateAppWidgetOptions(options)
+        appWidgetHostView.updateAppWidgetOptions(options)
         layoutWidget()
     }
 
@@ -109,7 +107,10 @@ class WidgetContainer(
 
         val extras = data?.extras
         if (extras != null) {
-            appWidgetId = extras.getInt(AppWidgetManager.EXTRA_APPWIDGET_ID, -1)
+            val intentWidgetId = extras.getInt(AppWidgetManager.EXTRA_APPWIDGET_ID, -1)
+            if(intentWidgetId != -1) {
+                appWidgetId = intentWidgetId
+            }
         }
         appWidgetProviderInfo = appWidgetManager.getAppWidgetInfo(appWidgetId)
         buildWidget()
@@ -117,13 +118,13 @@ class WidgetContainer(
 
     private fun layoutWidget() {
         val minWidth =
-            appWidgetProviderInfo.minWidth + widgetDB.widgets[widgetDBIndex!!].appWidgetHostView.paddingLeft + widgetDB.widgets[widgetDBIndex!!].appWidgetHostView.paddingRight
+            appWidgetProviderInfo.minWidth + appWidgetHostView.paddingLeft + appWidgetHostView.paddingRight
         val minHeight =
-            appWidgetProviderInfo.minHeight + widgetDB.widgets[widgetDBIndex!!].appWidgetHostView.paddingTop + widgetDB.widgets[widgetDBIndex!!].appWidgetHostView.paddingBottom
+            appWidgetProviderInfo.minHeight + appWidgetHostView.paddingTop + appWidgetHostView.paddingBottom
 
         neededWidth = parentLayout.widthToCells(minWidth) * parentLayout.getCellWidth()
         neededHeight = parentLayout.heightToCells(minHeight) * parentLayout.getCellHeight()
-        widgetDB.widgets[widgetDBIndex!!].appWidgetHostView.setPadding(0, 0, 0, 0)
+        appWidgetHostView.setPadding(0, 0, 0, 0)
         val viewParams = FrameLayout.LayoutParams(
             FrameLayout.LayoutParams.WRAP_CONTENT,
             FrameLayout.LayoutParams.WRAP_CONTENT
@@ -131,20 +132,23 @@ class WidgetContainer(
         viewParams.width = neededWidth
         viewParams.height = neededHeight
         viewParams.gravity = Gravity.CENTER
-        widgetDB.widgets[widgetDBIndex!!].appWidgetHostView.layoutParams = viewParams
+        appWidgetHostView.layoutParams = viewParams
         val widthSpec = MeasureSpec.makeMeasureSpec(neededWidth, MeasureSpec.EXACTLY)
         val heightSpec = MeasureSpec.makeMeasureSpec(neededHeight, MeasureSpec.EXACTLY)
         this.removeAllViews()
-        this.addView(widgetDB.widgets[widgetDBIndex!!].appWidgetHostView, viewParams)
-        widgetDB.widgets[widgetDBIndex!!].appWidgetHostView.measure(widthSpec, heightSpec)
-        widgetDB.widgets[widgetDBIndex!!].appWidgetHostView.updateAppWidgetSize(
+        this.addView(appWidgetHostView, viewParams)
+        appWidgetHostView.updateAppWidgetSize(
             null,
-            minWidth,
-            minHeight,
+            neededWidth,
+            neededHeight,
             neededWidth,
             neededHeight
         )
+        appWidgetHostView.measure(widthSpec, heightSpec)
         this.bringToFront()
+        if(appWidgetProviderInfo.provider.packageName.contains("jet")){
+            Log.d(TAG, "jetAudio!")
+        }
     }
 
     private fun checkBinding(): Boolean {
@@ -157,7 +161,7 @@ class WidgetContainer(
     }
 
     fun convertToIcon() {
-        val icon = Icon(mainContext, null)
+        val icon = Icon(parentActivity, null)
         val launchInfo = LaunchInfo()
         icon.setLaunchInfo(launchInfo)
         icon.setBlankOnDrag(true)

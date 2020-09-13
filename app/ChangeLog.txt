@@ -1,3 +1,10 @@
+Version 2020.9.13.1-internal
+Changes:
+- Removed dual screen replication for widgets, they now have to be placed on each screen if needed on both.  This is to address the issue where one screens widgets update and the other screens don't.
+
+Bug Fixes:
+- Fixed a bug that was causing internal signals to go to the wrong screen.
+
 Version 2020.9.12.1-internal
 Changes:
 - Individual layouts for landscape / desktop mode orientation.

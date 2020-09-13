@@ -16,18 +16,18 @@ import androidx.core.graphics.ColorUtils
 import com.graymatterapps.dualitylauncher.MainActivity.Companion.dragAndDropData
 
 class Icon(
-    private val con: Context,
+    private val parentActivity: MainActivity,
     attrs: AttributeSet?,
     activityInfo: String,
     packageInfo: String,
     userSerial: Long,
     isDragTarget: Boolean,
     isBlankOnDrag: Boolean
-) : LinearLayout(con, attrs) {
+) : LinearLayout(parentActivity, attrs) {
 
-    constructor(con: Context, attrs: AttributeSet?) : this(con, attrs, "", "", 0, true, false)
+    constructor(con: MainActivity, attrs: AttributeSet?) : this(con, attrs, "", "", 0, true, false)
     constructor(
-        con: Context,
+        con: MainActivity,
         attrs: AttributeSet?,
         activityInfo: String,
         packageInfo: String,
@@ -229,27 +229,27 @@ class Icon(
         var folder: Folder
         val params = this.layoutParams as HomeLayout.LayoutParams
         if (info.getType() == LaunchInfo.ICON) {
-            folder = Folder(mainContext, null, mainContext.getString(R.string.new_folder))
+            folder = Folder(parentActivity, null, parentActivity.getString(R.string.new_folder))
             folder.addFolderApp(launchInfo)
             folder.addFolderApp(info)
         } else {
-            folder = Folder(mainContext, null, info.getFolderName(), info)
+            folder = Folder(parentActivity, null, info.getFolderName(), info)
         }
         folder.layoutParams = params
-        folder.setListener(listener as Folder.FolderInterface)
+        folder.setListener(parentActivity.homePagerAdapter as Folder.FolderInterface)
         parentLayout.addView(folder)
         parentLayout.removeView(this)
     }
 
     fun convertToWidget(widgetInfo: WidgetInfo) {
         val widgetContainer = WidgetContainer(
-            mainContext,
+            parentActivity,
             widgetInfo.getAppWidgetId(),
             widgetInfo.getAppWidgetProviderInfo()
         )
         val params = this.layoutParams as HomeLayout.LayoutParams
         widgetContainer.layoutParams = params
-        widgetContainer.setListener(homeActivity)
+        widgetContainer.setListener(parentActivity as WidgetContainer.WidgetInterface)
         parentLayout.addView(widgetContainer)
         parentLayout.removeView(this)
     }

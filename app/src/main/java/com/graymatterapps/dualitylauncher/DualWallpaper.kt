@@ -12,9 +12,8 @@ import java.io.IOException
 import java.io.OutputStream
 
 
-class DualWallpaper(con: Context){
+class DualWallpaper(val context: Context){
     private lateinit var wallpaper: Drawable
-    private var context: Context = con
     val TAG = javaClass.simpleName
 
     init{

@@ -14,7 +14,7 @@ class SettingsDeveloper : PreferenceFragmentCompat() {
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         setPreferencesFromResource(R.xml.settings_developer, rootKey)
-        listener = mainContext as DeveloperInterface
+        listener = generalContext as DeveloperInterface
 
         preferenceManager.findPreference<Preference>("update_app_list")?.setOnPreferenceClickListener {
             listener.updateAppList()
@@ -43,11 +43,12 @@ class SettingsDeveloper : PreferenceFragmentCompat() {
 
         preferenceManager.findPreference<Preference>("clear_widget_grid")?.setOnPreferenceClickListener {
             val editor = prefs.edit()
-            editor.remove("homeWidgetsGrid0")
-            editor.remove("homeWidgetsGrid1")
-            editor.remove("homeWidgetsGrid2")
-            editor.remove("homeWidgetsGrid3")
-            editor.remove("homeWidgetsGrid4")
+            val allPrefs = prefs.all
+            allPrefs.forEach{
+                if(it.key.contains("homeWidgetsGrid")){
+                    editor.remove(it.key)
+                }
+            }
             editor.apply()
             shortToast(requireActivity(), "Home widget grid persistence cleared...")
             true

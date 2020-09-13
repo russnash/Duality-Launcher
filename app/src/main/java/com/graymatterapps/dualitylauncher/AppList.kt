@@ -85,7 +85,7 @@ class AppList(val context: Context) : LauncherApps.Callback() {
         if (app != null) {
             return app.icon
         } else {
-            return ContextCompat.getDrawable(mainContext, R.drawable.ic_launcher_foreground)!!
+            return ContextCompat.getDrawable(context, R.drawable.ic_launcher_foreground)!!
         }
     }
 
@@ -111,11 +111,11 @@ class AppList(val context: Context) : LauncherApps.Callback() {
             val handle = userManager.getUserForSerialNumber(launchInfo.getUserSerial())
             launcherApps.startMainActivity(componentName, handle, null, options.toBundle())
         } catch (e: Exception) {
-            longToast(mainContext, "App failed to launch (" + e.message + ")")
+            longToast(context, "App failed to launch (" + e.message + ")")
         }
     }
 
-    fun launchAppInfo(launchInfo: LaunchInfo, display: Int) {
+    fun launchAppInfo(con: Context, launchInfo: LaunchInfo, display: Int) {
         try {
             val options = ActivityOptions.makeBasic()
             options.launchDisplayId = display
@@ -124,7 +124,7 @@ class AppList(val context: Context) : LauncherApps.Callback() {
             val handle = userManager.getUserForSerialNumber(launchInfo.getUserSerial())
             launcherApps.startAppDetailsActivity(componentName, handle, null, options.toBundle())
         } catch (e: Exception) {
-            longToast(mainContext, "App Info failed to launch")
+            longToast(con, "App Info failed to launch")
         }
     }
 

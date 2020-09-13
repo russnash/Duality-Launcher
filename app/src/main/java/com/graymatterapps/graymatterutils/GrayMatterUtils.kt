@@ -11,11 +11,10 @@ import android.os.VibrationEffect
 import android.os.Vibrator
 import android.util.DisplayMetrics
 import android.view.View
-import android.view.WindowManager
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
-import com.graymatterapps.dualitylauncher.homeActivity
-import com.graymatterapps.dualitylauncher.mainContext
+import com.graymatterapps.dualitylauncher.MainActivity
+import com.graymatterapps.dualitylauncher.generalContext
 
 object GrayMatterUtils {
     fun getVersionCode(con: Context): Int {
@@ -58,7 +57,7 @@ object GrayMatterUtils {
     }
 
     fun colorToColorPref(color: Int): String {
-        when(color) {
+        when (color) {
             Color.BLACK -> return "Black"
             Color.WHITE -> return "White"
             Color.GREEN -> return "Green"
@@ -118,10 +117,10 @@ object GrayMatterUtils {
         imm.hideSoftInputFromWindow(view.windowToken, 0)
     }
 
-    fun isLandscape(con: Context): Boolean {
-        val displayManager = con.getSystemService(Context.DISPLAY_SERVICE) as DisplayManager
+    fun isLandscape(parent: MainActivity): Boolean {
+        val displayManager = parent.getSystemService(Context.DISPLAY_SERVICE) as DisplayManager
         val displays = displayManager.displays
-        val currentDisplay = homeActivity.windowManager.getDefaultDisplay().displayId
+        val currentDisplay = parent.windowManager.getDefaultDisplay().displayId
         val display = displays.find { it.displayId == currentDisplay }
         var realMetrics = DisplayMetrics()
         display!!.getRealMetrics(realMetrics)

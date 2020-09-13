@@ -9,12 +9,13 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.graymatterapps.graymatterutils.GrayMatterUtils
 import com.graymatterapps.graymatterutils.GrayMatterUtils.colorPrefToColor
 import kotlinx.android.synthetic.main.folder.view.*
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 
-class HomePagerAdapter(private val context: Context, private val container: ViewGroup) :
+class HomePagerAdapter(private val parent: MainActivity, private val container: ViewGroup) :
     RecyclerView.Adapter<HomePagerAdapter.HomePagerHolder>(), Icon.IconInterface,
     Folder.FolderInterface {
 
@@ -73,17 +74,17 @@ class HomePagerAdapter(private val context: Context, private val container: View
                     val appWidgetProviderInfo = appWidgetManager.getAppWidgetInfo(appWidgetId)
                     if (appWidgetProviderInfo != null) {
                         var widget = WidgetContainer(
-                            mainContext,
+                            parent,
                             homeWidgetsGrid.getWidgetId(row, column),
                             appWidgetProviderInfo
                         )
-                        widget.setListener(homeActivity)
+                        widget.setListener(parent)
                         homeIconsTable.addView(widget, widgetParams)
                     }
                 } else {
                     val launchInfo = homeIconsGrid.getLaunchInfo(row, column)
                     if (launchInfo.getType() == LaunchInfo.ICON) {
-                        var icon = Icon(context, null)
+                        var icon = Icon(parent, null)
                         var iconParams = HomeLayout.LayoutParams(
                             ViewGroup.LayoutParams.WRAP_CONTENT,
                             ViewGroup.LayoutParams.WRAP_CONTENT
@@ -108,9 +109,9 @@ class HomePagerAdapter(private val context: Context, private val container: View
                     }
                     if (launchInfo.getType() == LaunchInfo.FOLDER) {
                         var folder = Folder(
-                            context,
+                            parent,
                             null,
-                            mainContext.getString(R.string.new_folder),
+                            parent.getString(R.string.new_folder),
                             launchInfo
                         )
                         folder.setListener(this)
@@ -143,7 +144,7 @@ class HomePagerAdapter(private val context: Context, private val container: View
         if (loadItJson != "") {
             homeIconsGrid = loadItJson?.let { Json.decodeFromString(it) }!!
         }
-        loadItJson = prefs.getString("homeWidgetsGrid" + position, "")
+        loadItJson = prefs.getString("homeWidgetsGrid" + parent.displayId + ":" + position, "")
         if (loadItJson != "") {
             homeWidgetsGrid = loadItJson?.let { Json.decodeFromString(it) }!!
         }

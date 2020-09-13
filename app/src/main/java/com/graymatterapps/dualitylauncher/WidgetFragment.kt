@@ -14,7 +14,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.graymatterapps.graymatterutils.GrayMatterUtils
 
-class WidgetFragment : Fragment(), WidgetChooserAdapter.WidgetChooserInterface {
+class WidgetFragment(val parent: MainActivity) : Fragment(), WidgetChooserAdapter.WidgetChooserInterface {
 
     lateinit var installedProvs: MutableList<AppWidgetProviderInfo>
     lateinit var widgetChooser: RecyclerView
@@ -31,7 +31,7 @@ class WidgetFragment : Fragment(), WidgetChooserAdapter.WidgetChooserInterface {
 
         installedProvs = appWidgetManager.installedProviders
         installedProvs.sortBy {
-            it.provider.className
+            it.label.toLowerCase()
         }
         listener = activity as WidgetInterface
     }
@@ -47,9 +47,9 @@ class WidgetFragment : Fragment(), WidgetChooserAdapter.WidgetChooserInterface {
         super.onViewCreated(view, savedInstanceState)
 
         widgetChooser = view.findViewById(R.id.widgetChooser)
-        widgetChooserAdapter = WidgetChooserAdapter(mainContext, installedProvs)
+        widgetChooserAdapter = WidgetChooserAdapter(parent, installedProvs)
         (widgetChooserAdapter as WidgetChooserAdapter).setListener(this)
-        widgetChooserManager = LinearLayoutManager(mainContext)
+        widgetChooserManager = LinearLayoutManager(parent)
         widgetChooser.layoutManager = widgetChooserManager
         widgetChooser.adapter = widgetChooserAdapter
 

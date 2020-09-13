@@ -13,13 +13,13 @@ import com.graymatterapps.graymatterutils.GrayMatterUtils.colorPrefToColor
 
 
 class AppDrawerAdapter(
-    private val context: Context,
+    private val parentActivity: MainActivity,
     private val apps: MutableList<AppList.AppListDataType>
 ) : RecyclerView.Adapter<AppDrawerAdapter.AppDrawerHolder>(), Icon.IconInterface {
 
     private lateinit var listener: DrawerAdapterInterface
     val settingsPreferences: SharedPreferences =
-        PreferenceManager.getDefaultSharedPreferences(context)
+        PreferenceManager.getDefaultSharedPreferences(parentActivity)
     var filteredList: MutableList<AppList.AppListDataType> = ArrayList()
     var filteredWork: Boolean = false
     val TAG = javaClass.simpleName
@@ -39,7 +39,7 @@ class AppDrawerAdapter(
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AppDrawerHolder {
-        val inflatedView = parent.inflate(R.layout.app_grid_item, false)
+        val inflatedView = Icon(parentActivity, null)
         return AppDrawerHolder(inflatedView)
     }
 
@@ -52,8 +52,7 @@ class AppDrawerAdapter(
     }
 
     override fun onBindViewHolder(holder: AppDrawerHolder, position: Int) {
-        val rowView = holder.itemView
-        val icon = rowView.findViewById<Icon>(R.id.icon)
+        val icon = holder.itemView as Icon
         icon.label.setTextColor(
             settingsPreferences.getInt(
                 "app_drawer_text",
@@ -71,10 +70,10 @@ class AppDrawerAdapter(
     }
 
     override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
-        if (context is DrawerAdapterInterface) {
-            listener = context
+        if (parentActivity is DrawerAdapterInterface) {
+            listener = parentActivity
         } else {
-            throw ClassCastException(context.toString() + " must implement DrawerAdapterInterface.")
+            throw ClassCastException(parentActivity.toString() + " must implement DrawerAdapterInterface.")
         }
         super.onAttachedToRecyclerView(recyclerView)
     }
