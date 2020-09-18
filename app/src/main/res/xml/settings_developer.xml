@@ -20,6 +20,16 @@
         android:key="show_folder_id"
         android:title="Show folder ID's"
         app:icon="@android:drawable/ic_menu_view" />
+    <CheckBoxPreference
+        android:defaultValue="false"
+        android:key="widget_info"
+        android:title="Show widget info"
+        app:icon="@android:drawable/ic_menu_view" />
+    <CheckBoxPreference
+        android:defaultValue="false"
+        android:key="widget_borders"
+        android:title="Show widget container borders"
+        app:icon="@android:drawable/ic_menu_view" />
     <Preference
         android:key="log_recents"
         android:title="Recents to logcat"

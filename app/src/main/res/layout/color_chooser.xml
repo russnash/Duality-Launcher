@@ -56,7 +56,7 @@
 
     <SeekBar
         android:id="@+id/seekBarRed"
-        android:layout_width="250dp"
+        android:layout_width="200dp"
         android:layout_height="wrap_content"
         android:max="255"
         app:layout_constraintBottom_toBottomOf="@+id/seekTextRed"
@@ -72,6 +72,25 @@
         app:layout_constraintStart_toEndOf="@+id/seekBarRed"
         app:layout_constraintTop_toTopOf="@+id/seekTextRed" />
 
+    <ImageView
+        android:id="@+id/redLeft"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="32dp"
+        app:layout_constraintBottom_toBottomOf="@+id/seekBarRed"
+        app:layout_constraintStart_toStartOf="@+id/valueRed"
+        app:layout_constraintTop_toTopOf="@+id/seekBarRed"
+        app:srcCompat="@drawable/ic_arrow_left" />
+
+    <ImageView
+        android:id="@+id/redRight"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="@+id/redLeft"
+        app:layout_constraintStart_toEndOf="@+id/redLeft"
+        app:layout_constraintTop_toTopOf="@+id/redLeft"
+        app:srcCompat="@drawable/ic_arrow_right" />
+
     <TextView
         android:id="@+id/seekTextGreen"
         android:layout_width="wrap_content"
@@ -83,7 +102,7 @@
 
     <SeekBar
         android:id="@+id/seekBarGreen"
-        android:layout_width="250dp"
+        android:layout_width="200dp"
         android:layout_height="wrap_content"
         android:max="255"
         app:layout_constraintBottom_toBottomOf="@+id/seekTextGreen"
@@ -99,6 +118,25 @@
         app:layout_constraintStart_toEndOf="@+id/seekBarGreen"
         app:layout_constraintTop_toTopOf="@+id/seekTextGreen" />
 
+    <ImageView
+        android:id="@+id/greenLeft"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="32dp"
+        app:layout_constraintBottom_toBottomOf="@+id/seekBarGreen"
+        app:layout_constraintStart_toStartOf="@+id/valueRed"
+        app:layout_constraintTop_toTopOf="@+id/seekBarGreen"
+        app:srcCompat="@drawable/ic_arrow_left" />
+
+    <ImageView
+        android:id="@+id/greenRight"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="@+id/greenLeft"
+        app:layout_constraintStart_toEndOf="@+id/redLeft"
+        app:layout_constraintTop_toTopOf="@+id/greenLeft"
+        app:srcCompat="@drawable/ic_arrow_right" />
+
     <TextView
         android:id="@+id/seekTextBlue"
         android:layout_width="wrap_content"
@@ -110,7 +148,7 @@
 
     <SeekBar
         android:id="@+id/seekBarBlue"
-        android:layout_width="250dp"
+        android:layout_width="200dp"
         android:layout_height="wrap_content"
         android:max="255"
         app:layout_constraintBottom_toBottomOf="@+id/seekTextBlue"
@@ -126,6 +164,25 @@
         app:layout_constraintStart_toEndOf="@+id/seekBarBlue"
         app:layout_constraintTop_toTopOf="@+id/seekTextBlue" />
 
+    <ImageView
+        android:id="@+id/blueLeft"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="32dp"
+        app:layout_constraintBottom_toBottomOf="@+id/seekBarBlue"
+        app:layout_constraintStart_toStartOf="@+id/valueRed"
+        app:layout_constraintTop_toTopOf="@+id/seekBarBlue"
+        app:srcCompat="@drawable/ic_arrow_left" />
+
+    <ImageView
+        android:id="@+id/blueRight"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="@+id/blueLeft"
+        app:layout_constraintStart_toEndOf="@+id/redLeft"
+        app:layout_constraintTop_toTopOf="@+id/blueLeft"
+        app:srcCompat="@drawable/ic_arrow_right" />
+
     <TextView
         android:id="@+id/seekTextAlpha"
         android:layout_width="wrap_content"
@@ -137,7 +194,7 @@
 
     <SeekBar
         android:id="@+id/seekBarAlpha"
-        android:layout_width="250dp"
+        android:layout_width="200dp"
         android:layout_height="wrap_content"
         android:max="255"
         app:layout_constraintBottom_toBottomOf="@+id/seekTextAlpha"
@@ -152,5 +209,24 @@
         app:layout_constraintBottom_toBottomOf="@+id/seekTextAlpha"
         app:layout_constraintStart_toEndOf="@+id/seekBarAlpha"
         app:layout_constraintTop_toTopOf="@+id/seekTextAlpha" />
+
+    <ImageView
+        android:id="@+id/alphaLeft"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="32dp"
+        app:layout_constraintBottom_toBottomOf="@+id/seekBarAlpha"
+        app:layout_constraintStart_toStartOf="@+id/valueRed"
+        app:layout_constraintTop_toTopOf="@+id/seekBarAlpha"
+        app:srcCompat="@drawable/ic_arrow_left" />
+
+    <ImageView
+        android:id="@+id/alphaRight"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="@+id/alphaLeft"
+        app:layout_constraintStart_toEndOf="@+id/redLeft"
+        app:layout_constraintTop_toTopOf="@+id/alphaLeft"
+        app:srcCompat="@drawable/ic_arrow_right" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

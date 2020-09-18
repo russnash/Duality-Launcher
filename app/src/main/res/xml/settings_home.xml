@@ -19,6 +19,10 @@
             android:defaultValue="-16777216"
             android:key="dock_background_color"
             android:title="@string/pref_dock_background_color" />
+        <Preference
+            android:title="Dock Search"
+            android:summary="Display a custom search widget in the dock"
+            app:fragment="com.graymatterapps.dualitylauncher.SettingsDockSearch" />
 
     </PreferenceCategory>
 

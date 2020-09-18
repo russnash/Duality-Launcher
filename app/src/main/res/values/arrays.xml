@@ -37,6 +37,7 @@
 
     <string-array name="search_providers">
         <item>Google</item>
+        <item>Google (App)</item>
         <item>Yahoo</item>
     </string-array>
 </resources>

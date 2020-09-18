@@ -6,6 +6,7 @@ import android.appwidget.AppWidgetHostView
 import android.appwidget.AppWidgetManager
 import android.content.Context
 import android.content.SharedPreferences
+import android.util.Log
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.customview.widget.ExploreByTouchHelper
 import androidx.preference.PreferenceManager
@@ -19,6 +20,9 @@ lateinit var settingsPreferences: SharedPreferences
 lateinit var prefs: SharedPreferences
 lateinit var appList: AppList
 lateinit var appContext: Context
+lateinit var widgetDB: WidgetDB
+lateinit var dragAndDropData: DragAndDropData
+lateinit var dualWallpaper: DualWallpaper
 
 @AcraCore(buildConfigClass = org.acra.BuildConfig::class, reportFormat= StringFormat.JSON)
 @AcraMailSender(mailTo = "russnash37@gmail.com", reportAsFile = true)
@@ -31,8 +35,6 @@ class DualityLauncherApplication: Application() {
 
         ACRA.DEV_LOGGING = true
         ACRA.init(this)
-
-        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
     }
 
     override fun onCreate() {
@@ -43,12 +45,14 @@ class DualityLauncherApplication: Application() {
         appList = AppList(applicationContext)
         appWidgetManager = AppWidgetManager.getInstance(applicationContext)
         appWidgetHost = AppWidgetHost(applicationContext, 1)
-        appWidgetHost.stopListening()
         appWidgetHost.startListening()
+        widgetDB = WidgetDB(this)
+        dragAndDropData = DragAndDropData()
+        dualWallpaper = DualWallpaper(this)
     }
 
     override fun onTerminate() {
         super.onTerminate()
-        //appWidgetHost.stopListening()
+        appWidgetHost.stopListening()
     }
 }

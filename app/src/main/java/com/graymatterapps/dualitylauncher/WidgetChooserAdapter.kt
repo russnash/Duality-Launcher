@@ -12,7 +12,7 @@ import com.graymatterapps.graymatterutils.GrayMatterUtils.colorPrefToColor
 
 class WidgetChooserAdapter(
     private val context: Context,
-    private val widgets: MutableList<AppWidgetProviderInfo>
+    private val widgets: List<AppWidgetProviderInfo>
 ) : RecyclerView.Adapter<WidgetChooserAdapter.WidgetChooserHolder>() {
 
     private lateinit var listener: WidgetChooserInterface

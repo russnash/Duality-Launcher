@@ -17,6 +17,7 @@ import com.graymatterapps.graymatterutils.GrayMatterUtils
 class WidgetFragment(val parent: MainActivity) : Fragment(), WidgetChooserAdapter.WidgetChooserInterface {
 
     lateinit var installedProvs: MutableList<AppWidgetProviderInfo>
+    lateinit var usableProvs: List<AppWidgetProviderInfo>
     lateinit var widgetChooser: RecyclerView
     lateinit var widgetChooserAdapter: RecyclerView.Adapter<*>
     lateinit var widgetChooserManager: RecyclerView.LayoutManager
@@ -30,9 +31,10 @@ class WidgetFragment(val parent: MainActivity) : Fragment(), WidgetChooserAdapte
         super.onCreate(savedInstanceState)
 
         installedProvs = appWidgetManager.installedProviders
-        installedProvs.sortBy {
-            it.label.toLowerCase()
+        usableProvs = installedProvs.filter {
+            (it.widgetCategory or AppWidgetProviderInfo.WIDGET_CATEGORY_HOME_SCREEN) == it.widgetCategory
         }
+        usableProvs.sortedBy { it.label.toLowerCase() }
         listener = activity as WidgetInterface
     }
 
@@ -47,7 +49,7 @@ class WidgetFragment(val parent: MainActivity) : Fragment(), WidgetChooserAdapte
         super.onViewCreated(view, savedInstanceState)
 
         widgetChooser = view.findViewById(R.id.widgetChooser)
-        widgetChooserAdapter = WidgetChooserAdapter(parent, installedProvs)
+        widgetChooserAdapter = WidgetChooserAdapter(parent, usableProvs)
         (widgetChooserAdapter as WidgetChooserAdapter).setListener(this)
         widgetChooserManager = LinearLayoutManager(parent)
         widgetChooser.layoutManager = widgetChooserManager
@@ -65,7 +67,7 @@ class WidgetFragment(val parent: MainActivity) : Fragment(), WidgetChooserAdapte
         appWidgetId = appWidgetHost.allocateAppWidgetId()
         val id = System.currentTimeMillis().toString()
         val widgetInfo = WidgetInfo(appWidgetId, appWidgetProviderInfo, view)
-        MainActivity.dragAndDropData.addWidget(widgetInfo, id)
+        dragAndDropData.addWidget(widgetInfo, id)
         val clipData = ClipData.newPlainText("widget", id)
         listener.onAddWidget(clipData, view)
     }

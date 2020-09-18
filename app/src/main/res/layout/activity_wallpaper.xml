@@ -2,7 +2,8 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:foregroundTint="?attr/colorAccent">
 
     <com.ortiz.touchview.TouchImageView
         android:id="@+id/image"
@@ -35,5 +36,48 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/buttonCancel"
         app:layout_constraintTop_toTopOf="@+id/buttonCancel" />
+
+    <SeekBar
+        android:id="@+id/hingeGap"
+        android:layout_width="300dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:outlineAmbientShadowColor="?attr/colorAccent"
+        android:outlineSpotShadowColor="?attr/colorAccent"
+        app:layout_constraintEnd_toEndOf="@+id/buttonOk"
+        app:layout_constraintStart_toStartOf="@+id/buttonCancel"
+        app:layout_constraintTop_toBottomOf="@+id/buttonCancel" />
+
+    <TextView
+        android:id="@+id/hingeValue"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="TextView"
+        android:textColor="?attr/colorAccent"
+        app:layout_constraintBottom_toBottomOf="@+id/buttonCancel"
+        app:layout_constraintEnd_toEndOf="@+id/hingeGap"
+        app:layout_constraintStart_toStartOf="@+id/hingeGap" />
+
+    <ImageView
+        android:id="@+id/hingeLeft"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="16dp"
+        android:tint="?attr/colorAccent"
+        app:layout_constraintBottom_toBottomOf="@+id/hingeGap"
+        app:layout_constraintEnd_toStartOf="@+id/hingeGap"
+        app:layout_constraintTop_toTopOf="@+id/hingeGap"
+        app:srcCompat="@drawable/ic_arrow_left" />
+
+    <ImageView
+        android:id="@+id/hingeRight"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:tint="?attr/colorAccent"
+        app:layout_constraintBottom_toBottomOf="@+id/hingeGap"
+        app:layout_constraintStart_toEndOf="@+id/hingeGap"
+        app:layout_constraintTop_toTopOf="@+id/hingeGap"
+        app:srcCompat="@drawable/ic_arrow_right" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

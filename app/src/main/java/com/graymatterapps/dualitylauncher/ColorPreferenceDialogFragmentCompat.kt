@@ -2,19 +2,29 @@ package com.graymatterapps.dualitylauncher
 
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
+import android.media.Image
 import android.os.Bundle
 import android.view.View
 import android.widget.*
 import androidx.preference.PreferenceDialogFragmentCompat
 import com.graymatterapps.graymatterutils.GrayMatterUtils
+import kotlinx.android.synthetic.main.color_chooser.*
 
 class ColorPreferenceDialogFragmentCompat : PreferenceDialogFragmentCompat(),
     AdapterView.OnItemSelectedListener {
     var chosenColor: Int = Color.BLACK
     lateinit var seekBarRed: SeekBar
+    lateinit var redLeft: ImageView
+    lateinit var redRight: ImageView
     lateinit var seekBarGreen: SeekBar
+    lateinit var greenLeft: ImageView
+    lateinit var greenRight: ImageView
     lateinit var seekBarBlue: SeekBar
+    lateinit var blueLeft: ImageView
+    lateinit var blueRight: ImageView
     lateinit var seekBarAlpha: SeekBar
+    lateinit var alphaLeft: ImageView
+    lateinit var alphaRight: ImageView
     lateinit var spinnerPreset: Spinner
     lateinit var colorPreview: ImageView
     lateinit var valueRed: TextView
@@ -29,9 +39,17 @@ class ColorPreferenceDialogFragmentCompat : PreferenceDialogFragmentCompat(),
 
         if (view != null) {
             seekBarRed = view.findViewById(R.id.seekBarRed)
+            redLeft = view.findViewById(R.id.redLeft)
+            redRight = view.findViewById(R.id.redRight)
             seekBarGreen = view.findViewById(R.id.seekBarGreen)
+            greenLeft = view.findViewById(R.id.greenLeft)
+            greenRight = view.findViewById(R.id.greenRight)
             seekBarBlue = view.findViewById(R.id.seekBarBlue)
+            blueLeft = view.findViewById(R.id.blueLeft)
+            blueRight = view.findViewById(R.id.blueRight)
             seekBarAlpha = view.findViewById(R.id.seekBarAlpha)
+            alphaLeft = view.findViewById(R.id.alphaLeft)
+            alphaRight = view.findViewById(R.id.alphaRight)
             spinnerPreset = view.findViewById(R.id.spinnerPreset)
             colorPreview = view.findViewById(R.id.colorPreview)
             valueRed = view.findViewById(R.id.valueRed)
@@ -55,6 +73,12 @@ class ColorPreferenceDialogFragmentCompat : PreferenceDialogFragmentCompat(),
             }
 
         })
+        redLeft.setOnClickListener {
+            seekBarRed.progress--
+        }
+        redRight.setOnClickListener {
+            seekBarRed.progress++
+        }
         seekBarGreen.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(p0: SeekBar?, p1: Int, p2: Boolean) {
                 valueGreen.text = p1.toString()
@@ -68,6 +92,12 @@ class ColorPreferenceDialogFragmentCompat : PreferenceDialogFragmentCompat(),
             }
 
         })
+        greenLeft.setOnClickListener {
+            seekBarGreen.progress--
+        }
+        greenRight.setOnClickListener {
+            seekBarGreen.progress++
+        }
         seekBarBlue.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(p0: SeekBar?, p1: Int, p2: Boolean) {
                 valueBlue.text = p1.toString()
@@ -81,6 +111,12 @@ class ColorPreferenceDialogFragmentCompat : PreferenceDialogFragmentCompat(),
             }
 
         })
+        blueLeft.setOnClickListener {
+            seekBarBlue.progress--
+        }
+        blueRight.setOnClickListener {
+            seekBarBlue.progress++
+        }
         seekBarAlpha.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(p0: SeekBar?, p1: Int, p2: Boolean) {
                 valueAlpha.text = p1.toString()
@@ -94,6 +130,12 @@ class ColorPreferenceDialogFragmentCompat : PreferenceDialogFragmentCompat(),
             }
 
         })
+        alphaLeft.setOnClickListener {
+            seekBarAlpha.progress--
+        }
+        alphaRight.setOnClickListener {
+            seekBarAlpha.progress++
+        }
         var adapter = ArrayAdapter.createFromResource(
             requireActivity().baseContext,
             R.array.android_colors,

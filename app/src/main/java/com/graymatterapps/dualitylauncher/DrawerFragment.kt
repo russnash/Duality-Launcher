@@ -2,6 +2,7 @@ package com.graymatterapps.dualitylauncher
 
 import android.content.Context
 import android.content.SharedPreferences
+import android.graphics.Color
 import android.os.Bundle
 import android.view.*
 import androidx.core.graphics.ColorUtils
@@ -97,8 +98,7 @@ class DrawerFragment(val parent: MainActivity) : Fragment(), SharedPreferences.O
     }
 
     fun changeTextColors() {
-        val color =
-            colorPrefToColor(settingsPreferences.getString("app_drawer_text", "White"))
+        val color = settingsPreferences.getInt("app_drawer_text", Color.WHITE)
 
         var x: Int = drawer.childCount
         var i = 0

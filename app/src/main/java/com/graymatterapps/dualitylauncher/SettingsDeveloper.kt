@@ -50,6 +50,7 @@ class SettingsDeveloper : PreferenceFragmentCompat() {
                 }
             }
             editor.apply()
+            listener.removeWidgets()
             shortToast(requireActivity(), "Home widget grid persistence cleared...")
             true
         }
@@ -81,5 +82,6 @@ class SettingsDeveloper : PreferenceFragmentCompat() {
     interface DeveloperInterface {
         fun updateAppList()
         fun logRecents()
+        fun removeWidgets(leavePager: Boolean = false)
     }
 }

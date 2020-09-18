@@ -13,7 +13,7 @@
         android:title="Position of the search widget"
         app:useSimpleSummaryProvider="true" />
     <ListPreference
-        android:defaultValue="Google"
+        android:defaultValue="Google (Web)"
         android:entries="@array/search_providers"
         android:entryValues="@array/search_providers"
         android:key="dock_search_provider"

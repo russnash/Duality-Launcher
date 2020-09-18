@@ -1,3 +1,17 @@
+Version 2020.9.17.1-internal
+Changes:
+- Re-wrote widget system from scratch.
+- Added option for Google app as dock search provider.
+- Added configurable hinge gap to the wide wallpaper setting.
+- Moved the dock search settings to the dock section of the home screen settings.
+- Added fine adjustment arrows to the color chooser sliders.
+- Changed dock search icons.
+- Dock search 'G' icon launches Google Now.
+
+Bug Fixes:
+- Asta la vista old widget system.
+
+
 Version 2020.9.13.1-internal
 Changes:
 - Removed dual screen replication for widgets, they now have to be placed on each screen if needed on both.  This is to address the issue where one screens widgets update and the other screens don't.

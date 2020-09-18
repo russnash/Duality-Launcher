@@ -83,8 +83,6 @@ class HomeLayout(context: Context, attributeSet: AttributeSet?) : ViewGroup(
         val r = l + (columnSpan * cellWidth)
         val b = t + (rowSpan * cellHeight)
         view.layout(l, t, r, b)
-        //view.layoutParams.width = (columnSpan * cellWidth)
-        //view.layoutParams.height = (rowSpan * cellHeight)
     }
 
     fun widthToCells(width: Int) : Int{

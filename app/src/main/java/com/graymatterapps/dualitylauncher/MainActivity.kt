@@ -1,14 +1,13 @@
 package com.graymatterapps.dualitylauncher
 
 import android.annotation.SuppressLint
-import android.app.ActivityManager
+import android.app.ActivityOptions
 import android.app.usage.UsageStatsManager
+import android.appwidget.AppWidgetHost
+import android.appwidget.AppWidgetHostView
 import android.appwidget.AppWidgetManager
 import android.appwidget.AppWidgetProviderInfo
-import android.content.ClipData
-import android.content.Context
-import android.content.Intent
-import android.content.SharedPreferences
+import android.content.*
 import android.content.res.ColorStateList
 import android.graphics.Color
 import android.hardware.display.DisplayManager
@@ -24,14 +23,14 @@ import android.widget.ArrayAdapter
 import android.widget.ImageView
 import android.widget.TableRow
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.getSystemService
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.graphics.ColorUtils
 import androidx.core.view.ViewCompat.startDragAndDrop
+import androidx.core.view.get
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
+import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
-import com.graymatterapps.graymatterutils.GrayMatterUtils
-import com.graymatterapps.graymatterutils.GrayMatterUtils.colorPrefToColor
 import com.graymatterapps.graymatterutils.GrayMatterUtils.getVersionCode
 import com.graymatterapps.graymatterutils.GrayMatterUtils.shortToast
 import com.graymatterapps.graymatterutils.GrayMatterUtils.showOkDialog
@@ -45,7 +44,6 @@ const val PREFS_FILENAME = "com.graymatterapps.dualitylauncher.prefs"
 const val REQUEST_PERMISSION = 1
 const val CONFIGURE_WIDGET = 2
 var isFolderOpen = false
-var isPaging = false
 lateinit var generalContext: Context
 
 class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterface,
@@ -53,7 +51,7 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
     GestureLayout.GestureEvents, Dock.DockInterface,
     HomePagerAdapter.HomeIconsInterface, WidgetFragment.WidgetInterface,
     SettingsDeveloper.DeveloperInterface, WidgetContainer.WidgetInterface,
-    FolderAdapter.FolderAdapterInterface {
+    FolderAdapter.FolderAdapterInterface, WidgetDB.WidgetDBInterface {
 
     lateinit var homeActivity: MainActivity
     var displayId: Int = 99999
@@ -62,8 +60,6 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
     lateinit var widgetFragment: WidgetFragment
     lateinit var settingsFragment: SettingsFragment
     lateinit var displayManager: DisplayManager
-    var appWidgetId: Int = 0
-    lateinit var appWidgetProviderInfo: AppWidgetProviderInfo
     lateinit var homePagerAdapter: HomePagerAdapter
     lateinit var dock: Dock
     private val enteredColor = ColorUtils.setAlphaComponent(Color.GREEN, 20)
@@ -77,10 +73,10 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
         homeActivity = this
         displayId = windowManager.getDefaultDisplay().displayId
         displayManager = getSystemService(Context.DISPLAY_SERVICE) as DisplayManager
-        initCompanion(this)
 
         if (isMainDisplay()) {
             postUpdateCheck()
+            widgetDB.setListener(this)
         }
 
         prefs.registerOnSharedPreferenceChangeListener(this)
@@ -158,19 +154,30 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
         dock.populateDock()
         dock.setListener(this)
 
+        // TEMP
+        /*
+        try {
+            val editor = prefs.edit()
+            editor.remove("homeWidgetsGrid0:1")
+            editor.remove("homeIconsGrid1")
+            editor.apply()
+        } catch (e: Exception) {
+            // Do nothing
+        }
+
+         */
+
         homePager.offscreenPageLimit = 5
         homePagerAdapter = HomePagerAdapter(this, frameLayout)
         homePager.adapter = homePagerAdapter
         homePager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
             override fun onPageScrollStateChanged(state: Int) {
+                Log.d(TAG, "onPageScrollStateChanged()")
                 super.onPageScrollStateChanged(state)
                 setupHomePageIndicator()
-                isPaging = state == ViewPager2.SCROLL_STATE_DRAGGING
             }
         })
         homePagerAdapter.setListener(this)
-
-        homePager.adapter?.notifyDataSetChanged()
 
         setupHomePageIndicator()
 
@@ -205,7 +212,7 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
                             if (dragEvent.clipDescription.label.toString().equals("widget")) {
                                 val id = dragEvent.clipData.getItemAt(0).text.toString()
                                 val widgetInfo = dragAndDropData.retrieveWidgetId(id)
-                                appWidgetHost.deleteAppWidgetId(widgetInfo.getAppWidgetId())
+                                widgetDB.deleteWidget(widgetInfo.getAppWidgetId())
                             }
                             if (dragEvent.clipDescription.label.toString().equals("launchInfo")) {
                                 val id = dragEvent.clipData.getItemAt(0).text.toString()
@@ -256,10 +263,13 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
     }
 
     fun persistGrid(position: Int) {
+        if(position == 1) {
+            Log.d(TAG, "$position")
+        }
         Log.d(TAG, "persistGrid()")
         var homeIconsGrid = HomeIconsGrid()
         var homeWidgetsGrid = HomeWidgetsGrid()
-        val view = homePager.findViewWithTag<View>(position)
+        val view = frameLayout.findViewWithTag<View>(position)
         val homeIconsTable = view.findViewById<HomeLayout>(R.id.homeIconsTable)
         for (n in 0 until homeIconsTable.childCount) {
             if (homeIconsTable.getChildAt(n) is Icon) {
@@ -319,11 +329,13 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
     fun showHomeMenu(state: Boolean) {
         if (state) {
             homeMenu.visibility = View.VISIBLE
-            val animation = AnimationUtils.loadAnimation(this@MainActivity, R.anim.grow_fade_in_center)
+            val animation =
+                AnimationUtils.loadAnimation(this@MainActivity, R.anim.grow_fade_in_center)
             homeMenu.startAnimation(animation)
         } else {
             homeMenu.visibility = View.INVISIBLE
-            val animation = AnimationUtils.loadAnimation(this@MainActivity, R.anim.shrink_fade_out_center)
+            val animation =
+                AnimationUtils.loadAnimation(this@MainActivity, R.anim.shrink_fade_out_center)
             homeMenu.startAnimation(animation)
         }
     }
@@ -331,11 +343,13 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
     fun showHomeFolder(state: Boolean) {
         if (state) {
             homeFolder.visibility = View.VISIBLE
-            val animation = AnimationUtils.loadAnimation(this@MainActivity, R.anim.grow_fade_in_center)
+            val animation =
+                AnimationUtils.loadAnimation(this@MainActivity, R.anim.grow_fade_in_center)
             homeFolder.startAnimation(animation)
         } else {
             homeFolder.visibility = View.INVISIBLE
-            val animation = AnimationUtils.loadAnimation(this@MainActivity, R.anim.shrink_fade_out_center)
+            val animation =
+                AnimationUtils.loadAnimation(this@MainActivity, R.anim.shrink_fade_out_center)
             homeFolder.startAnimation(animation)
         }
         isFolderOpen = state
@@ -387,16 +401,6 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
     fun setNavBarBackground() {
         var color = settingsPreferences.getInt("nav_background", Color.BLACK)
         window.navigationBarColor = color
-    }
-
-    companion object {
-        var dragAndDropData = DragAndDropData()
-        lateinit var dualWallpaper: DualWallpaper
-
-        fun initCompanion(con: Context) {
-            Log.d("COMPANION", "Initialize companion...")
-            dualWallpaper = DualWallpaper(con)
-        }
     }
 
     fun closeAppDrawer() {
@@ -556,6 +560,9 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
             if (key == "home_text_shadow_color") {
                 homePagerAdapter.notifyDataSetChanged()
             }
+            if (key == "widget_info") {
+                showWidgets()
+            }
         }
     }
 
@@ -714,12 +721,32 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
         shortToast(this, "AppList update forced...")
     }
 
-    override fun needPermissionToBind(widgetId: Int, widgetProviderInfo: AppWidgetProviderInfo) {
-        appWidgetId = widgetId
-        appWidgetProviderInfo = widgetProviderInfo
+    override fun showWidgets() {
+        if (settingsPreferences.getBoolean("widget_info", false)) {
+            widgetList.visibility = View.VISIBLE
+            val widgetTags = ArrayList<String>()
+            widgetDB.widgets.forEach {
+                widgetTags.add("${it.widgetId}:${it.widgetProviderInfo.provider.toShortString()}")
+            }
+            val adapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, widgetTags)
+            widgetList.adapter = adapter
+            adapter.notifyDataSetChanged()
+        } else {
+            widgetList.visibility = View.INVISIBLE
+        }
+    }
+
+    fun needPermissionToBind(
+        widgetId: Int,
+        widgetProviderInfo: AppWidgetProviderInfo
+    ) {
         val intent = Intent(AppWidgetManager.ACTION_APPWIDGET_BIND).apply {
             putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, widgetId)
             putExtra(AppWidgetManager.EXTRA_APPWIDGET_PROVIDER, widgetProviderInfo.provider)
+            putExtra(
+                AppWidgetManager.EXTRA_APPWIDGET_OPTIONS,
+                appWidgetManager.getAppWidgetOptions(widgetId)
+            )
         }
         startActivityForResult(intent, REQUEST_PERMISSION)
     }
@@ -728,59 +755,96 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
         persistGrid(getCurrentHomePagerItem())
     }
 
-    override fun configureWidget(widgetId: Int, widgetProviderInfo: AppWidgetProviderInfo) {
-        intent = Intent(AppWidgetManager.ACTION_APPWIDGET_CONFIGURE)
-        intent.setComponent(widgetProviderInfo.configure)
-        intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, widgetId)
-        try {
-            startActivityForResult(intent, CONFIGURE_WIDGET)
-        } catch (e: Exception) {
-            createWidget(null)
-        }
+    override fun updateWidgets(widgetInfo: AppWidgetProviderInfo) {
+        val intent = Intent(applicationContext, widgetInfo.provider.className.javaClass)
+        intent.action = AppWidgetManager.ACTION_APPWIDGET_UPDATE
+        val ids = appWidgetManager.getAppWidgetIds(ComponentName(applicationContext, widgetInfo.provider.className.javaClass))
+        appWidgetManager.notifyAppWidgetViewDataChanged(ids, android.R.id.list)
+        intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, ids)
+        this.sendBroadcast(intent)
+    }
 
+    private fun configureWidget(
+        widgetId: Int,
+    ) {
+        if (widgetDB.widgets[widgetDB.getWidgetIndex(widgetId)].widgetProviderInfo.configure != null) {
+            intent = Intent(AppWidgetManager.ACTION_APPWIDGET_CONFIGURE)
+            intent.component =
+                widgetDB.widgets[widgetDB.getWidgetIndex(widgetId)].widgetProviderInfo.configure
+            intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, widgetId)
+            val options = ActivityOptions.makeBasic()
+            options.launchDisplayId = displayId
+            try {
+                startActivityForResult(intent, CONFIGURE_WIDGET, options.toBundle())
+            } catch (e: Exception) {
+                buildWidget(widgetId)
+            }
+        } else {
+            buildWidget(widgetId)
+        }
+    }
+
+    override fun initializeWidget(
+        hostView: AppWidgetHostView,
+        widgetId: Int,
+        widgetProviderInfo: AppWidgetProviderInfo
+    ) {
+        if (appWidgetManager.getAppWidgetInfo(widgetId) != null) {
+            buildWidget(widgetId)
+        } else {
+            val canBind = appWidgetManager.bindAppWidgetIdIfAllowed(
+                widgetId,
+                widgetProviderInfo.provider
+            )
+            if (canBind) {
+                configureWidget(widgetId)
+            } else {
+                needPermissionToBind(widgetId, widgetProviderInfo)
+            }
+        }
+    }
+
+    private fun buildWidget(widgetId: Int) {
+        widgetDB.widgets[widgetDB.getWidgetIndex(widgetId)].appWidgetHostView =
+            appWidgetHost.createView(
+                applicationContext,
+                widgetId,
+                appWidgetManager.getAppWidgetInfo(widgetId)
+            )
+        widgetDB.widgets[widgetDB.getWidgetIndex(widgetId)].appWidgetHostView.setAppWidget(
+            widgetId,
+            appWidgetManager.getAppWidgetInfo(widgetId)
+        )
+        val options = appWidgetManager.getAppWidgetOptions(widgetId)
+        widgetDB.widgets[widgetDB.getWidgetIndex(widgetId)].appWidgetHostView.updateAppWidgetOptions(
+            options
+        )
+        widgetDB.widgets[widgetDB.getWidgetIndex(widgetId)].initialized = true
+        widgetDB.widgets[widgetDB.getWidgetIndex(widgetId)].widgetContainer.addWidgetView()
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (resultCode == RESULT_OK) {
             if (requestCode == REQUEST_PERMISSION) {
-                configureWidgetData(data)
+                val extras = data!!.extras
+                configureWidget(extras!!.getInt(AppWidgetManager.EXTRA_APPWIDGET_ID))
             }
 
             if (requestCode == CONFIGURE_WIDGET) {
-                createWidget(data)
+                val extras = data!!.extras
+                val widgetId = extras!!.getInt(AppWidgetManager.EXTRA_APPWIDGET_ID)
+                buildWidget(widgetId)
             }
         } else {
-            appWidgetHost.deleteAppWidgetId(appWidgetId)
+            try {
+                val extras = data!!.extras
+                val widgetId = extras!!.getInt(AppWidgetManager.EXTRA_APPWIDGET_ID)
+                appWidgetHost.deleteAppWidgetId(widgetId)
+            } catch (e: Exception) {
+                Log.d(TAG, "onActivityResult() Could not deleteAppWidgetId after bad resultCode!")
+            }
         }
         super.onActivityResult(requestCode, resultCode, data)
-    }
-
-    fun configureWidgetData(data: Intent? = null) {
-        val view =
-            homePager.findViewWithTag<View>(getCurrentHomePagerItem())
-        val homeIconsTable = view.findViewById<HomeLayout>(R.id.homeIconsTable)
-        for (n in 0 until homeIconsTable.childCount) {
-            if (homeIconsTable.getChildAt(n) is WidgetContainer) {
-                val child = homeIconsTable.getChildAt(n) as WidgetContainer
-                if (child.isWaitingForPermission) {
-                    child.configureWidget(data)
-                }
-            }
-        }
-    }
-
-    fun createWidget(data: Intent?) {
-        val view =
-            homePager.findViewWithTag<View>(getCurrentHomePagerItem())
-        val homeIconsTable = view.findViewById<HomeLayout>(R.id.homeIconsTable)
-        for (n in 0 until homeIconsTable.childCount) {
-            if (homeIconsTable.getChildAt(n) is WidgetContainer) {
-                val child = homeIconsTable.getChildAt(n) as WidgetContainer
-                if (child.isWaitingForConfigure) {
-                    child.createWidget(data)
-                }
-            }
-        }
     }
 
     override fun onShowFolder(state: Boolean) {
@@ -849,7 +913,7 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
                     DragEvent.ACTION_DROP -> {
                         if (dragEvent.clipDescription.label.toString().equals("launchInfo")) {
                             val id = dragEvent.clipData.getItemAt(0).text.toString()
-                            val info = MainActivity.dragAndDropData.retrieveLaunchInfo(id)
+                            val info = dragAndDropData.retrieveLaunchInfo(id)
                             folder.addFolderApp(info)
                             folderAdapter.notifyDataSetChanged()
                         }
@@ -867,9 +931,23 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
     override fun logRecents() {
         val usageStatsManager = getSystemService(Context.USAGE_STATS_SERVICE) as UsageStatsManager
         val time = System.currentTimeMillis()
-        val stats = usageStatsManager.queryUsageStats(UsageStatsManager.INTERVAL_DAILY, time - android.os.SystemClock.uptimeMillis(), time)
-        stats.forEach{
+        val stats = usageStatsManager.queryUsageStats(
+            UsageStatsManager.INTERVAL_DAILY,
+            time - android.os.SystemClock.uptimeMillis(),
+            time
+        )
+        stats.forEach {
             Log.d(TAG, it.packageName)
+        }
+    }
+
+    override fun removeWidgets(leavePager: Boolean) {
+        widgetDB = WidgetDB(applicationContext)
+        widgetDB.setListener(this)
+        AppWidgetHost.deleteAllHosts()
+        if (!leavePager) {
+            homePagerAdapter.firstRun = arrayOf(true, true, true, true, true)
+            homePagerAdapter.notifyDataSetChanged()
         }
     }
 }

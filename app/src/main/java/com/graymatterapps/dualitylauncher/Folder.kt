@@ -19,7 +19,6 @@ import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.ColorUtils
 import androidx.core.graphics.drawable.toBitmap
-import com.graymatterapps.dualitylauncher.MainActivity.Companion.dragAndDropData
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
@@ -133,7 +132,7 @@ class Folder(
                         if (respondToDrag) {
                             if (dragEvent.clipDescription.label.toString().equals("launchInfo")) {
                                 val id = dragEvent.clipData.getItemAt(0).text.toString()
-                                val info = MainActivity.dragAndDropData.retrieveLaunchInfo(id)
+                                val info = dragAndDropData.retrieveLaunchInfo(id)
                                 if(info.getType() == LaunchInfo.ICON) {
                                     addFolderApp(info)
                                 }

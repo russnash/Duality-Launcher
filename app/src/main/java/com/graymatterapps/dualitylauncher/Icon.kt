@@ -13,7 +13,6 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.core.graphics.ColorUtils
-import com.graymatterapps.dualitylauncher.MainActivity.Companion.dragAndDropData
 
 class Icon(
     private val parentActivity: MainActivity,

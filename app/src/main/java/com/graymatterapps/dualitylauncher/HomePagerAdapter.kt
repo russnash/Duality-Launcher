@@ -24,6 +24,7 @@ class HomePagerAdapter(private val parent: MainActivity, private val container: 
     var numRows: Int = 0
     var numCols: Int = 0
     private lateinit var listener: HomeIconsInterface
+    var firstRun = arrayOf(true, true, true, true, true)
     val TAG = javaClass.simpleName
 
     class HomePagerHolder(view: View) : RecyclerView.ViewHolder(view) {
@@ -31,13 +32,12 @@ class HomePagerAdapter(private val parent: MainActivity, private val container: 
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): HomePagerHolder {
-        val inflatedView =
-            LayoutInflater.from(container.context).inflate(R.layout.home_icons, container, false)
+        val inflatedView = LayoutInflater.from(container.context).inflate(R.layout.home_icons, container, false)
         return HomePagerHolder(inflatedView)
     }
 
     override fun onBindViewHolder(holder: HomePagerHolder, position: Int) {
-        Log.d(TAG, "onBindViewHolder()")
+        Log.d(TAG, "onBindViewHolder() firstRun=${firstRun[position]} displayId=${parent.displayId} position=$position")
         val itemView = holder.itemView
         itemView.tag = position
         val homeIconsTable = itemView.findViewById<HomeLayout>(R.id.homeIconsTable)
@@ -56,13 +56,26 @@ class HomePagerAdapter(private val parent: MainActivity, private val container: 
         numRows = Integer.parseInt(numRowsString.toString())
         val textColor = settingsPreferences.getInt("home_text_color", Color.WHITE)
         val textShadowColor = settingsPreferences.getInt("home_text_shadow_color", Color.BLACK)
-        homeIconsTable.removeAllViews()
+
+        if(firstRun[position]) {
+            homeIconsTable.removeAllViews()
+        } else {
+            for (n: Int in 0 until homeIconsTable.childCount){
+                if(homeIconsTable.getChildAt(n) is Icon) {
+                    homeIconsTable.removeView(homeIconsTable.getChildAt(n))
+                }
+                if(homeIconsTable.getChildAt(n) is Folder) {
+                    homeIconsTable.removeView(homeIconsTable.getChildAt(n))
+                }
+            }
+        }
+
         homeIconsTable.setGridSize(numRows, numCols)
 
         for (row in 0 until numRows) {
             for (column in 0 until numCols) {
                 val appWidgetId = homeWidgetsGrid.getWidgetId(row, column)
-                if (appWidgetId != 0) {
+                if (appWidgetId != 0 && firstRun[position]) {
                     var widgetParams = HomeLayout.LayoutParams(
                         ViewGroup.LayoutParams.WRAP_CONTENT,
                         ViewGroup.LayoutParams.WRAP_CONTENT
@@ -131,6 +144,7 @@ class HomePagerAdapter(private val parent: MainActivity, private val container: 
                 }
             }
         }
+        firstRun[position] = false
     }
 
     override fun getItemCount(): Int {
