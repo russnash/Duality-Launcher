@@ -1,3 +1,18 @@
+Version ?
+Changes:
+
+Bug Fixes:
+
+Version 2020.9.20.1-internal
+Changes:
+- Added option for automatic color scheme.
+- Added widget resizing, long press widget to activate. Release then drag to move.
+
+Bug Fixes:
+- Fixed a crash when dropping a widget into the trash can.
+- Fixed issue where removing an icon from one screen left a 'ghost' on the other.
+- Applied dirty patch to the replication system to limit crashes caused by adding widgets / icons / folders.
+
 Version 2020.9.17.1-internal
 Changes:
 - Re-wrote widget system from scratch.

@@ -98,4 +98,8 @@ class AppDrawerAdapter(
     override fun onLongClick(view: View) {
         // Do nothing
     }
+
+    override fun resetResize() {
+        // Do nothing
+    }
 }

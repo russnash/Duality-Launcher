@@ -58,6 +58,10 @@ class FolderAdapter(var parentActivity: MainActivity, var apps: ArrayList<Launch
         // Do nothing
     }
 
+    override fun resetResize() {
+        // Do nothing
+    }
+
     fun setListener(ear: FolderAdapterInterface) {
         listener = ear
     }

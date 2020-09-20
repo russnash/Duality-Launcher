@@ -170,8 +170,6 @@ class Icon(
                 dragAndDropData.addLaunchInfo(passedLaunchInfo, id)
                 var clipData = ClipData.newPlainText("launchInfo", id)
 
-                listener.onDragStarted(this, clipData)
-
                 if (blankOnDrag) {
                     launchInfo.setActivityName("")
                     launchInfo.setPackageName("")
@@ -180,6 +178,7 @@ class Icon(
                     label.text = ""
                 }
                 listener.onIconChanged()
+                listener.onDragStarted(this, clipData)
                 true
             }
         } else {
@@ -190,6 +189,12 @@ class Icon(
             label.setOnLongClickListener { view ->
                 listener.onLongClick(view)
                 true
+            }
+            icon.setOnClickListener {
+                listener.resetResize()
+            }
+            label.setOnClickListener{
+                listener.resetResize()
             }
             icon.setImageDrawable(ColorDrawable(Color.TRANSPARENT))
             label.text = ""
@@ -258,5 +263,6 @@ class Icon(
         fun onDragStarted(view: View, clipData: ClipData)
         fun onLaunch(launchInfo: LaunchInfo, displayId: Int)
         fun onLongClick(view: View)
+        fun resetResize()
     }
 }

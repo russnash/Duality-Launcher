@@ -23,13 +23,10 @@ import android.widget.ArrayAdapter
 import android.widget.ImageView
 import android.widget.TableRow
 import androidx.appcompat.app.AppCompatActivity
-import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.graphics.ColorUtils
 import androidx.core.view.ViewCompat.startDragAndDrop
-import androidx.core.view.get
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
-import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
 import com.graymatterapps.graymatterutils.GrayMatterUtils.getVersionCode
 import com.graymatterapps.graymatterutils.GrayMatterUtils.shortToast
@@ -71,7 +68,7 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
 
         generalContext = this
         homeActivity = this
-        displayId = windowManager.getDefaultDisplay().displayId
+        displayId = this.display!!.displayId
         displayManager = getSystemService(Context.DISPLAY_SERVICE) as DisplayManager
 
         if (isMainDisplay()) {
@@ -153,19 +150,6 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
         dock.depersistDock()
         dock.populateDock()
         dock.setListener(this)
-
-        // TEMP
-        /*
-        try {
-            val editor = prefs.edit()
-            editor.remove("homeWidgetsGrid0:1")
-            editor.remove("homeIconsGrid1")
-            editor.apply()
-        } catch (e: Exception) {
-            // Do nothing
-        }
-
-         */
 
         homePager.offscreenPageLimit = 5
         homePagerAdapter = HomePagerAdapter(this, frameLayout)
@@ -263,9 +247,7 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
     }
 
     fun persistGrid(position: Int) {
-        if(position == 1) {
-            Log.d(TAG, "$position")
-        }
+        homePagerAdapter.lock.lock()
         Log.d(TAG, "persistGrid()")
         var homeIconsGrid = HomeIconsGrid()
         var homeWidgetsGrid = HomeWidgetsGrid()
@@ -306,6 +288,7 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
         saveItJson = Json.encodeToString(homeWidgetsGrid)
         editor.putString("homeWidgetsGrid" + displayId + ":" + position, saveItJson)
         editor.apply()
+        homePagerAdapter.lock.unlock()
     }
 
     fun setupHomeMenu() {
@@ -357,7 +340,7 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
 
     fun isMainDisplay(): Boolean {
         val displays = displayManager.displays
-        val currentDisplay = windowManager.getDefaultDisplay().displayId
+        val currentDisplay = this.display!!.displayId
         return displays[0].displayId == currentDisplay
     }
 
@@ -726,7 +709,7 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
             widgetList.visibility = View.VISIBLE
             val widgetTags = ArrayList<String>()
             widgetDB.widgets.forEach {
-                widgetTags.add("${it.widgetId}:${it.widgetProviderInfo.provider.toShortString()}")
+                widgetTags.add("${it.widgetId}:${it.widgetProviderInfo.provider.shortClassName}")
             }
             val adapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, widgetTags)
             widgetList.adapter = adapter
@@ -926,6 +909,17 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
 
     override fun onFolderChanged() {
         persistGrid(getCurrentHomePagerItem())
+    }
+
+    override fun resetResize() {
+        val view = frameLayout.findViewWithTag<View>(getCurrentHomePagerItem())
+        val homeIconsTable = view.findViewById<HomeLayout>(R.id.homeIconsTable)
+        for (n in 0 until homeIconsTable.childCount) {
+            if (homeIconsTable.getChildAt(n) is WidgetContainer) {
+                val child = homeIconsTable.getChildAt(n) as WidgetContainer
+                child.resetResize()
+            }
+        }
     }
 
     override fun logRecents() {

@@ -125,4 +125,10 @@ object GrayMatterUtils {
         display!!.getRealMetrics(realMetrics)
         return realMetrics.widthPixels > realMetrics.heightPixels
     }
+
+    fun getDistance(x1: Float, y1: Float, x2: Float, y2: Float) : Double {
+        return Math.sqrt(Math.pow(x2.toDouble() - x1.toDouble(), 2.0) + Math.pow(y2.toDouble() - y1.toDouble(),
+            2.0
+        ))
+    }
 }

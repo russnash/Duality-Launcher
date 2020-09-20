@@ -193,6 +193,10 @@ class Dock(val parentActivity: MainActivity, attrs: AttributeSet?) : LinearLayou
         // Do nothing
     }
 
+    override fun resetResize() {
+        // Do nothing
+    }
+
     fun startDrag(view: View, clipData: ClipData) {
         val dsb = View.DragShadowBuilder(view)
         view.startDrag(clipData, dsb, view, 0)

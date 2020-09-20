@@ -42,6 +42,13 @@ class DualityLauncherApplication: Application() {
         appContext = this
         prefs = this.getSharedPreferences(PREFS_FILENAME, 0)
         settingsPreferences = PreferenceManager.getDefaultSharedPreferences(this)
+        /* try {
+            val editor = prefs.edit()
+            editor.remove("widgetSizes")
+            editor.apply()
+        } catch (e: Exception) {
+            // Do nothing
+        } */
         appList = AppList(applicationContext)
         appWidgetManager = AppWidgetManager.getInstance(applicationContext)
         appWidgetHost = AppWidgetHost(applicationContext, 1)
