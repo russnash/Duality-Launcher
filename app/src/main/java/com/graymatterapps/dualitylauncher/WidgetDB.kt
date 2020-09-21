@@ -76,8 +76,12 @@ class WidgetDB(val con: Context) {
     ): Int {
         for (i in 0 until widgets.size) {
             if (widgets[i].widgetId == appWidgetId) {
-                Log.d(TAG, "(container) appWidgetId $appWidgetId found at index $i.")
+                Log.d(TAG, "allocateWidget() appWidgetId $appWidgetId found at index $i.")
                 widgets[i].widgetContainer = requestingContainer
+                if(widgets[i].initialized) {
+                    Log.d(TAG, "allocateWidget() Widget initialized, performing addWidgetView()")
+                    widgets[i].widgetContainer.addWidgetView()
+                }
                 listener.showWidgets()
                 return i
             }
@@ -94,7 +98,7 @@ class WidgetDB(val con: Context) {
 
         for (i in 0 until widgets.size) {
             if (widgets[i].widgetId == appWidgetId) {
-                Log.d(TAG, "(container) appWidgetId $appWidgetId created at index $i.")
+                Log.d(TAG, "allocateWidget() appWidgetId $appWidgetId created at index $i.")
                 listener.initializeWidget(
                     widgets[i].appWidgetHostView,
                     appWidgetId,
@@ -104,26 +108,26 @@ class WidgetDB(val con: Context) {
                 return i
             }
         }
-        Log.d(TAG, "(container) Shouldn't have gotten here!")
+        Log.d(TAG, "allocateWidget() Shouldn't have gotten here!")
         return -1
     }
 
     fun getWidgetIndex(appWidgetId: Int): Int {
         for (i in 0 until widgets.size) {
             if (widgets[i].widgetId == appWidgetId) {
-                Log.d(TAG, "(activity) appWidgetId $appWidgetId found at index $i.")
+                Log.d(TAG, "getWidgetIndex() appWidgetId $appWidgetId found at index $i.")
                 listener.showWidgets()
                 return i
             }
         }
-        Log.d(TAG, "(activity) Shouldn't have gotten here!")
+        Log.d(TAG, "getWidgetIndex() Shouldn't have gotten here!")
         return -1
     }
 
     fun deleteWidget(appWidgetId: Int) {
         for (i in 0 until widgets.size) {
             if (widgets[i].widgetId == appWidgetId) {
-                Log.d(TAG, "(delete) appWidgetId $appWidgetId found at index $i and destroyed.")
+                Log.d(TAG, "deleteWidget() appWidgetId $appWidgetId found at index $i and destroyed.")
                 appWidgetHost.deleteAppWidgetId(appWidgetId)
                 widgets.removeAt(i)
                 listener.showWidgets()

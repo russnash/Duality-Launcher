@@ -39,15 +39,11 @@
         app:icon="@android:drawable/ic_menu_delete" />
     <Preference
         android:key="clear_widget_grid"
-        android:title="Clear home widget grid persistence"
+        android:title="Clear home widget grid persistence and AppWidgetHostData"
         app:icon="@android:drawable/ic_menu_delete" />
     <Preference
         android:key="clear_dock"
         android:title="Clear dock persistence"
-        app:icon="@android:drawable/ic_menu_delete" />
-    <Preference
-        android:key="clear_appwidgethosts"
-        android:title="Clear AppWidgetHost data for Duality Launcher"
         app:icon="@android:drawable/ic_menu_delete" />
     <Preference
         android:key="clear_folders"

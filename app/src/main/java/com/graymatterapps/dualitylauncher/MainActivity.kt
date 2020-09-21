@@ -513,10 +513,14 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
             }
 
             if (key.contains("homeIconsGrid")) {
+                homePagerAdapter.lock.lock()
                 homePagerAdapter.notifyDataSetChanged()
+                homePagerAdapter.lock.unlock()
             }
             if (key.contains("homeWidgetsGrid" + displayId)) {
+                homePagerAdapter.lock.lock()
                 homePagerAdapter.notifyDataSetChanged()
+                homePagerAdapter.lock.unlock()
             }
             if (key == "apps") {
                 if (dock != null) {
@@ -525,7 +529,9 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
             }
 
             if (key == "home_grid_pages" || key == "home_grid_columns" || key == "home_grid_rows") {
+                homePagerAdapter.lock.lock()
                 homePagerAdapter.notifyDataSetChanged()
+                homePagerAdapter.lock.unlock()
                 setupHomePageIndicator()
             }
             if (key == "home_widget_color") {
@@ -538,10 +544,14 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
                 )
             }
             if (key == "home_text_color") {
+                homePagerAdapter.lock.lock()
                 homePagerAdapter.notifyDataSetChanged()
+                homePagerAdapter.lock.unlock()
             }
             if (key == "home_text_shadow_color") {
+                homePagerAdapter.lock.lock()
                 homePagerAdapter.notifyDataSetChanged()
+                homePagerAdapter.lock.unlock()
             }
             if (key == "widget_info") {
                 showWidgets()
@@ -735,7 +745,11 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
     }
 
     override fun onWidgetChanged() {
-        persistGrid(getCurrentHomePagerItem())
+        try {
+            persistGrid(getCurrentHomePagerItem())
+        } catch (e: Exception) {
+            Log.d(TAG, "onWidgetChanged() persistGrid() failed!")
+        }
     }
 
     override fun updateWidgets(widgetInfo: AppWidgetProviderInfo) {
@@ -750,6 +764,7 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
     private fun configureWidget(
         widgetId: Int,
     ) {
+        Log.d(TAG, "configureWidget()")
         if (widgetDB.widgets[widgetDB.getWidgetIndex(widgetId)].widgetProviderInfo.configure != null) {
             intent = Intent(AppWidgetManager.ACTION_APPWIDGET_CONFIGURE)
             intent.component =
@@ -772,6 +787,7 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
         widgetId: Int,
         widgetProviderInfo: AppWidgetProviderInfo
     ) {
+        Log.d(TAG, "initializeWidget()")
         if (appWidgetManager.getAppWidgetInfo(widgetId) != null) {
             buildWidget(widgetId)
         } else {
@@ -788,6 +804,7 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
     }
 
     private fun buildWidget(widgetId: Int) {
+        Log.d(TAG, "buildWidget()")
         widgetDB.widgets[widgetDB.getWidgetIndex(widgetId)].appWidgetHostView =
             appWidgetHost.createView(
                 applicationContext,
@@ -940,8 +957,10 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
         widgetDB.setListener(this)
         AppWidgetHost.deleteAllHosts()
         if (!leavePager) {
+            homePagerAdapter.lock.lock()
             homePagerAdapter.firstRun = arrayOf(true, true, true, true, true)
             homePagerAdapter.notifyDataSetChanged()
+            homePagerAdapter.lock.unlock()
         }
     }
 }

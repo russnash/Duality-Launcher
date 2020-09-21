@@ -1,7 +1,9 @@
-Version ?
+Version 2020.9.21.1-internal
 Changes:
+- Merged clear widget grid persistence and delete AppWidgetHostData developer tools into one.
 
 Bug Fixes:
+- Fixed a bug that was preventing the addition of new widgets, however, the ghost icon issue may return.
 
 Version 2020.9.20.1-internal
 Changes:

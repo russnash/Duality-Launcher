@@ -26,6 +26,7 @@ class WidgetContainer(
     private lateinit var resizeFrame: ResizeFrame
     private var eventHistory = ArrayList<MotionEvent>()
     private val touchSlop: Int = android.view.ViewConfiguration.get(context).scaledTouchSlop
+    private var resizing: Boolean = false
     val TAG = javaClass.simpleName
 
     override fun onInterceptTouchEvent(event: MotionEvent?): Boolean {
@@ -48,7 +49,7 @@ class WidgetContainer(
         super.onAttachedToWindow()
         parentLayout = this.parent as HomeLayout
 
-        interceptGestureDetector = GestureDetectorCompat(parentActivity, object:
+        interceptGestureDetector = GestureDetectorCompat(parentActivity, object :
             GestureDetector.OnGestureListener {
             override fun onDown(p0: MotionEvent?): Boolean {
                 Log.d(TAG, "iOnDown()")
@@ -91,124 +92,127 @@ class WidgetContainer(
             }
         })
 
-        gestureDetector = GestureDetectorCompat(parentActivity, object: GestureDetector.OnGestureListener {
-            override fun onDown(event: MotionEvent?): Boolean {
-                Log.d(TAG, "OnDown()")
-                if(event != null) {
-                    eventHistory.add(MotionEvent.obtain(event))
-                }
-                return true
-            }
-
-            override fun onShowPress(event: MotionEvent?) {
-                Log.d(TAG, "onShowPress()")
-                if(event != null) {
-                    eventHistory.add(MotionEvent.obtain(event))
-                }
-            }
-
-            override fun onSingleTapUp(event: MotionEvent?): Boolean {
-                Log.d(TAG, "onSingleTapUp()")
-                if(event != null) {
-                    eventHistory.add(MotionEvent.obtain(event))
-                    if (resizeFrame.isResizing()) {
-                        eventHistory.forEach {
-                            resizeFrame.dispatchTouchEvent(it)
-                        }
-                        eventHistory.clear()
-                    } else {
-                        val hostView =
-                            widgetDB.widgets[widgetDB.getWidgetIndex(appWidgetId)].appWidgetHostView
-                        eventHistory.forEach{
-                            hostView.dispatchTouchEvent(it)
-                        }
-                        eventHistory.clear()
+        gestureDetector =
+            GestureDetectorCompat(parentActivity, object : GestureDetector.OnGestureListener {
+                override fun onDown(event: MotionEvent?): Boolean {
+                    Log.d(TAG, "OnDown()")
+                    if (event != null) {
+                        eventHistory.add(MotionEvent.obtain(event))
                     }
-                } else {
-                    Log.d(TAG, "onSingleTapUp() event = null!")
+                    return true
                 }
-                return false
-            }
 
-            override fun onScroll(
-                eventOld: MotionEvent?,
-                event: MotionEvent?,
-                p2: Float,
-                p3: Float
-            ): Boolean {
-                Log.d(TAG, "onScroll()")
-                if(event != null) {
-                    eventHistory.add(MotionEvent.obtain(event))
-                    if(resizeFrame.isResizing()) {
-                        eventHistory.forEach{
-                            resizeFrame.dispatchTouchEvent(it)
-                        }
-                        eventHistory.clear()
-                        if(eventOld != null) {
-                            val distance = GrayMatterUtils.getDistance(
-                                event.x,
-                                event.y,
-                                eventOld.x,
-                                eventOld.y
-                            )
-                            Log.d(TAG, "onScroll() distance: $distance")
-                            if (distance > touchSlop
-                            ) {
-                                resizeFrame.setResize(false)
-                                eventHistory.clear()
-                                startDrag()
+                override fun onShowPress(event: MotionEvent?) {
+                    Log.d(TAG, "onShowPress()")
+                    if (event != null) {
+                        eventHistory.add(MotionEvent.obtain(event))
+                    }
+                }
+
+                override fun onSingleTapUp(event: MotionEvent?): Boolean {
+                    Log.d(TAG, "onSingleTapUp()")
+                    if (event != null) {
+                        eventHistory.add(MotionEvent.obtain(event))
+                        if (resizeFrame.isResizing()) {
+                            eventHistory.forEach {
+                                resizeFrame.dispatchTouchEvent(it)
                             }
+                            eventHistory.clear()
+                        } else {
+                            val hostView =
+                                widgetDB.widgets[widgetDB.getWidgetIndex(appWidgetId)].appWidgetHostView
+                            eventHistory.forEach {
+                                hostView.dispatchTouchEvent(it)
+                            }
+                            eventHistory.clear()
                         }
                     } else {
-                        val hostView =
-                            widgetDB.widgets[widgetDB.getWidgetIndex(appWidgetId)].appWidgetHostView
-                        eventHistory.forEach{
-                            hostView.dispatchTouchEvent(it)
-                        }
-                        eventHistory.clear()
+                        Log.d(TAG, "onSingleTapUp() event = null!")
                     }
+                    return false
                 }
-                return false
-            }
 
-            override fun onLongPress(p0: MotionEvent?) {
-                Log.d(TAG, "onLongPress()")
-                eventHistory.clear()
-                GrayMatterUtils.vibrate(parentActivity, 50)
-                resizeFrame.setResize(true)
-                resizeFrame.bringToFront()
-            }
-
-            override fun onFling(
-                eventOld: MotionEvent?,
-                event: MotionEvent?,
-                p2: Float,
-                p3: Float
-            ): Boolean {
-                Log.d(TAG, "onFling()")
-                if(event != null) {
-                    eventHistory.add(MotionEvent.obtain(event))
-                    if(resizeFrame.isResizing()) {
-                        eventHistory.forEach{
-                            resizeFrame.dispatchTouchEvent(it)
+                override fun onScroll(
+                    eventOld: MotionEvent?,
+                    event: MotionEvent?,
+                    p2: Float,
+                    p3: Float
+                ): Boolean {
+                    Log.d(TAG, "onScroll()")
+                    if (event != null) {
+                        eventHistory.add(MotionEvent.obtain(event))
+                        if (resizeFrame.isResizing()) {
+                            eventHistory.forEach {
+                                resizeFrame.dispatchTouchEvent(it)
+                            }
+                            eventHistory.clear()
+                            if (eventOld != null) {
+                                val distance = GrayMatterUtils.getDistance(
+                                    event.x,
+                                    event.y,
+                                    eventOld.x,
+                                    eventOld.y
+                                )
+                                Log.d(TAG, "onScroll() distance: $distance")
+                                if (distance > touchSlop
+                                ) {
+                                    resizeFrame.setResize(false)
+                                    eventHistory.clear()
+                                    startDrag()
+                                }
+                            }
+                        } else {
+                            val hostView =
+                                widgetDB.widgets[widgetDB.getWidgetIndex(appWidgetId)].appWidgetHostView
+                            eventHistory.forEach {
+                                hostView.dispatchTouchEvent(it)
+                            }
+                            eventHistory.clear()
                         }
-                        eventHistory.clear()
-                    } else {
-                        val hostView =
-                            widgetDB.widgets[widgetDB.getWidgetIndex(appWidgetId)].appWidgetHostView
-                        eventHistory.forEach{
-                            hostView.dispatchTouchEvent(it)
-                        }
-                        eventHistory.clear()
                     }
+                    return false
                 }
-                return false
-            }
-        })
+
+                override fun onLongPress(p0: MotionEvent?) {
+                    Log.d(TAG, "onLongPress()")
+                    eventHistory.clear()
+                    GrayMatterUtils.vibrate(parentActivity, 50)
+                    resizeFrame.bringToFront()
+                    resizeFrame.setResize(true)
+                    resizing = true
+                }
+
+                override fun onFling(
+                    eventOld: MotionEvent?,
+                    event: MotionEvent?,
+                    p2: Float,
+                    p3: Float
+                ): Boolean {
+                    Log.d(TAG, "onFling()")
+                    if (event != null) {
+                        eventHistory.add(MotionEvent.obtain(event))
+                        if (resizeFrame.isResizing()) {
+                            eventHistory.forEach {
+                                resizeFrame.dispatchTouchEvent(it)
+                            }
+                            eventHistory.clear()
+                        } else {
+                            val hostView =
+                                widgetDB.widgets[widgetDB.getWidgetIndex(appWidgetId)].appWidgetHostView
+                            eventHistory.forEach {
+                                hostView.dispatchTouchEvent(it)
+                            }
+                            eventHistory.clear()
+                        }
+                    }
+                    return false
+                }
+            })
     }
 
     fun resetResize() {
         resizeFrame.setResize(false)
+        resizing = false
         eventHistory.clear()
     }
 
@@ -230,6 +234,7 @@ class WidgetContainer(
     }
 
     fun addWidgetView() {
+        Log.d(TAG, "addWidgetView()")
         appWidgetProviderInfo = appWidgetManager.getAppWidgetInfo(appWidgetId)
         listener.updateWidgets(appWidgetProviderInfo)
         val widgetIndex = widgetDB.getWidgetIndex(appWidgetId)
@@ -239,19 +244,21 @@ class WidgetContainer(
         val minHeight =
             appWidgetProviderInfo.minHeight + widgetDB.widgets[widgetIndex].appWidgetHostView.paddingTop + widgetDB.widgets[widgetIndex].appWidgetHostView.paddingBottom
 
+        val containerParams = this.layoutParams as HomeLayout.LayoutParams
         val sizes = widgetDB.getWidgetSize(appWidgetId)
         if (sizes.getInt("columnSpan") != 0) {
             neededWidth = sizes.getInt("columnSpan") * parentLayout.getCellWidth()
             neededHeight = sizes.getInt("rowSpan") * parentLayout.getCellHeight()
+            containerParams.columnSpan = sizes.getInt("columnSpan")
+            containerParams.rowSpan = sizes.getInt("rowSpan")
         } else {
             neededWidth = parentLayout.widthToCells(minWidth) * parentLayout.getCellWidth()
             neededHeight = parentLayout.heightToCells(minHeight) * parentLayout.getCellHeight()
+            containerParams.columnSpan = parentLayout.widthToCells(neededWidth)
+            containerParams.rowSpan = parentLayout.heightToCells(neededHeight)
         }
-        val containerParams = this.layoutParams as HomeLayout.LayoutParams
         containerParams.width = neededWidth
         containerParams.height = neededHeight
-        containerParams.columnSpan = sizes.getInt("columnSpan")
-        containerParams.rowSpan = sizes.getInt("rowSpan")
         this.layoutParams = containerParams
 
         val viewParams = FrameLayout.LayoutParams(
@@ -292,6 +299,10 @@ class WidgetContainer(
         resizeFrame.layoutParams = viewParams
         this.addView(resizeFrame, viewParams)
         resizeFrame.measure(widthSpec, heightSpec)
+        if (resizing) {
+            resizeFrame.setResize(true)
+            resizeFrame.bringToFront()
+        }
         listener.onWidgetChanged()
         this.bringToFront()
         widgetDB.updateWidgetSize(appWidgetId, containerParams.rowSpan, containerParams.columnSpan)
@@ -317,9 +328,12 @@ class WidgetContainer(
     }
 
     override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
-        val i = widgetDB.allocateWidget(appWidgetId, appWidgetProviderInfo, this)
-        if (this.childCount == 0 && widgetDB.widgets[widgetDB.getWidgetIndex(appWidgetId)].initialized) {
-            addWidgetView()
+        Log.d(TAG, "onLayout()")
+        if (this.childCount == 0) {
+            val i = widgetDB.allocateWidget(appWidgetId, appWidgetProviderInfo, this)
+            if(widgetDB.widgets[i].initialized) {
+                addWidgetView()
+            }
         }
         val widthSpec = MeasureSpec.makeMeasureSpec(neededWidth, MeasureSpec.EXACTLY)
         val heightSpec = MeasureSpec.makeMeasureSpec(neededHeight, MeasureSpec.EXACTLY)
@@ -327,7 +341,11 @@ class WidgetContainer(
             widthSpec,
             heightSpec
         )
-        resizeFrame.measure(widthSpec, heightSpec)
+        try {
+            resizeFrame.measure(widthSpec, heightSpec)
+        } catch (e: Exception) {
+            // Do nothing
+        }
         super.onLayout(changed, left, top, right, bottom)
     }
 

@@ -152,7 +152,7 @@ class HomePagerAdapter(private val parent: MainActivity, private val container: 
                 }
             }
         }
-        firstRun[position] = true
+        firstRun[position] = false
         //if(parent.displayId == 1 && position == 0) {
         //    dumpGrid(homeIconsTable, position)
         //}

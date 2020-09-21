@@ -48,16 +48,17 @@ class SettingsDeveloper : PreferenceFragmentCompat() {
                 if(it.key.contains("homeWidgetsGrid")){
                     editor.remove(it.key)
                 }
+                if(it.key.contains("widgetSizes")) {
+                    editor.remove(it.key)
+                }
+                widgetDB = WidgetDB(appContext)
             }
             editor.apply()
             listener.removeWidgets()
-            shortToast(requireActivity(), "Home widget grid persistence cleared...")
-            true
-        }
-
-        preferenceManager.findPreference<Preference>("clear_appwidgethosts")?.setOnPreferenceClickListener {
+            listener.showWidgets()
             AppWidgetHost.deleteAllHosts()
-            shortToast(requireActivity(), "AppWidgetHost data for Duality Launcher cleared...")
+            shortToast(requireActivity(), "Home widget grid persistence and AppWidgetHost data cleared...")
+
             true
         }
 
@@ -83,5 +84,6 @@ class SettingsDeveloper : PreferenceFragmentCompat() {
         fun updateAppList()
         fun logRecents()
         fun removeWidgets(leavePager: Boolean = false)
+        fun showWidgets()
     }
 }
