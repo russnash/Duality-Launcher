@@ -101,6 +101,31 @@
                 android:textColor="?android:attr/textColorPrimary" />
         </LinearLayout>
 
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginBottom="2dp"
+            android:background="@drawable/popup_menu_item_background"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:id="@+id/iconWideshot"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:paddingLeft="10dp"
+                app:srcCompat="@android:drawable/ic_menu_camera" />
+
+            <Button
+                android:id="@+id/buttonActionWideshot"
+                style="@style/Widget.AppCompat.Button.Borderless"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/action_wideshot"
+                android:textAlignment="textStart"
+                android:textColor="?android:attr/textColorPrimary" />
+        </LinearLayout>
+
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

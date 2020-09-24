@@ -1,16 +1,15 @@
 package com.graymatterapps.dualitylauncher
 
 import android.content.ClipData
-import android.content.Context
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.util.AttributeSet
 import android.view.DragEvent
 import android.view.View
-import android.view.WindowManager
 import android.view.animation.AnimationUtils
 import android.widget.ImageView
 import android.widget.LinearLayout
+import android.widget.TableRow
 import android.widget.TextView
 import androidx.core.graphics.ColorUtils
 
@@ -21,17 +20,19 @@ class Icon(
     packageInfo: String,
     userSerial: Long,
     isDragTarget: Boolean,
-    isBlankOnDrag: Boolean
+    isBlankOnDrag: Boolean,
+    var replicate: Boolean = false,
+    var page: Int
 ) : LinearLayout(parentActivity, attrs) {
 
-    constructor(con: MainActivity, attrs: AttributeSet?) : this(con, attrs, "", "", 0, true, false)
+    constructor(con: MainActivity, attrs: AttributeSet?, replicate: Boolean, page: Int) : this(con, attrs, "", "", 0, true, false, replicate, page)
     constructor(
         con: MainActivity,
         attrs: AttributeSet?,
         activityInfo: String,
         packageInfo: String,
         userSerial: Long
-    ) : this(con, attrs, activityInfo, packageInfo, userSerial, true, false)
+    ) : this(con, attrs, activityInfo, packageInfo, userSerial, true, false, false, 0)
 
     private lateinit var listener: IconInterface
     lateinit var parentLayout: HomeLayout
@@ -39,7 +40,6 @@ class Icon(
     var icon: ImageView
     var label: TextView
     private var launchInfo = LaunchInfo()
-    private val displayId: Int
     private var dragTarget = true
     private var blankOnDrag = false
     private var isDockIcon = false
@@ -49,9 +49,6 @@ class Icon(
 
     init {
         inflate(context, R.layout.icon, this)
-
-        val wm = context.getSystemService(Context.WINDOW_SERVICE) as WindowManager
-        displayId = wm.defaultDisplay.displayId
 
         dragTarget = isDragTarget
 
@@ -124,14 +121,29 @@ class Icon(
                                     } else {
                                         val id = dragEvent.clipData.getItemAt(0).text.toString()
                                         launchInfo = dragAndDropData.retrieveLaunchInfo(id)
+                                        if(launchInfo.getType() == LaunchInfo.ICON) {
+                                            if (this.parent is HomeLayout) {
+                                                replicate = false
+                                                val params =
+                                                    this.layoutParams as HomeLayout.LayoutParams
+                                                replicator.changeIcon(
+                                                    parentActivity.displayId,
+                                                    launchInfo,
+                                                    page,
+                                                    params.row,
+                                                    params.column
+                                                )
+                                            }
+                                            setupIcon()
+                                        } else {
+                                            convertToFolder(launchInfo)
+                                        }
                                     }
-                                    listener.onIconChanged()
                                 }
                                 if (dragEvent.clipDescription.label.toString().equals("widget")) {
                                     val id = dragEvent.clipData.getItemAt(0).text.toString()
                                     val widgetInfo = dragAndDropData.retrieveWidgetId(id)
                                     convertToWidget(widgetInfo)
-                                    listener.onIconChanged()
                                 }
                             }
                         }
@@ -146,6 +158,11 @@ class Icon(
         super.onAttachedToWindow()
         if (this.parent is HomeLayout) {
             parentLayout = this.parent as HomeLayout
+            if(replicate) {
+                val params = this.layoutParams as HomeLayout.LayoutParams
+                replicator.deleteViews(parentActivity.displayId, page, params.row, params.column)
+                replicator.addIcon(parentActivity.displayId, launchInfo, page, params.row, params.column)
+            }
         }
     }
 
@@ -161,9 +178,19 @@ class Icon(
             label.text = appList.getLabel(launchInfo)
 
             icon.setOnClickListener {
-                listener.onLaunch(launchInfo, displayId)
+                listener.onLaunch(launchInfo, parentActivity.displayId)
             }
 
+            if(replicate) {
+                val params = this.layoutParams as HomeLayout.LayoutParams
+                replicator.addIcon(
+                    parentActivity.displayId,
+                    launchInfo,
+                    page,
+                    params.row,
+                    params.column
+                )
+            }
             icon.setOnLongClickListener { view ->
                 val id = System.currentTimeMillis().toString()
                 val passedLaunchInfo = launchInfo.copy()
@@ -177,7 +204,19 @@ class Icon(
                     icon.setImageDrawable(ColorDrawable(Color.TRANSPARENT))
                     label.text = ""
                 }
-                listener.onIconChanged()
+                if(this.parent is HomeLayout) {
+                    val params = this.layoutParams as HomeLayout.LayoutParams
+                    replicator.changeIcon(
+                        parentActivity.displayId,
+                        launchInfo,
+                        page,
+                        params.row,
+                        params.column
+                    )
+                }
+                if(isDockIcon){
+                    parentActivity.dock.persistDock()
+                }
                 listener.onDragStarted(this, clipData)
                 true
             }
@@ -233,14 +272,15 @@ class Icon(
         var folder: Folder
         val params = this.layoutParams as HomeLayout.LayoutParams
         if (info.getType() == LaunchInfo.ICON) {
-            folder = Folder(parentActivity, null, parentActivity.getString(R.string.new_folder))
+            folder = Folder(parentActivity, null, parentActivity.getString(R.string.new_folder), null, true, page)
             folder.addFolderApp(launchInfo)
             folder.addFolderApp(info)
         } else {
-            folder = Folder(parentActivity, null, info.getFolderName(), info)
+            folder = Folder(parentActivity, null, info.getFolderName(), info, true, page)
         }
         folder.layoutParams = params
         folder.setListener(parentActivity.homePagerAdapter as Folder.FolderInterface)
+        replicator.deleteViews(parentActivity.displayId, page, params.row, params.column)
         parentLayout.addView(folder)
         parentLayout.removeView(this)
     }
@@ -255,11 +295,11 @@ class Icon(
         widgetContainer.layoutParams = params
         widgetContainer.setListener(parentActivity as WidgetContainer.WidgetInterface)
         parentLayout.addView(widgetContainer)
+        replicator.deleteViews(parentActivity.displayId, page, params.row, params.column)
         parentLayout.removeView(this)
     }
 
     interface IconInterface {
-        fun onIconChanged()
         fun onDragStarted(view: View, clipData: ClipData)
         fun onLaunch(launchInfo: LaunchInfo, displayId: Int)
         fun onLongClick(view: View)

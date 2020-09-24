@@ -5,6 +5,7 @@ import android.app.AlertDialog
 import android.content.Context
 import android.content.DialogInterface
 import android.content.pm.PackageManager
+import android.graphics.Bitmap
 import android.graphics.Color
 import android.hardware.display.DisplayManager
 import android.os.VibrationEffect
@@ -130,5 +131,13 @@ object GrayMatterUtils {
         return Math.sqrt(Math.pow(x2.toDouble() - x1.toDouble(), 2.0) + Math.pow(y2.toDouble() - y1.toDouble(),
             2.0
         ))
+    }
+
+    fun getScreenshotOfRoot(view: View) : Bitmap {
+        val root = view.rootView
+        root.setDrawingCacheEnabled(true)
+        val bitmap = Bitmap.createBitmap(root.getDrawingCache())
+        root.setDrawingCacheEnabled(false)
+        return bitmap
     }
 }

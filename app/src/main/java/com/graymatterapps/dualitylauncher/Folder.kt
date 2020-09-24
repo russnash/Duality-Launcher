@@ -1,7 +1,6 @@
 package com.graymatterapps.dualitylauncher
 
 import android.content.ClipData
-import android.content.Context
 import android.content.SharedPreferences
 import android.graphics.*
 import android.graphics.drawable.BitmapDrawable
@@ -11,7 +10,6 @@ import android.text.SpannableStringBuilder
 import android.util.AttributeSet
 import android.view.DragEvent
 import android.view.View
-import android.view.WindowManager
 import android.view.animation.AnimationUtils
 import android.widget.ImageView
 import android.widget.LinearLayout
@@ -28,10 +26,11 @@ class Folder(
     private val parentActivity: MainActivity,
     attrs: AttributeSet?,
     name: String,
-    info: LaunchInfo? = null
+    info: LaunchInfo? = null,
+    var replicate: Boolean = false,
+    var page: Int
 ) : LinearLayout(parentActivity, attrs), SharedPreferences.OnSharedPreferenceChangeListener {
 
-    private val displayId: Int
     private val enteredColor = ColorUtils.setAlphaComponent(Color.GREEN, 20)
     private val folderLayout: LinearLayout
     private val folderIcon: ImageView
@@ -45,9 +44,6 @@ class Folder(
     private val pulseAnim = AnimationUtils.loadAnimation(context, R.anim.pulse_alpha)
 
     init {
-        val wm = context.getSystemService(Context.WINDOW_SERVICE) as WindowManager
-        displayId = wm.defaultDisplay.displayId
-
         prefs.registerOnSharedPreferenceChangeListener(this)
 
         inflate(parentActivity, R.layout.folder, this)
@@ -61,6 +57,8 @@ class Folder(
         if (info == null) {
             launchInfo.setType(LaunchInfo.FOLDER)
             launchInfo.setFolderUniqueId(System.currentTimeMillis())
+            folderLabel.text = parentActivity.getString(R.string.new_folder)
+            launchInfo.setFolderName(parentActivity.getString(R.string.new_folder))
         } else {
             launchInfo = info
             folderLabel.text = launchInfo.getFolderName()
@@ -80,7 +78,7 @@ class Folder(
             var clipData = ClipData.newPlainText("launchInfo", id)
             listener.onDragStarted(this, clipData)
             convertToIcon()
-            listener.onFolderChanged()
+            //listener.onFolderChanged()
             true
         }
     }
@@ -89,6 +87,10 @@ class Folder(
         super.onAttachedToWindow()
         if (this.parent is HomeLayout) {
             parentLayout = this.parent as HomeLayout
+            if(replicate) {
+                val params = this.layoutParams as HomeLayout.LayoutParams
+                replicator.addFolder(parentActivity.displayId, launchInfo, page, params.row, params.column)
+            }
         }
     }
 
@@ -210,7 +212,21 @@ class Folder(
     fun setFolderName(name: String) {
         folderLabel.text = name
         launchInfo.setFolderName(name)
-        listener.onFolderChanged()
+        if(replicate) {
+            val params = this.layoutParams as HomeLayout.LayoutParams
+            replicator.changeFolder(
+                parentActivity.displayId,
+                launchInfo,
+                page,
+                params.row,
+                params.column
+            )
+        }
+    }
+
+    fun setLaunchInfo(info: LaunchInfo) {
+        launchInfo = info
+        folderLabel.text = info.getFolderName()
     }
 
     fun getLaunchInfo(): LaunchInfo {
@@ -243,19 +259,19 @@ class Folder(
     }
 
     fun convertToIcon() {
-        val icon = Icon(parentActivity, null)
+        val icon = Icon(parentActivity, null, true, page)
         val params = this.layoutParams as HomeLayout.LayoutParams
         icon.setLaunchInfo(LaunchInfo())
         icon.layoutParams = params
         icon.setListener(listener as Icon.IconInterface)
-        parentLayout.addView(icon)
+        parentLayout.addView(icon, params)
+        replicator.deleteViews(parentActivity.displayId, page, params.row, params.column)
         parentLayout.removeView(this)
     }
 
     interface FolderInterface {
         fun onShowFolder(state: Boolean)
         fun onSetupFolder(apps: ArrayList<LaunchInfo>, name: Editable, folder: Folder)
-        fun onFolderChanged()
         fun onDragStarted(view: View, clipData: ClipData)
     }
 

@@ -1,7 +1,6 @@
 package com.graymatterapps.dualitylauncher
 
 import android.content.ClipData
-import android.content.Context
 import android.graphics.Color
 import android.text.Editable
 import android.util.Log
@@ -9,10 +8,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.graymatterapps.graymatterutils.GrayMatterUtils
-import com.graymatterapps.graymatterutils.GrayMatterUtils.colorPrefToColor
 import kotlinx.android.synthetic.main.folder.view.*
-import kotlinx.android.synthetic.main.icon.view.*
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 import java.util.concurrent.locks.ReentrantLock
@@ -26,7 +22,6 @@ class HomePagerAdapter(private val parent: MainActivity, private val container: 
     var numRows: Int = 0
     var numCols: Int = 0
     private lateinit var listener: HomeIconsInterface
-    var firstRun = arrayOf(true, true, true, true, true)
     val TAG = javaClass.simpleName
     val lock = ReentrantLock()
 
@@ -35,18 +30,19 @@ class HomePagerAdapter(private val parent: MainActivity, private val container: 
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): HomePagerHolder {
-        val inflatedView = LayoutInflater.from(container.context).inflate(R.layout.home_icons, container, false)
+        val inflatedView =
+            LayoutInflater.from(container.context).inflate(R.layout.home_icons, container, false)
         return HomePagerHolder(inflatedView)
     }
 
     override fun onBindViewHolder(holder: HomePagerHolder, position: Int) {
-        Log.d(TAG, "onBindViewHolder() firstRun=${firstRun[position]} displayId=${parent.displayId} position=$position")
+        Log.d(TAG, "onBindViewHolder() displayId=${parent.displayId} position=$position")
         lock.lock()
         val itemView = holder.itemView
         itemView.tag = position
         val homeIconsTable = itemView.findViewById<HomeLayout>(R.id.homeIconsTable)
 
-        if(parent.displayId == 1 && position == 0) {
+        if (parent.displayId == 1 && position == 0) {
             Log.d(TAG, "Breakpoint")
         }
 
@@ -65,25 +61,14 @@ class HomePagerAdapter(private val parent: MainActivity, private val container: 
         val textColor = settingsPreferences.getInt("home_text_color", Color.WHITE)
         val textShadowColor = settingsPreferences.getInt("home_text_shadow_color", Color.BLACK)
 
-        if(firstRun[position]) {
-            homeIconsTable.removeAllViews()
-        } else {
-            for (n: Int in 0 until homeIconsTable.childCount){
-                if(homeIconsTable.getChildAt(n) is Icon) {
-                    homeIconsTable.removeView(homeIconsTable.getChildAt(n))
-                }
-                if(homeIconsTable.getChildAt(n) is Folder) {
-                    homeIconsTable.removeView(homeIconsTable.getChildAt(n))
-                }
-            }
-        }
+        homeIconsTable.removeAllViews()
 
         homeIconsTable.setGridSize(numRows, numCols)
 
         for (row in 0 until numRows) {
             for (column in 0 until numCols) {
                 val appWidgetId = homeWidgetsGrid.getWidgetId(row, column)
-                if (appWidgetId != 0 && firstRun[position]) {
+                if (appWidgetId != 0) {
                     var widgetParams = HomeLayout.LayoutParams(
                         ViewGroup.LayoutParams.WRAP_CONTENT,
                         ViewGroup.LayoutParams.WRAP_CONTENT
@@ -105,7 +90,7 @@ class HomePagerAdapter(private val parent: MainActivity, private val container: 
                 } else {
                     val launchInfo = homeIconsGrid.getLaunchInfo(row, column)
                     if (launchInfo.getType() == LaunchInfo.ICON) {
-                        var icon = Icon(parent, null)
+                        var icon = Icon(parent, null, false, position)
                         var iconParams = HomeLayout.LayoutParams(
                             ViewGroup.LayoutParams.WRAP_CONTENT,
                             ViewGroup.LayoutParams.WRAP_CONTENT
@@ -133,7 +118,9 @@ class HomePagerAdapter(private val parent: MainActivity, private val container: 
                             parent,
                             null,
                             parent.getString(R.string.new_folder),
-                            launchInfo
+                            launchInfo,
+                            false,
+                            position
                         )
                         folder.setListener(this)
                         var folderParams = HomeLayout.LayoutParams(
@@ -152,7 +139,6 @@ class HomePagerAdapter(private val parent: MainActivity, private val container: 
                 }
             }
         }
-        firstRun[position] = false
         //if(parent.displayId == 1 && position == 0) {
         //    dumpGrid(homeIconsTable, position)
         //}
@@ -160,16 +146,26 @@ class HomePagerAdapter(private val parent: MainActivity, private val container: 
     }
 
     fun dumpGrid(homeLayout: HomeLayout, position: Int) {
-        for(n in 0 until homeLayout.childCount) {
-            if(homeLayout.getChildAt(n) is Icon) {
+        for (n in 0 until homeLayout.childCount) {
+            if (homeLayout.getChildAt(n) is Icon) {
                 val icon = homeLayout.getChildAt(n) as Icon
-                Log.d("dumpGrid", "(${parent.displayId}-$position) Icon: ${icon.getLaunchInfo().getActivityName()}")
+                Log.d(
+                    "dumpGrid",
+                    "(${parent.displayId}-$position) Icon: ${
+                        icon.getLaunchInfo().getActivityName()
+                    }"
+                )
             }
-            if(homeLayout.getChildAt(n) is Folder) {
+            if (homeLayout.getChildAt(n) is Folder) {
                 val folder = homeLayout.getChildAt(n) as Folder
-                Log.d("dumpGrid", "(${parent.displayId}-$position) Folder: ${folder.getLaunchInfo().getFolderName()}")
+                Log.d(
+                    "dumpGrid",
+                    "(${parent.displayId}-$position) Folder: ${
+                        folder.getLaunchInfo().getFolderName()
+                    }"
+                )
             }
-            if(homeLayout.getChildAt(n) is WidgetContainer) {
+            if (homeLayout.getChildAt(n) is WidgetContainer) {
                 val widget = homeLayout.getChildAt(n) as WidgetContainer
                 Log.d("dumpGrid", "(${parent.displayId}-$position) Widget: ${widget.appWidgetId}")
             }
@@ -191,10 +187,6 @@ class HomePagerAdapter(private val parent: MainActivity, private val container: 
         if (loadItJson != "") {
             homeWidgetsGrid = loadItJson?.let { Json.decodeFromString(it) }!!
         }
-    }
-
-    override fun onIconChanged() {
-        listener.onIconChanged()
     }
 
     override fun onDragStarted(view: View, clipData: ClipData) {
@@ -234,9 +226,5 @@ class HomePagerAdapter(private val parent: MainActivity, private val container: 
 
     override fun onSetupFolder(apps: ArrayList<LaunchInfo>, name: Editable, folder: Folder) {
         listener.onSetupFolder(apps, name, folder)
-    }
-
-    override fun onFolderChanged() {
-        listener.onFolderChanged()
     }
 }

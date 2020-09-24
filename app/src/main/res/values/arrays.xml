@@ -40,4 +40,9 @@
         <item>Google (App)</item>
         <item>Yahoo</item>
     </string-array>
+
+    <string-array name="pref_types">
+        <item>prefs</item>
+        <item>settingsPreferences</item>
+    </string-array>
 </resources>

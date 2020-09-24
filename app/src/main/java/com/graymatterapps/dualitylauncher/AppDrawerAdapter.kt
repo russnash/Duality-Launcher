@@ -39,7 +39,7 @@ class AppDrawerAdapter(
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AppDrawerHolder {
-        val inflatedView = Icon(parentActivity, null)
+        val inflatedView = Icon(parentActivity, null, false, 9999)
         return AppDrawerHolder(inflatedView)
     }
 
@@ -53,6 +53,7 @@ class AppDrawerAdapter(
 
     override fun onBindViewHolder(holder: AppDrawerHolder, position: Int) {
         val icon = holder.itemView as Icon
+        icon.page = position
         icon.label.setTextColor(
             settingsPreferences.getInt(
                 "app_drawer_text",
@@ -81,10 +82,6 @@ class AppDrawerAdapter(
     interface DrawerAdapterInterface {
         fun onDragStarted(view: View, clipData: ClipData)
         fun onLaunch(launchInfo: LaunchInfo, displayId: Int)
-    }
-
-    override fun onIconChanged() {
-        // Do nothing
     }
 
     override fun onDragStarted(view: View, clipData: ClipData) {

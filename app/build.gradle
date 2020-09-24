@@ -11,8 +11,8 @@ android {
         applicationId "com.graymatterapps.dualitylauncher"
         minSdkVersion 28
         targetSdkVersion 29
-        versionCode 23
-        versionName "2020.9.21.1-internal"
+        versionCode 25
+        versionName "2020.9.23.2-internal"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -30,6 +30,10 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            resValue "bool", "enableOnDebug", "false"
+        }
+        debug {
+            resValue "bool", "enableOnDebug", "true"
         }
     }
 

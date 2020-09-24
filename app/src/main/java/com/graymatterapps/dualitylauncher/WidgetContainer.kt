@@ -313,7 +313,7 @@ class WidgetContainer(
     }
 
     private fun convertToIcon() {
-        val icon = Icon(parentActivity, null)
+        val icon = Icon(parentActivity, null, true, parentActivity.getCurrentHomePagerItem())
         val launchInfo = LaunchInfo()
         icon.setLaunchInfo(launchInfo)
         icon.setBlankOnDrag(true)

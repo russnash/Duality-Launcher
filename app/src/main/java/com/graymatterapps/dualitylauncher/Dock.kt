@@ -115,6 +115,7 @@ class Dock(val parentActivity: MainActivity, attrs: AttributeSet?) : LinearLayou
 
     fun depersistDock() {
         appList.waitForReady()
+        dockItems = DockItems()
         val loadItJson = prefs.getString("dockItems", "")
         if (loadItJson != "") {
             dockItems = loadItJson?.let { Json.decodeFromString(it) }!!
@@ -175,10 +176,6 @@ class Dock(val parentActivity: MainActivity, attrs: AttributeSet?) : LinearLayou
 
     interface DockInterface {
         fun onDragStarted(view: View, clipData: ClipData)
-    }
-
-    override fun onIconChanged() {
-        persistDock()
     }
 
     override fun onDragStarted(view: View, clipData: ClipData) {

@@ -5,36 +5,46 @@
     <uses-permission android:name="android.permission.SET_WALLPAPER" />
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.EXPAND_STATUS_BAR" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
     <application
         android:name=".DualityLauncherApplication"
-        android:exported="true"
         android:allowBackup="true"
+        android:exported="true"
+        android:hardwareAccelerated="true"
         android:icon="@mipmap/ic_dualitylauncher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_dualitylauncher_round"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme"
-        android:hardwareAccelerated="true">
-
+        android:theme="@style/AppTheme">
+        <activity
+            android:name=".DLMaintenance"
+            android:label="DL Maintenance"
+            android:theme="@style/SettingsActivity"
+            android:enabled="@bool/enableOnDebug">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
         <activity
             android:name=".WallpaperActivity"
+            android:hardwareAccelerated="true"
             android:label="@string/title_activity_wallpaper"
-            android:theme="@style/WallpaperActivity"
-            android:hardwareAccelerated="true"/>
+            android:theme="@style/WallpaperActivity" />
         <activity
             android:name=".SettingsActivity"
+            android:hardwareAccelerated="true"
             android:label="@string/title_activity_settings"
             android:launchMode="singleTop"
             android:parentActivityName=".MainActivity"
-            android:theme="@style/SettingsActivity"
-            android:hardwareAccelerated="true"/>
+            android:theme="@style/SettingsActivity" />
         <activity
             android:name=".MainActivity"
+            android:hardwareAccelerated="true"
             android:launchMode="singleTop"
             android:resizeableActivity="true"
             android:resumeWhilePausing="true"
-            android:hardwareAccelerated="true"
             android:theme="@style/AppTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

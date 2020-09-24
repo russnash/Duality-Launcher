@@ -1,3 +1,16 @@
+Version 2020.9.23.2-internal
+Bug Fixes:
+- Fixed an oops where wide screenshot would not work after the first use when permission had been already granted.
+
+Version 2020.9.23.1-internal
+Changes:
+- Implemented new replication system.
+- Added a 'Wide Screenshot' option to the home screen menu.
+
+Bug Fixes:
+- Fixed a bug where failure to find the primary colors in a wallpaper was causing a crash.
+- Fixed a bug where the hinge gap sometimes showed 'TextView' instead of '0'.
+
 Version 2020.9.21.1-internal
 Changes:
 - Merged clear widget grid persistence and delete AppWidgetHostData developer tools into one.

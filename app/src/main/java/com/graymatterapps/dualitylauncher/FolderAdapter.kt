@@ -28,7 +28,7 @@ class FolderAdapter(var parentActivity: MainActivity, var apps: ArrayList<Launch
     }
 
     override fun getView(position: Int, view: View?, viewGroup: ViewGroup?): View {
-        val icon = Icon(parentActivity, null)
+        val icon = Icon(parentActivity, null, false, 0)
         icon.setLaunchInfo(apps[position])
         icon.setDockIcon(true)
         icon.setListener(this)
@@ -38,10 +38,6 @@ class FolderAdapter(var parentActivity: MainActivity, var apps: ArrayList<Launch
         icon.label.setShadowLayer(6F, 0F, 0F, textShadowColor)
         icon.setPadding(0, 0, 0, 25)
         return icon
-    }
-
-    override fun onIconChanged() {
-        // Do nothing
     }
 
     override fun onDragStarted(view: View, clipData: ClipData) {

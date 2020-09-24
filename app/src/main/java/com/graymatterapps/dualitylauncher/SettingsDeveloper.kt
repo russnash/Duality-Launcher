@@ -28,6 +28,7 @@ class SettingsDeveloper : PreferenceFragmentCompat() {
             editor.remove("homeIconsGrid2")
             editor.remove("homeIconsGrid3")
             editor.remove("homeIconsGrid4")
+            editor.putLong("notifyDataSetChanged", System.currentTimeMillis())
             editor.apply()
             shortToast(requireActivity(), "Home icon / folder grid persistence cleared...")
             true
@@ -36,6 +37,7 @@ class SettingsDeveloper : PreferenceFragmentCompat() {
         preferenceManager.findPreference<Preference>("clear_dock")?.setOnPreferenceClickListener {
             val editor = prefs.edit()
             editor.remove("dockItems")
+            editor.putLong("notifyDataSetChanged", System.currentTimeMillis())
             editor.apply()
             shortToast(requireActivity(), "Dock persistence cleared...")
             true
@@ -53,6 +55,7 @@ class SettingsDeveloper : PreferenceFragmentCompat() {
                 }
                 widgetDB = WidgetDB(appContext)
             }
+            editor.putLong("notifyDataSetChanged", System.currentTimeMillis())
             editor.apply()
             listener.removeWidgets()
             listener.showWidgets()
