@@ -1,3 +1,14 @@
+Version 2020.9.25.1-internal
+Changes:
+- Back button now closes folders.
+- Implemented full screen option (under Home Screen) to set nav and status bars to fully transparent.
+- Moved auto color scheme options to Home Screen section.
+
+Bug Fixes:
+- Fixed a bug that was causing multiple wide screenshots to be taken instead of just one.
+- Fixed a bug where the dual screen starting before the main screen could cause a crash.
+- Widget config screens will now show on the same display as the widget.
+
 Version 2020.9.23.2-internal
 Bug Fixes:
 - Fixed an oops where wide screenshot would not work after the first use when permission had been already granted.

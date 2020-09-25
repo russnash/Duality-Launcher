@@ -70,6 +70,12 @@ class DrawerFragment(val parent: MainActivity) : Fragment(), SharedPreferences.O
         settingsPreferences.registerOnSharedPreferenceChangeListener(this)
     }
 
+    override fun onDestroyView() {
+        prefs.unregisterOnSharedPreferenceChangeListener(this)
+        settingsPreferences.unregisterOnSharedPreferenceChangeListener(this)
+        super.onDestroyView()
+    }
+
     private fun setDrawerBackground() {
         var color = settingsPreferences.getInt(
             "app_drawer_background",

@@ -1,13 +1,17 @@
 package com.graymatterapps.dualitylauncher
 
+import android.app.WallpaperManager
+import android.content.Context
 import android.content.SharedPreferences
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
+import androidx.core.graphics.ColorUtils
 import androidx.fragment.app.DialogFragment
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import com.graymatterapps.graymatterutils.GrayMatterUtils
+import java.lang.Exception
 
 class SettingsHomeFragment : PreferenceFragmentCompat(), SharedPreferences.OnSharedPreferenceChangeListener {
     val TAG = javaClass.simpleName
@@ -15,6 +19,36 @@ class SettingsHomeFragment : PreferenceFragmentCompat(), SharedPreferences.OnSha
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         setPreferencesFromResource(R.xml.settings_home, rootKey)
         settingsPreferences.registerOnSharedPreferenceChangeListener(this)
+
+        preferenceManager.findPreference<Preference>("full_screen_mode")?.setOnPreferenceClickListener {
+            val editor = settingsPreferences.edit()
+            val color = ColorUtils.setAlphaComponent(Color.BLACK, 0)
+            editor.putInt("status_background", color)
+            editor.putInt("nav_background", color)
+            editor.apply()
+            true
+        }
+
+        preferenceManager.findPreference<Preference>("auto_color")?.setOnPreferenceClickListener {
+            val wallpaperManager =
+                requireActivity().getSystemService(Context.WALLPAPER_SERVICE) as WallpaperManager
+            val colors = wallpaperManager.getWallpaperColors(WallpaperManager.FLAG_SYSTEM)
+            val editor = settingsPreferences.edit()
+            try {
+                val primaryColor = ColorUtils.setAlphaComponent(
+                    colors!!.primaryColor.toArgb(),
+                    settingsPreferences.getInt("auto_color_alpha", 200)
+                )
+                editor.putInt("dock_background_color", primaryColor)
+                editor.putInt("dock_search_color", primaryColor)
+                editor.putInt("folder_background", primaryColor)
+                editor.putInt("app_drawer_background", primaryColor)
+                editor.apply()
+            } catch (e: Exception) {
+                GrayMatterUtils.longToast(appContext, "Could not extract colors from wallpaper!")
+            }
+            true
+        }
     }
 
     override fun onDisplayPreferenceDialog(preference: Preference?) {

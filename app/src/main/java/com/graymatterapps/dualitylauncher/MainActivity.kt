@@ -80,9 +80,16 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
 
         if (isMainDisplay()) {
             postUpdateCheck()
-            widgetDB.setListener(this)
         }
+        widgetDB.setListener(this, displayId)
 
+        replicator.register(displayId, this)
+        try {
+            prefs.unregisterOnSharedPreferenceChangeListener(this)
+            settingsPreferences.unregisterOnSharedPreferenceChangeListener(this)
+        } catch (e: Exception) {
+            // Do nothing
+        }
         prefs.registerOnSharedPreferenceChangeListener(this)
         settingsPreferences.registerOnSharedPreferenceChangeListener(this)
 
@@ -91,11 +98,13 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
         settingsFragment = SettingsFragment()
 
         setContentView(R.layout.activity_main)
-        if(displayId == 0) {
+        if (displayId == 0) {
+            homePagerMain = homePager
             mainScreen = frameLayout
             mainContext = this
         }
-        if(displayId == 1) {
+        if (displayId == 1) {
+            homePagerDual = homePager
             dualScreen = frameLayout
         }
         setStatusBars()
@@ -170,14 +179,36 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
         homePager.adapter = homePagerAdapter
         homePager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
             override fun onPageScrollStateChanged(state: Int) {
-                Log.d(TAG, "onPageScrollStateChanged()")
+                Log.d(TAG, "onPageScrollStateChanged() state:$state")
                 super.onPageScrollStateChanged(state)
                 setupHomePageIndicator()
+                /*
+                if (settingsPreferences.getBoolean("linked_viewpager", false)) {
+                    val lastPage =
+                        Integer.parseInt(settingsPreferences.getString("home_grid_pages", "1")) - 1
+                    if (lastPage > 0) {
+                        if (displayId == 0 && homePagerDual != null) {
+                            val currentPage = homePager.currentItem
+                            if (currentPage == 0) {
+                                homePagerDual.setCurrentItem(lastPage, true)
+                            } else {
+                                homePagerDual.setCurrentItem(currentPage - 1, true)
+                            }
+                        }
+                        if (displayId == 1 && homePagerMain != null) {
+                            val currentPage = homePager.currentItem
+                            if (currentPage == lastPage) {
+                                homePagerMain.setCurrentItem(0, true)
+                            } else {
+                                homePagerMain.setCurrentItem(currentPage + 1, true)
+                            }
+                        }
+                    }
+                }
+                 */
             }
         })
         homePagerAdapter.setListener(this)
-
-        replicator.register(displayId, this)
 
         setupHomePageIndicator()
 
@@ -239,8 +270,10 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
     }
 
     override fun onDestroy() {
-        replicator.deregister(displayId)
         super.onDestroy()
+        replicator.deregister(displayId)
+        prefs.unregisterOnSharedPreferenceChangeListener(this)
+        settingsPreferences.unregisterOnSharedPreferenceChangeListener(this)
     }
 
     fun setupHomePageIndicator() {
@@ -326,10 +359,15 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
             showHomeMenu(false)
         }
         buttonActionWideshot.setOnClickListener {
+            Log.d(TAG, "buttonActionWideshot.setOnClickListener()")
             if (checkSelfPermission(android.Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
                 wideScreenshot()
             } else {
-                ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE), WIDE_SCREENSHOT)
+                ActivityCompat.requestPermissions(
+                    this,
+                    arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE),
+                    WIDE_SCREENSHOT
+                )
             }
         }
         homeMenuBackground.setOnClickListener {
@@ -338,12 +376,13 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
     }
 
     private fun wideScreenshot() {
+        Log.d(TAG, "wideScreenshot()")
         showHomeMenu(false)
-        Thread( Runnable {
+        Thread(Runnable {
             Thread.sleep(500)
-            val edit = prefs.edit()
-            edit.putLong("wideshot", System.currentTimeMillis())
-            edit.apply()
+            this@MainActivity.runOnUiThread {
+                dualityLauncherApplication.wideShot()
+            }
         }).start()
     }
 
@@ -451,6 +490,10 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
     }
 
     override fun onBackPressed() {
+        if (homeFolder.visibility == View.VISIBLE && !drawerFragment.isVisible) {
+            showHomeFolder(false)
+        }
+
         if (drawerFragment.isVisible) {
             closeAppDrawer()
         }
@@ -527,6 +570,7 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
 
     override fun onSharedPreferenceChanged(sharedPrefs: SharedPreferences?, key: String?) {
         if (key != null) {
+            Log.d(TAG, "onSharedPreferenceChanged() $key")
             if (key == "status_background") {
                 setStatusBars()
             }
@@ -601,15 +645,12 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
             if (key == "widget_info") {
                 showWidgets()
             }
-            if(key == "notifyDataSetChanged") {
+            if (key == "notifyDataSetChanged") {
                 homePagerAdapter.lock.lock()
                 homePagerAdapter.notifyDataSetChanged()
                 homePagerAdapter.lock.unlock()
                 dock.depersistDock()
                 dock.populateDock()
-            }
-            if(key == "wideshot") {
-                dualityLauncherApplication.wideShot()
             }
         }
     }
@@ -1013,8 +1054,7 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
     }
 
     override fun removeWidgets(leavePager: Boolean) {
-        widgetDB = WidgetDB(applicationContext)
-        widgetDB.setListener(this)
+        widgetDB.widgets.clear()
         AppWidgetHost.deleteAllHosts()
         if (!leavePager) {
             homePagerAdapter.lock.lock()
@@ -1027,9 +1067,9 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
         homePagerAdapter.lock.lock()
         val view = frameLayout.findViewWithTag<View>(page)
         val homeIconsTable = view.findViewById<HomeLayout>(R.id.homeIconsTable)
-        for(i in 0 until homeIconsTable.childCount) {
+        for (i in 0 until homeIconsTable.childCount) {
             val child = homeIconsTable.getChildAt(i)
-            if(child != null) {
+            if (child != null) {
                 val params = child.layoutParams as HomeLayout.LayoutParams
                 if (params.row == row && params.column == column) {
                     homeIconsTable.removeView(child)
@@ -1076,8 +1116,8 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
         homePagerAdapter.lock.lock()
         val view = frameLayout.findViewWithTag<View>(page)
         val homeIconsTable = view.findViewById<HomeLayout>(R.id.homeIconsTable)
-        for(i in 0 until homeIconsTable.childCount) {
-            if(homeIconsTable.getChildAt(i) is Icon) {
+        for (i in 0 until homeIconsTable.childCount) {
+            if (homeIconsTable.getChildAt(i) is Icon) {
                 val child = homeIconsTable.getChildAt(i) as Icon
                 if (child != null) {
                     val params = child.layoutParams as HomeLayout.LayoutParams
@@ -1128,8 +1168,8 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
         homePagerAdapter.lock.lock()
         val view = frameLayout.findViewWithTag<View>(page)
         val homeIconsTable = view.findViewById<HomeLayout>(R.id.homeIconsTable)
-        for(i in 0 until homeIconsTable.childCount) {
-            if(homeIconsTable.getChildAt(i) is Folder) {
+        for (i in 0 until homeIconsTable.childCount) {
+            if (homeIconsTable.getChildAt(i) is Folder) {
                 val child = homeIconsTable.getChildAt(i) as Folder
                 if (child != null) {
                     val params = child.layoutParams as HomeLayout.LayoutParams

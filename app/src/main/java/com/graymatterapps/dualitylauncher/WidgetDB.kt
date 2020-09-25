@@ -14,13 +14,40 @@ class WidgetDB(val con: Context) {
     val widgets: ArrayList<WidgetDBDataType> = ArrayList()
     var sizes: ArrayList<WidgetDBSizes> = ArrayList()
     val TAG = javaClass.simpleName
-    private lateinit var listener: WidgetDBInterface
+    var listeners: ArrayList<Listeners> = ArrayList()
 
     init {
         var loadItJson = prefs.getString("widgetSizes", "")
         if (loadItJson != "") {
             sizes = loadItJson?.let { Json.decodeFromString(it) }!!
         }
+    }
+
+    fun setListener(ear: WidgetDBInterface, displayId: Int) {
+        desetListener(displayId)
+
+        listeners.add(
+            Listeners(
+                displayId,
+                ear
+            )
+        )
+        Log.d(TAG, "setListener() $displayId")
+    }
+
+    fun desetListener(displayId: Int) {
+        val indexes = ArrayList<Int>()
+
+        for (i in 0 until listeners.size) {
+            if (listeners[i].displayId == displayId) {
+                indexes.add(i)
+            }
+        }
+
+        indexes.forEach {
+            listeners.removeAt(it)
+        }
+        Log.d(TAG, "desetListener() $displayId")
     }
 
     private fun persistSizes() {
@@ -72,17 +99,22 @@ class WidgetDB(val con: Context) {
     fun allocateWidget(
         appWidgetId: Int,
         appWidgetProviderInfo: AppWidgetProviderInfo,
-        requestingContainer: WidgetContainer
+        requestingContainer: WidgetContainer,
+        displayId: Int
     ): Int {
         for (i in 0 until widgets.size) {
             if (widgets[i].widgetId == appWidgetId) {
                 Log.d(TAG, "allocateWidget() appWidgetId $appWidgetId found at index $i.")
                 widgets[i].widgetContainer = requestingContainer
-                if(widgets[i].initialized) {
+                if (widgets[i].initialized) {
                     Log.d(TAG, "allocateWidget() Widget initialized, performing addWidgetView()")
                     widgets[i].widgetContainer.addWidgetView()
                 }
-                listener.showWidgets()
+                listeners.forEach {
+                    if (it.displayId == displayId) {
+                        it.listener.showWidgets()
+                    }
+                }
                 return i
             }
         }
@@ -99,12 +131,20 @@ class WidgetDB(val con: Context) {
         for (i in 0 until widgets.size) {
             if (widgets[i].widgetId == appWidgetId) {
                 Log.d(TAG, "allocateWidget() appWidgetId $appWidgetId created at index $i.")
-                listener.initializeWidget(
-                    widgets[i].appWidgetHostView,
-                    appWidgetId,
-                    appWidgetProviderInfo
-                )
-                listener.showWidgets()
+                listeners.forEach {
+                    if (it.displayId == displayId) {
+                        it.listener.initializeWidget(
+                            widgets[i].appWidgetHostView,
+                            appWidgetId,
+                            appWidgetProviderInfo
+                        )
+                    }
+                }
+                listeners.forEach {
+                    if (it.displayId == displayId) {
+                        it.listener.showWidgets()
+                    }
+                }
                 return i
             }
         }
@@ -116,7 +156,6 @@ class WidgetDB(val con: Context) {
         for (i in 0 until widgets.size) {
             if (widgets[i].widgetId == appWidgetId) {
                 Log.d(TAG, "getWidgetIndex() appWidgetId $appWidgetId found at index $i.")
-                listener.showWidgets()
                 return i
             }
         }
@@ -127,10 +166,12 @@ class WidgetDB(val con: Context) {
     fun deleteWidget(appWidgetId: Int) {
         for (i in 0 until widgets.size) {
             if (widgets[i].widgetId == appWidgetId) {
-                Log.d(TAG, "deleteWidget() appWidgetId $appWidgetId found at index $i and destroyed.")
+                Log.d(
+                    TAG,
+                    "deleteWidget() appWidgetId $appWidgetId found at index $i and destroyed."
+                )
                 appWidgetHost.deleteAppWidgetId(appWidgetId)
                 widgets.removeAt(i)
-                listener.showWidgets()
                 break
             }
         }
@@ -151,9 +192,10 @@ class WidgetDB(val con: Context) {
         var columnSpan: Int
     )
 
-    fun setListener(ear: WidgetDBInterface) {
-        listener = ear
-    }
+    data class Listeners(
+        var displayId: Int,
+        var listener: WidgetDBInterface
+    )
 
     interface WidgetDBInterface {
         fun initializeWidget(

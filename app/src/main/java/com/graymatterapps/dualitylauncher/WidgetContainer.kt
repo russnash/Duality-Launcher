@@ -177,8 +177,8 @@ class WidgetContainer(
                     Log.d(TAG, "onLongPress()")
                     eventHistory.clear()
                     GrayMatterUtils.vibrate(parentActivity, 50)
-                    resizeFrame.bringToFront()
                     resizeFrame.setResize(true)
+                    resizeFrame.bringToFront()
                     resizing = true
                 }
 
@@ -330,7 +330,7 @@ class WidgetContainer(
     override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
         Log.d(TAG, "onLayout()")
         if (this.childCount == 0) {
-            val i = widgetDB.allocateWidget(appWidgetId, appWidgetProviderInfo, this)
+            val i = widgetDB.allocateWidget(appWidgetId, appWidgetProviderInfo, this, parentActivity.displayId)
             if(widgetDB.widgets[i].initialized) {
                 addWidgetView()
             }

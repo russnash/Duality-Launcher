@@ -64,7 +64,7 @@ class HomeLayout(context: Context, attributeSet: AttributeSet?) : ViewGroup(
             val heightSpec = MeasureSpec.makeMeasureSpec(childHeight, MeasureSpec.EXACTLY)
             child.measure(widthSpec, heightSpec)
             //Log.d(TAG, "row:${params.row} column:${params.column} rowSpan:${params.rowSpan} columnSpan:${params.columnSpan}")
-            layoutChild(child, params.row, params.column, params.rowSpan, params.columnSpan)
+            layoutChild(child, params.row, params.column, params.rowSpan, params.columnSpan, params.freeForm)
         }
     }
 
@@ -77,11 +77,22 @@ class HomeLayout(context: Context, attributeSet: AttributeSet?) : ViewGroup(
         setMeasuredDimension(widthSize, heightSize)
     }
 
-    private fun layoutChild(view: View, row: Int, column: Int, rowSpan: Int, columnSpan: Int){
-        val l = column * cellWidth
-        val t = row * cellHeight
-        val r = l + (columnSpan * cellWidth)
-        val b = t + (rowSpan * cellHeight)
+    private fun layoutChild(view: View, row: Int, column: Int, rowSpan: Int, columnSpan: Int, freeForm: Boolean){
+        var l = 0
+        var t = 0
+        var r = 0
+        var b = 0
+        if(freeForm) {
+            l = column
+            t = row
+            r = l + (columnSpan * cellWidth)
+            b = t + (rowSpan * cellHeight)
+        } else {
+            l = column * cellWidth
+            t = row * cellHeight
+            r = l + (columnSpan * cellWidth)
+            b = t + (rowSpan * cellHeight)
+        }
         view.layout(l, t, r, b)
     }
 
@@ -115,11 +126,24 @@ class HomeLayout(context: Context, attributeSet: AttributeSet?) : ViewGroup(
 
     class LayoutParams : ViewGroup.LayoutParams {
         constructor(width: Int, height: Int) : super(width, height) {}
-        constructor(context: Context?, attrs: AttributeSet?) : super(context, attrs) {}
+        constructor(context: Context?, attrs: AttributeSet?) : super(context, attrs) {
+            val array = context!!.theme.obtainStyledAttributes(
+                attrs,
+                R.styleable.HomeLayout_LayoutParams,
+                0,
+                0
+            )
+            row = array.getInteger(R.styleable.HomeLayout_LayoutParams_row, 1)
+            column = array.getInteger(R.styleable.HomeLayout_LayoutParams_column, 1)
+            freeForm = array.getBoolean(R.styleable.HomeLayout_LayoutParams_freeForm, false)
+            rowSpan = array.getInteger(R.styleable.HomeLayout_LayoutParams_rowSpan, 1)
+            columnSpan = array.getInteger(R.styleable.HomeLayout_LayoutParams_columnSpan, 1)
+        }
 
         var row = 0
         var column = 0
         var rowSpan = 1
         var columnSpan = 1
+        var freeForm = false
     }
 }

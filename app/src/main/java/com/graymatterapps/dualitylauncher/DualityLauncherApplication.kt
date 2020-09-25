@@ -19,6 +19,7 @@ import android.util.Log
 import android.view.View
 import androidx.appcompat.app.AlertDialog
 import androidx.preference.PreferenceManager
+import androidx.viewpager2.widget.ViewPager2
 import com.graymatterapps.graymatterutils.GrayMatterUtils
 import org.acra.ACRA
 import org.acra.annotation.AcraCore
@@ -43,6 +44,8 @@ lateinit var dualityLauncherApplication: DualityLauncherApplication
 lateinit var mainScreen: View
 lateinit var mainContext: Context
 lateinit var dualScreen: View
+lateinit var homePagerDual: ViewPager2
+lateinit var homePagerMain: ViewPager2
 
 @AcraCore(buildConfigClass = org.acra.BuildConfig::class, reportFormat = StringFormat.JSON)
 @AcraMailSender(mailTo = "russnash37@gmail.com", reportAsFile = true)
@@ -86,6 +89,7 @@ class DualityLauncherApplication: Application() {
     }
 
     fun wideShot() {
+        Log.d(TAG, "wideShot()")
         val displayManager = getSystemService(Context.DISPLAY_SERVICE) as DisplayManager
         val displays = displayManager.displays
 

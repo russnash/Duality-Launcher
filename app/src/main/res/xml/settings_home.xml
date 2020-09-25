@@ -2,6 +2,25 @@
     xmlns:android="http://schemas.android.com/apk/res/android">
 
     <PreferenceCategory
+        android:title="Overall theme">
+        <Preference
+            android:key="full_screen_mode"
+            android:title="Full Screen Mode"
+            android:summary="Sets the status and navigation bars to fully transparent"/>
+        <Preference
+            android:key="auto_color"
+            android:title="Automatic Color Scheme"
+            android:summary="Automatically sets Dock, Dock Search, Folder and App Drawer colors to the wallpapers primary color" />
+        <SeekBarPreference
+            android:defaultValue="200"
+            android:key="auto_color_alpha"
+            android:max="255"
+            android:summary="Alpha value to use when setting automatic colors"
+            android:title="Automatic Color Alpha"
+            app:min="0"
+            app:showSeekBarValue="true" />
+    </PreferenceCategory>
+    <PreferenceCategory
         android:title="Dock">
 
         <ListPreference

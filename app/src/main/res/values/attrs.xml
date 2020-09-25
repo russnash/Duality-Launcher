@@ -15,5 +15,6 @@
         <attr name="column" format="integer"/>
         <attr name="rowSpan" format="integer"/>
         <attr name="columnSpan" format="integer"/>
+        <attr name="freeForm" format="boolean"/>
     </declare-styleable>
 </resources>

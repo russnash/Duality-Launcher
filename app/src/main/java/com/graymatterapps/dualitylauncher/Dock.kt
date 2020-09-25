@@ -22,7 +22,6 @@ class Dock(val parentActivity: MainActivity, attrs: AttributeSet?) : LinearLayou
     val settingsPreferences: SharedPreferences =
         PreferenceManager.getDefaultSharedPreferences(context)
     lateinit var listener: DockInterface
-    var prefs: SharedPreferences
     var dockItems = DockItems()
     var dockTable: TableLayout
     var dockRow: TableRow
@@ -37,7 +36,6 @@ class Dock(val parentActivity: MainActivity, attrs: AttributeSet?) : LinearLayou
         dockRow = findViewById(R.id.dockRow)
         searchRowTop = findViewById(R.id.searchRowTop)
         searchRowBottom = findViewById(R.id.searchRowBottom)
-        prefs = context.getSharedPreferences(PREFS_FILENAME, 0)
         prefs.registerOnSharedPreferenceChangeListener(this)
         settingsPreferences.registerOnSharedPreferenceChangeListener(this)
         dockRow.setBackgroundColor(Color.TRANSPARENT)
