@@ -196,6 +196,7 @@ class Icon(
                 val passedLaunchInfo = launchInfo.copy()
                 dragAndDropData.addLaunchInfo(passedLaunchInfo, id)
                 var clipData = ClipData.newPlainText("launchInfo", id)
+                listener.onDragStarted(this, clipData)
 
                 if (blankOnDrag) {
                     launchInfo.setActivityName("")
@@ -217,7 +218,6 @@ class Icon(
                 if(isDockIcon){
                     parentActivity.dock.persistDock()
                 }
-                listener.onDragStarted(this, clipData)
                 true
             }
         } else {

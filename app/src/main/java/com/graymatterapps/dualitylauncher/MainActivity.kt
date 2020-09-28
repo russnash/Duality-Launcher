@@ -93,8 +93,8 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
         prefs.registerOnSharedPreferenceChangeListener(this)
         settingsPreferences.registerOnSharedPreferenceChangeListener(this)
 
-        drawerFragment = DrawerFragment(this)
-        widgetFragment = WidgetFragment(this)
+        drawerFragment = DrawerFragment()
+        widgetFragment = WidgetFragment()
         settingsFragment = SettingsFragment()
 
         setContentView(R.layout.activity_main)
@@ -267,6 +267,10 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
         prefs = this.getSharedPreferences(PREFS_FILENAME, 0)
 
         setWindowBackground()
+
+        homePageIndicator.setOnClickListener {
+            setWideMode()
+        }
     }
 
     override fun onDestroy() {
@@ -715,6 +719,12 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
         expand.invoke(statusBarService)
     }
 
+    fun setWideMode() {
+        val winManager = Class.forName("android.view.WindowManager")
+        val switchWideScreenMode = winManager.getMethod("switchWideScreenMode")
+        switchWideScreenMode.invoke(true)
+    }
+
     override fun onAddWidget(clipData: ClipData, view: View) {
         val dsb = WidgetDragShadowBuilder(view)
         showHomeFragment(widgetFragment)
@@ -1055,6 +1065,7 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
 
     override fun removeWidgets(leavePager: Boolean) {
         widgetDB.widgets.clear()
+        widgetDB.sizes.clear()
         AppWidgetHost.deleteAllHosts()
         if (!leavePager) {
             homePagerAdapter.lock.lock()

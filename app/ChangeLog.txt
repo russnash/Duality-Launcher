@@ -1,3 +1,8 @@
+Version 2020.9.28.1-internal
+Bug Fixes:
+- Fixed a bug where changing rotation with the drawer or widget chooser open caused a crash.
+- Fixed a bug where dragging an icon from the home screen didn't show the icon being dragged.
+
 Version 2020.9.25.1-internal
 Changes:
 - Back button now closes folders.

@@ -14,7 +14,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.graymatterapps.graymatterutils.GrayMatterUtils
 
-class WidgetFragment(val parent: MainActivity) : Fragment(), WidgetChooserAdapter.WidgetChooserInterface {
+class WidgetFragment() : Fragment(), WidgetChooserAdapter.WidgetChooserInterface {
 
     lateinit var installedProvs: MutableList<AppWidgetProviderInfo>
     lateinit var usableProvs: List<AppWidgetProviderInfo>
@@ -25,16 +25,18 @@ class WidgetFragment(val parent: MainActivity) : Fragment(), WidgetChooserAdapte
     lateinit var widgetPreviewImage: Drawable
     private var appWidgetId: Int = 0
     private lateinit var appWidgetProviderInfo: AppWidgetProviderInfo
+    lateinit var parent: MainActivity
     val TAG = javaClass.simpleName
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        parent = activity as MainActivity
         installedProvs = appWidgetManager.installedProviders
         usableProvs = installedProvs.filter {
             (it.widgetCategory or AppWidgetProviderInfo.WIDGET_CATEGORY_HOME_SCREEN) == it.widgetCategory
         }
-        usableProvs.sortedBy { it.label.toLowerCase() }
+        usableProvs.sortedBy { it.loadLabel(parent.packageManager) }
         listener = activity as WidgetInterface
     }
 

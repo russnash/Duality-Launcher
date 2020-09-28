@@ -59,7 +59,6 @@ class SettingsDeveloper : PreferenceFragmentCompat() {
             editor.apply()
             listener.removeWidgets()
             listener.showWidgets()
-            AppWidgetHost.deleteAllHosts()
             shortToast(requireActivity(), "Home widget grid persistence and AppWidgetHost data cleared...")
 
             true

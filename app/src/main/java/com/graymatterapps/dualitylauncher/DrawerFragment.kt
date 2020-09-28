@@ -1,23 +1,23 @@
 package com.graymatterapps.dualitylauncher
 
-import android.content.Context
 import android.content.SharedPreferences
 import android.graphics.Color
 import android.os.Bundle
-import android.view.*
-import androidx.core.graphics.ColorUtils
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.graymatterapps.graymatterutils.GrayMatterUtils
-import com.graymatterapps.graymatterutils.GrayMatterUtils.colorPrefToColor
 import kotlinx.android.synthetic.main.fragment_drawer.*
 import kotlinx.android.synthetic.main.icon.view.*
 
-class DrawerFragment(val parent: MainActivity) : Fragment(), SharedPreferences.OnSharedPreferenceChangeListener {
+class DrawerFragment() : Fragment(), SharedPreferences.OnSharedPreferenceChangeListener {
 
     lateinit var gridLayoutManager: GridLayoutManager
     lateinit var adapter: AppDrawerAdapter
+    lateinit var parent: MainActivity
     val TAG = javaClass.simpleName
 
     override fun onDestroy() {
@@ -36,6 +36,7 @@ class DrawerFragment(val parent: MainActivity) : Fragment(), SharedPreferences.O
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        parent = activity as MainActivity
         gridLayoutManager = if(GrayMatterUtils.isLandscape(parent)){
             GridLayoutManager(context?.applicationContext, 12)
         } else {
