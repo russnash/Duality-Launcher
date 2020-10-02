@@ -1,3 +1,11 @@
+Version 2020.10.1.1-internal
+Changes:
+- Implemented new drag and drop system.
+
+Bug fixes:
+- Fixed an issue where dragging an item over an existing icon in the dock caused a crash.
+- Fixed an issue where the resize frame and widget weren't keeping their sizes in sync with the container.
+
 Version 2020.9.28.1-internal
 Bug Fixes:
 - Fixed a bug where changing rotation with the drawer or widget chooser open caused a crash.

@@ -3,10 +3,13 @@ package com.graymatterapps.dualitylauncher
 import android.appwidget.AppWidgetHostView
 import android.appwidget.AppWidgetProviderInfo
 import android.content.ClipData
+import android.graphics.Bitmap
+import android.graphics.Canvas
 import android.util.Log
 import android.view.GestureDetector
 import android.view.Gravity
 import android.view.MotionEvent
+import android.view.ViewGroup
 import android.widget.FrameLayout
 import androidx.core.view.GestureDetectorCompat
 import com.graymatterapps.graymatterutils.GrayMatterUtils
@@ -27,7 +30,14 @@ class WidgetContainer(
     private var eventHistory = ArrayList<MotionEvent>()
     private val touchSlop: Int = android.view.ViewConfiguration.get(context).scaledTouchSlop
     private var resizing: Boolean = false
+    private lateinit var containerParams: HomeLayout.LayoutParams
+    private lateinit var viewParams: FrameLayout.LayoutParams
     val TAG = javaClass.simpleName
+
+    init {
+        containerParams = HomeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
+        viewParams = FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT)
+    }
 
     override fun onInterceptTouchEvent(event: MotionEvent?): Boolean {
         return if (interceptGestureDetector.onTouchEvent(event)) {
@@ -176,10 +186,7 @@ class WidgetContainer(
                 override fun onLongPress(p0: MotionEvent?) {
                     Log.d(TAG, "onLongPress()")
                     eventHistory.clear()
-                    GrayMatterUtils.vibrate(parentActivity, 50)
-                    resizeFrame.setResize(true)
-                    resizeFrame.bringToFront()
-                    resizing = true
+                    resize(true)
                 }
 
                 override fun onFling(
@@ -210,10 +217,33 @@ class WidgetContainer(
             })
     }
 
+    private fun resize(state: Boolean) {
+        if (state) {
+            GrayMatterUtils.vibrate(parentActivity, 50)
+            /*
+            val resizeParams = FrameLayout.LayoutParams(
+                FrameLayout.LayoutParams.MATCH_PARENT,
+                FrameLayout.LayoutParams.MATCH_PARENT
+            )
+            val containerParams = this.layoutParams as HomeLayout.LayoutParams
+            resizeParams.width = parentLayout.getCellWidth() * containerParams.columnSpan
+            resizeParams.height = parentLayout.getCellHeight() * containerParams.rowSpan
+            resizeParams.gravity = Gravity.CENTER
+            resizeFrame.layoutParams = resizeParams
+
+             */
+            resizeFrame.setResize(true)
+            resizeFrame.bringToFront()
+            resizing = true
+        } else {
+            resizeFrame.setResize(false)
+            resizing = false
+            eventHistory.clear()
+        }
+    }
+
     fun resetResize() {
-        resizeFrame.setResize(false)
-        resizing = false
-        eventHistory.clear()
+        resize(false)
     }
 
     fun setListener(ear: WidgetInterface) {
@@ -226,11 +256,16 @@ class WidgetContainer(
         dragAndDropData.addWidget(widgetInfo, id)
         val clipData = ClipData.newPlainText("widget", id)
         val dsb = WidgetDragShadowBuilder(this)
+        val bitmap = Bitmap.createBitmap(this.width, this.height, Bitmap.Config.ARGB_8888)
+        val canvas = Canvas(bitmap)
+        this.layout(this.left, this.top, this.right, this.bottom)
+        this.draw(canvas)
+        dragWidgetBitmap = bitmap
         if (!this.startDragAndDrop(clipData, dsb, this, 0)) {
             widgetInfo = dragAndDropData.retrieveWidgetId(id)
             appWidgetHost.deleteAppWidgetId(widgetInfo.getAppWidgetId())
         }
-        this.convertToIcon()
+        this.convertToEmpty()
     }
 
     fun addWidgetView() {
@@ -244,14 +279,16 @@ class WidgetContainer(
         val minHeight =
             appWidgetProviderInfo.minHeight + widgetDB.widgets[widgetIndex].appWidgetHostView.paddingTop + widgetDB.widgets[widgetIndex].appWidgetHostView.paddingBottom
 
-        val containerParams = this.layoutParams as HomeLayout.LayoutParams
+        containerParams = this.layoutParams as HomeLayout.LayoutParams
         val sizes = widgetDB.getWidgetSize(appWidgetId)
         if (sizes.getInt("columnSpan") != 0) {
+            Log.d(TAG, "addWidgetView() Sizes found: $sizes")
             neededWidth = sizes.getInt("columnSpan") * parentLayout.getCellWidth()
             neededHeight = sizes.getInt("rowSpan") * parentLayout.getCellHeight()
             containerParams.columnSpan = sizes.getInt("columnSpan")
             containerParams.rowSpan = sizes.getInt("rowSpan")
         } else {
+            Log.d(TAG, "addWidgetView() Sizes not found")
             neededWidth = parentLayout.widthToCells(minWidth) * parentLayout.getCellWidth()
             neededHeight = parentLayout.heightToCells(minHeight) * parentLayout.getCellHeight()
             containerParams.columnSpan = parentLayout.widthToCells(neededWidth)
@@ -261,9 +298,9 @@ class WidgetContainer(
         containerParams.height = neededHeight
         this.layoutParams = containerParams
 
-        val viewParams = FrameLayout.LayoutParams(
-            FrameLayout.LayoutParams.MATCH_PARENT,
-            FrameLayout.LayoutParams.MATCH_PARENT
+        viewParams = FrameLayout.LayoutParams(
+            neededWidth,
+            neededHeight
         )
         viewParams.width = neededWidth
         viewParams.height = neededHeight
@@ -281,6 +318,7 @@ class WidgetContainer(
             widgetDB.widgets[widgetIndex].appWidgetHostView,
             viewParams
         )
+        widgetDB.widgets[widgetIndex].appWidgetHostView.requestLayout()
         val widthSpec = MeasureSpec.makeMeasureSpec(neededWidth, MeasureSpec.EXACTLY)
         val heightSpec = MeasureSpec.makeMeasureSpec(neededHeight, MeasureSpec.EXACTLY)
         widgetDB.widgets[widgetDB.getWidgetIndex(appWidgetId)].appWidgetHostView.measure(
@@ -296,8 +334,13 @@ class WidgetContainer(
         )
         resizeFrame = ResizeFrame(parentActivity, null)
         resizeFrame.setListener(this)
-        resizeFrame.layoutParams = viewParams
-        this.addView(resizeFrame, viewParams)
+        val resizeParams = FrameLayout.LayoutParams(
+            neededWidth,
+            neededHeight
+        )
+        resizeFrame.layoutParams = resizeParams
+        this.addView(resizeFrame, resizeParams)
+        resizeFrame.requestLayout()
         resizeFrame.measure(widthSpec, heightSpec)
         if (resizing) {
             resizeFrame.setResize(true)
@@ -306,22 +349,18 @@ class WidgetContainer(
         listener.onWidgetChanged()
         this.bringToFront()
         widgetDB.updateWidgetSize(appWidgetId, containerParams.rowSpan, containerParams.columnSpan)
+        Log.d(
+            TAG,
+            "addWidgetView() updateWidgetSize widgetId:${appWidgetId} rows:${containerParams.rowSpan} cols:${containerParams.columnSpan}"
+        )
     }
 
     fun pleaseRemove(widget: AppWidgetHostView) {
         this.removeView(widget)
     }
 
-    private fun convertToIcon() {
-        val icon = Icon(parentActivity, null, true, parentActivity.getCurrentHomePagerItem())
-        val launchInfo = LaunchInfo()
-        icon.setLaunchInfo(launchInfo)
-        icon.setBlankOnDrag(true)
+    private fun convertToEmpty() {
         val params = this.layoutParams as HomeLayout.LayoutParams
-        params.columnSpan = 1
-        params.rowSpan = 1
-        icon.layoutParams = params
-        parentLayout.addView(icon, params)
         this.removeAllViews()
         parentLayout.removeView(this)
         listener.onWidgetChanged()
@@ -330,32 +369,45 @@ class WidgetContainer(
     override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
         Log.d(TAG, "onLayout()")
         if (this.childCount == 0) {
-            val i = widgetDB.allocateWidget(appWidgetId, appWidgetProviderInfo, this, parentActivity.displayId)
-            if(widgetDB.widgets[i].initialized) {
+            val i = widgetDB.allocateWidget(
+                appWidgetId,
+                appWidgetProviderInfo,
+                this,
+                parentActivity.displayId
+            )
+            if (widgetDB.widgets[i].initialized) {
                 addWidgetView()
             }
-        }
-        val widthSpec = MeasureSpec.makeMeasureSpec(neededWidth, MeasureSpec.EXACTLY)
-        val heightSpec = MeasureSpec.makeMeasureSpec(neededHeight, MeasureSpec.EXACTLY)
-        widgetDB.widgets[widgetDB.getWidgetIndex(appWidgetId)].appWidgetHostView.measure(
-            widthSpec,
-            heightSpec
-        )
-        try {
-            resizeFrame.measure(widthSpec, heightSpec)
-        } catch (e: Exception) {
-            // Do nothing
+        } else {
+            neededWidth = this.width
+            neededHeight = this.height
+            viewParams.width = neededWidth
+            viewParams.height = neededHeight
+            viewParams.gravity = Gravity.CENTER
+            val widgetIndex = widgetDB.getWidgetIndex(appWidgetId)
+            widgetDB.widgets[widgetIndex].appWidgetHostView.layoutParams = viewParams
+            val widthSpec = MeasureSpec.makeMeasureSpec(neededWidth, MeasureSpec.EXACTLY)
+            val heightSpec = MeasureSpec.makeMeasureSpec(neededHeight, MeasureSpec.EXACTLY)
+            widgetDB.widgets[widgetIndex].appWidgetHostView.measure(
+                widthSpec,
+                heightSpec
+            )
+            try {
+                resizeFrame.layoutParams = viewParams
+                resizeFrame.measure(widthSpec, heightSpec)
+            } catch (e: Exception) {
+                // Do nothing
+            }
         }
         super.onLayout(changed, left, top, right, bottom)
     }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
-        parentLayout = this.parent as HomeLayout
-        val params = this.layoutParams as HomeLayout.LayoutParams
-        params.rowSpan = parentLayout.heightToCells(neededHeight)
-        params.columnSpan = parentLayout.widthToCells(neededWidth)
-        this.layoutParams = params
-        setMeasuredDimension(neededWidth, neededHeight)
+        Log.d(TAG, "onMeasure() width:${MeasureSpec.getSize(widthMeasureSpec)} height:${MeasureSpec.getSize(heightMeasureSpec)}")
+        setMeasuredDimension(
+            MeasureSpec.getSize(widthMeasureSpec),
+            MeasureSpec.getSize(heightMeasureSpec)
+        )
     }
 
     interface WidgetInterface {
@@ -373,8 +425,8 @@ class WidgetContainer(
         this.layoutParams = containerParams
 
         val viewParams = FrameLayout.LayoutParams(
-            FrameLayout.LayoutParams.MATCH_PARENT,
-            FrameLayout.LayoutParams.MATCH_PARENT
+            neededWidth,
+            neededHeight
         )
         viewParams.width = neededWidth
         viewParams.height = neededHeight
@@ -394,6 +446,10 @@ class WidgetContainer(
             neededHeight
         )
         widgetDB.updateWidgetSize(appWidgetId, containerParams.rowSpan, containerParams.columnSpan)
+        Log.d(
+            TAG,
+            "adjustLayout() updateWidgetSize widgetId:${appWidgetId} rows:${containerParams.rowSpan} cols:${containerParams.columnSpan}"
+        )
         resizeFrame.layoutParams = viewParams
         resizeFrame.measure(widthSpec, heightSpec)
         listener.onWidgetChanged()

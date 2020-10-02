@@ -77,7 +77,7 @@ class Folder(
             dragAndDropData.addLaunchInfo(passedLaunchInfo, id)
             var clipData = ClipData.newPlainText("launchInfo", id)
             listener.onDragStarted(this, clipData)
-            convertToIcon()
+            convertToEmpty()
             //listener.onFolderChanged()
             true
         }
@@ -87,9 +87,15 @@ class Folder(
         super.onAttachedToWindow()
         if (this.parent is HomeLayout) {
             parentLayout = this.parent as HomeLayout
-            if(replicate) {
+            if (replicate) {
                 val params = this.layoutParams as HomeLayout.LayoutParams
-                replicator.addFolder(parentActivity.displayId, launchInfo, page, params.row, params.column)
+                replicator.addFolder(
+                    parentActivity.displayId,
+                    launchInfo,
+                    page,
+                    params.row,
+                    params.column
+                )
             }
         }
     }
@@ -112,18 +118,15 @@ class Folder(
 
                 when (dragEvent.action) {
                     DragEvent.ACTION_DRAG_STARTED -> {
-                        if (respondToDrag) {
-                            folderLayout.setBackgroundResource(R.drawable.icon_drag_target)
-                        }
                     }
                     DragEvent.ACTION_DRAG_ENTERED -> {
                         if (respondToDrag) {
-                            folderLayout.setBackgroundColor(enteredColor)
+                            folderLayout.setBackgroundResource(R.drawable.icon_drag_target)
                         }
                     }
                     DragEvent.ACTION_DRAG_EXITED -> {
                         if (respondToDrag) {
-                            folderLayout.setBackgroundResource(R.drawable.icon_drag_target)
+                            folderLayout.setBackgroundColor(Color.TRANSPARENT)
                         }
                     }
                     DragEvent.ACTION_DRAG_ENDED -> {
@@ -135,7 +138,7 @@ class Folder(
                             if (dragEvent.clipDescription.label.toString().equals("launchInfo")) {
                                 val id = dragEvent.clipData.getItemAt(0).text.toString()
                                 val info = dragAndDropData.retrieveLaunchInfo(id)
-                                if(info.getType() == LaunchInfo.ICON) {
+                                if (info.getType() == LaunchInfo.ICON) {
                                     addFolderApp(info)
                                 }
                             }
@@ -155,7 +158,8 @@ class Folder(
         var canvas = Canvas(bitmap!!)
         canvas.drawRect(0F, 0F, canvas.width.toFloat(), canvas.height.toFloat(), clearPaint)
 
-        var firstBitmap = ContextCompat.getDrawable(parentActivity, R.drawable.ic_folder)!!.toBitmap()
+        var firstBitmap =
+            ContextCompat.getDrawable(parentActivity, R.drawable.ic_folder)!!.toBitmap()
         if (folderApps.size != 0) {
             firstBitmap = appList.getIcon(folderApps[0]).toBitmap()
         }
@@ -166,7 +170,8 @@ class Folder(
         )
         canvas.drawBitmap(firstBitmap, srcRect, dstRect, null)
 
-        var secondBitmap = ContextCompat.getDrawable(parentActivity, R.drawable.ic_folder)!!.toBitmap()
+        var secondBitmap =
+            ContextCompat.getDrawable(parentActivity, R.drawable.ic_folder)!!.toBitmap()
         if (folderApps.size != 0) {
             secondBitmap = appList.getIcon(folderApps[folderApps.size - 1]).toBitmap()
         }
@@ -200,6 +205,7 @@ class Folder(
         }
         folderApps.clear()
         folderApps.addAll(tempFolderApps)
+        folderIcon.setImageBitmap(makeFolderIcon())
     }
 
     private fun persistFolderApps() {
@@ -207,21 +213,20 @@ class Folder(
         val editor = prefs.edit()
         editor.putString("folder" + launchInfo.getFolderUniqueId(), saveItJson)
         editor.apply()
+        folderIcon.setImageBitmap(makeFolderIcon())
     }
 
     fun setFolderName(name: String) {
         folderLabel.text = name
         launchInfo.setFolderName(name)
-        if(replicate) {
-            val params = this.layoutParams as HomeLayout.LayoutParams
-            replicator.changeFolder(
-                parentActivity.displayId,
-                launchInfo,
-                page,
-                params.row,
-                params.column
-            )
-        }
+        val params = this.layoutParams as HomeLayout.LayoutParams
+        replicator.changeFolder(
+            parentActivity.displayId,
+            launchInfo,
+            page,
+            params.row,
+            params.column
+        )
     }
 
     fun setLaunchInfo(info: LaunchInfo) {
@@ -238,7 +243,6 @@ class Folder(
             folderApps.add(info)
             folderApps.sortBy { appList.getLabel(it) }
             persistFolderApps()
-            folderIcon.setImageBitmap(makeFolderIcon())
         }
     }
 
@@ -258,13 +262,8 @@ class Folder(
         listener = ear
     }
 
-    fun convertToIcon() {
-        val icon = Icon(parentActivity, null, true, page)
+    fun convertToEmpty() {
         val params = this.layoutParams as HomeLayout.LayoutParams
-        icon.setLaunchInfo(LaunchInfo())
-        icon.layoutParams = params
-        icon.setListener(listener as Icon.IconInterface)
-        parentLayout.addView(icon, params)
         replicator.deleteViews(parentActivity.displayId, page, params.row, params.column)
         parentLayout.removeView(this)
     }

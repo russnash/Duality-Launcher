@@ -16,7 +16,7 @@ class Replicator {
             displayId,
             listener
         ))
-        Log.d(TAG, "register() $displayId")
+        Log.d(TAG, "register() display:$displayId")
     }
 
     fun deregister(displayId: Int) {
@@ -31,13 +31,13 @@ class Replicator {
         indexes.forEach {
             participants.removeAt(it)
         }
-        Log.d(TAG, "deregister() $displayId * ${indexes.size}")
+        Log.d(TAG, "deregister() display:$displayId * ${indexes.size}")
     }
 
     fun addIcon(displayId: Int, launchInfo: LaunchInfo, page: Int, row: Int, column: Int) {
         participants.forEach {
             if(it.displayId != displayId) {
-                Log.d(TAG, "addIcon() to ${it.displayId}")
+                Log.d(TAG, "addIcon() to display:${it.displayId} page:$page")
                 it.listener.addIcon(launchInfo, page, row, column)
             }
         }
@@ -46,7 +46,7 @@ class Replicator {
     fun changeIcon(displayId: Int, launchInfo: LaunchInfo, page: Int, row: Int, column: Int) {
         participants.forEach {
             if(it.displayId != displayId) {
-                Log.d(TAG, "changeIcon() to ${it.displayId}")
+                Log.d(TAG, "changeIcon() on display:${it.displayId} page:$page")
                 it.listener.changeIcon(launchInfo, page, row, column)
             }
         }
@@ -55,7 +55,7 @@ class Replicator {
     fun addFolder(displayId: Int, launchInfo: LaunchInfo, page: Int, row: Int, column: Int) {
         participants.forEach {
             if(it.displayId != displayId) {
-                Log.d(TAG, "addFolder() to ${it.displayId}")
+                Log.d(TAG, "addFolder() to display:${it.displayId} page:$page")
                 it.listener.addFolder(launchInfo, page, row, column)
             }
         }
@@ -64,7 +64,7 @@ class Replicator {
     fun changeFolder(displayId: Int, launchInfo: LaunchInfo, page: Int, row: Int, column: Int) {
         participants.forEach {
             if(it.displayId != displayId) {
-                Log.d(TAG, "changeFolder() to ${it.displayId}")
+                Log.d(TAG, "changeFolder() on display:${it.displayId} page:$page")
                 it.listener.changeFolder(launchInfo, page, row, column)
             }
         }
@@ -73,7 +73,7 @@ class Replicator {
     fun deleteViews(displayId: Int, page: Int, row: Int, column: Int){
         participants.forEach {
             if(it.displayId != displayId) {
-                Log.d(TAG, "deleteViews() to ${it.displayId}")
+                Log.d(TAG, "deleteViews() on display:${it.displayId} page:$page")
                 it.listener.deleteViews(page, row, column)
             }
         }

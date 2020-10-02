@@ -77,32 +77,21 @@ class Icon(
                         if (dragEvent.clipDescription.label.toString().equals("launchInfo")) {
                             respondToDrag = true
                         }
-                        if (dragEvent.clipDescription.label.toString().equals("widget")) {
-                            // Dock icons don't respond to widget drags!
-                            respondToDrag = !isDockIcon
-                        }
-                        if (isFolderOpen) {
-                            respondToDrag = false
-                        }
                     } catch (e: Exception) {
                         respondToDrag = false
                     }
 
                     when (dragEvent.action) {
                         DragEvent.ACTION_DRAG_STARTED -> {
-                            if (respondToDrag) {
-                                iconLayout.setBackgroundResource(R.drawable.icon_drag_target)
-                                //iconLayout.startAnimation(pulseAnim)
-                            }
                         }
                         DragEvent.ACTION_DRAG_ENTERED -> {
                             if (respondToDrag) {
-                                iconLayout.setBackgroundColor(enteredColor)
+                                iconLayout.setBackgroundResource(R.drawable.icon_drag_target)
                             }
                         }
                         DragEvent.ACTION_DRAG_EXITED -> {
                             if (respondToDrag) {
-                                iconLayout.setBackgroundResource(R.drawable.icon_drag_target)
+                                iconLayout.setBackgroundColor(Color.TRANSPARENT)
                                 //iconLayout.startAnimation(pulseAnim)
                             }
                         }
@@ -114,36 +103,40 @@ class Icon(
                             if (respondToDrag) {
                                 if (dragEvent.clipDescription.label.toString().equals("launchInfo")
                                 ) {
-                                    if (launchInfo.getActivityName() != "") {
-                                        val id = dragEvent.clipData.getItemAt(0).text.toString()
-                                        val info = dragAndDropData.retrieveLaunchInfo(id)
-                                        convertToFolder(info)
+                                    if(!isDockIcon) {
+                                        if (launchInfo.getActivityName() != "") {
+                                            val id = dragEvent.clipData.getItemAt(0).text.toString()
+                                            val info = dragAndDropData.retrieveLaunchInfo(id)
+                                            convertToFolder(info)
+                                        } else {
+                                            val id = dragEvent.clipData.getItemAt(0).text.toString()
+                                            launchInfo = dragAndDropData.retrieveLaunchInfo(id)
+                                            if (launchInfo.getType() == LaunchInfo.ICON) {
+                                                if (this.parent is HomeLayout) {
+                                                    replicate = false
+                                                    val params =
+                                                        this.layoutParams as HomeLayout.LayoutParams
+                                                    replicator.changeIcon(
+                                                        parentActivity.displayId,
+                                                        launchInfo,
+                                                        page,
+                                                        params.row,
+                                                        params.column
+                                                    )
+                                                }
+                                                setupIcon()
+                                            } else {
+                                                convertToFolder(launchInfo)
+                                            }
+                                        }
                                     } else {
                                         val id = dragEvent.clipData.getItemAt(0).text.toString()
                                         launchInfo = dragAndDropData.retrieveLaunchInfo(id)
                                         if(launchInfo.getType() == LaunchInfo.ICON) {
-                                            if (this.parent is HomeLayout) {
-                                                replicate = false
-                                                val params =
-                                                    this.layoutParams as HomeLayout.LayoutParams
-                                                replicator.changeIcon(
-                                                    parentActivity.displayId,
-                                                    launchInfo,
-                                                    page,
-                                                    params.row,
-                                                    params.column
-                                                )
-                                            }
+                                            this.launchInfo = launchInfo
                                             setupIcon()
-                                        } else {
-                                            convertToFolder(launchInfo)
                                         }
                                     }
-                                }
-                                if (dragEvent.clipDescription.label.toString().equals("widget")) {
-                                    val id = dragEvent.clipData.getItemAt(0).text.toString()
-                                    val widgetInfo = dragAndDropData.retrieveWidgetId(id)
-                                    convertToWidget(widgetInfo)
                                 }
                             }
                         }
@@ -204,39 +197,31 @@ class Icon(
                     launchInfo.setUserSerial(0)
                     icon.setImageDrawable(ColorDrawable(Color.TRANSPARENT))
                     label.text = ""
-                }
-                if(this.parent is HomeLayout) {
-                    val params = this.layoutParams as HomeLayout.LayoutParams
-                    replicator.changeIcon(
-                        parentActivity.displayId,
-                        launchInfo,
-                        page,
-                        params.row,
-                        params.column
-                    )
+                    if(this.parent is HomeLayout) {
+                        val params = this.layoutParams as HomeLayout.LayoutParams
+                        replicator.changeIcon(
+                            parentActivity.displayId,
+                            launchInfo,
+                            page,
+                            params.row,
+                            params.column
+                        )
+                    }
+                } else {
+                    if(this.parent is HomeLayout) {
+                        val params = this.layoutParams as HomeLayout.LayoutParams
+                        replicator.deleteViews(parentActivity.displayId, page, params.row, params.column)
+                        parentLayout.removeView(this)
+                    }
                 }
                 if(isDockIcon){
                     parentActivity.dock.persistDock()
                 }
                 true
             }
-        } else {
-            icon.setOnLongClickListener { view ->
-                listener.onLongClick(view)
-                true
-            }
-            label.setOnLongClickListener { view ->
-                listener.onLongClick(view)
-                true
-            }
-            icon.setOnClickListener {
-                listener.resetResize()
-            }
-            label.setOnClickListener{
-                listener.resetResize()
-            }
-            icon.setImageDrawable(ColorDrawable(Color.TRANSPARENT))
-            label.text = ""
+        }
+        if(isDockIcon){
+            parentActivity.dock.persistDock()
         }
     }
 
@@ -285,6 +270,7 @@ class Icon(
         parentLayout.removeView(this)
     }
 
+    /*
     fun convertToWidget(widgetInfo: WidgetInfo) {
         val widgetContainer = WidgetContainer(
             parentActivity,
@@ -298,6 +284,8 @@ class Icon(
         replicator.deleteViews(parentActivity.displayId, page, params.row, params.column)
         parentLayout.removeView(this)
     }
+
+     */
 
     interface IconInterface {
         fun onDragStarted(view: View, clipData: ClipData)

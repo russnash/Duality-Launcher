@@ -41,11 +41,16 @@ class HomePagerAdapter(private val parent: MainActivity, private val container: 
         val itemView = holder.itemView
         itemView.tag = position
         val homeIconsTable = itemView.findViewById<HomeLayout>(R.id.homeIconsTable)
+        homeIconsTable.parentActivity = parent
+        homeIconsTable.page = position
 
         if (parent.displayId == 1 && position == 0) {
             Log.d(TAG, "Breakpoint")
         }
 
+        itemView.setOnClickListener {
+            listener.resetResize()
+        }
         itemView.setOnLongClickListener { view ->
             listener.onLongClick(view)
             true
@@ -90,28 +95,30 @@ class HomePagerAdapter(private val parent: MainActivity, private val container: 
                 } else {
                     val launchInfo = homeIconsGrid.getLaunchInfo(row, column)
                     if (launchInfo.getType() == LaunchInfo.ICON) {
-                        var icon = Icon(parent, null, false, position)
-                        var iconParams = HomeLayout.LayoutParams(
-                            ViewGroup.LayoutParams.WRAP_CONTENT,
-                            ViewGroup.LayoutParams.WRAP_CONTENT
-                        )
-                        iconParams.row = row
-                        iconParams.column = column
-                        iconParams.rowSpan = 1
-                        iconParams.columnSpan = 1
-                        icon.layoutParams = iconParams
-                        icon.label.maxLines = 1
-                        icon.label.setTextColor(textColor)
-                        icon.label.setShadowLayer(6F, 0F, 0F, textShadowColor)
-                        icon.setListener(this)
-                        icon.setBlankOnDrag(true)
-                        icon.setDockIcon(false)
-                        icon.setLaunchInfo(
-                            launchInfo.getActivityName(),
-                            launchInfo.getPackageName(),
-                            launchInfo.getUserSerial()
-                        )
-                        homeIconsTable.addView(icon, iconParams)
+                        if(launchInfo.getActivityName() != "") {
+                            var icon = Icon(parent, null, false, position)
+                            var iconParams = HomeLayout.LayoutParams(
+                                ViewGroup.LayoutParams.WRAP_CONTENT,
+                                ViewGroup.LayoutParams.WRAP_CONTENT
+                            )
+                            iconParams.row = row
+                            iconParams.column = column
+                            iconParams.rowSpan = 1
+                            iconParams.columnSpan = 1
+                            icon.layoutParams = iconParams
+                            icon.label.maxLines = 1
+                            icon.label.setTextColor(textColor)
+                            icon.label.setShadowLayer(6F, 0F, 0F, textShadowColor)
+                            icon.setListener(this)
+                            icon.setBlankOnDrag(false)
+                            icon.setDockIcon(false)
+                            icon.setLaunchInfo(
+                                launchInfo.getActivityName(),
+                                launchInfo.getPackageName(),
+                                launchInfo.getUserSerial()
+                            )
+                            homeIconsTable.addView(icon, iconParams)
+                        }
                     }
                     if (launchInfo.getType() == LaunchInfo.FOLDER) {
                         var folder = Folder(

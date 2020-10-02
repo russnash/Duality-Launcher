@@ -11,6 +11,8 @@ import android.appwidget.AppWidgetProviderInfo
 import android.content.*
 import android.content.pm.PackageManager
 import android.content.res.ColorStateList
+import android.graphics.Bitmap
+import android.graphics.Canvas
 import android.graphics.Color
 import android.hardware.display.DisplayManager
 import android.os.Bundle
@@ -48,6 +50,7 @@ const val CONFIGURE_WIDGET = 2
 const val WIDE_SCREENSHOT = 3
 var isFolderOpen = false
 lateinit var generalContext: Context
+var dragWidgetBitmap: Bitmap? = null
 
 class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterface,
     SharedPreferences.OnSharedPreferenceChangeListener, Animation.AnimationListener,
@@ -727,6 +730,11 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
 
     override fun onAddWidget(clipData: ClipData, view: View) {
         val dsb = WidgetDragShadowBuilder(view)
+        val bitmap = Bitmap.createBitmap(view.width, view.height, Bitmap.Config.ARGB_8888)
+        val canvas = Canvas(bitmap)
+        view.layout(view.left, view.top, view.right, view.bottom)
+        view.draw(canvas)
+        dragWidgetBitmap = bitmap
         showHomeFragment(widgetFragment)
         if (homePager.startDragAndDrop(clipData, dsb, false, 0)) {
             Log.d(TAG, "onAddWidget() startDragAndDrop successful")
@@ -1010,7 +1018,7 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
                     }
                     DragEvent.ACTION_DRAG_ENTERED -> {
                         if (respondToDrag) {
-                            folderGrid.setBackgroundColor(enteredColor)
+                            folderGrid.setBackgroundResource(R.drawable.icon_drag_target)
                         }
                     }
                     DragEvent.ACTION_DRAG_EXITED -> {
