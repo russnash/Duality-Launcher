@@ -88,6 +88,10 @@ class DualityLauncherApplication: Application() {
         appWidgetHost.stopListening()
     }
 
+    fun arePagersInitialized() : Boolean {
+        return ::homePagerDual.isInitialized && ::homePagerMain.isInitialized
+    }
+
     fun wideShot() {
         Log.d(TAG, "wideShot()")
         val displayManager = getSystemService(Context.DISPLAY_SERVICE) as DisplayManager

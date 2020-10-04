@@ -69,6 +69,11 @@
             android:entries="@array/values_5_to_8"
             android:entryValues="@array/values_5_to_8"
             android:defaultValue="7"/>
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="linked_viewpager"
+            android:summary="Links the home page carousels on the main and dual screens so that they page in sequence with one another"
+            android:title="Linked carousels" />
         <com.graymatterapps.dualitylauncher.ColorPreference
             android:key="home_widget_color"
             android:title="Widget color"

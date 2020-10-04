@@ -185,33 +185,49 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
                 Log.d(TAG, "onPageScrollStateChanged() state:$state")
                 super.onPageScrollStateChanged(state)
                 setupHomePageIndicator()
-                /*
-                if (settingsPreferences.getBoolean("linked_viewpager", false)) {
-                    val lastPage =
-                        Integer.parseInt(settingsPreferences.getString("home_grid_pages", "1")) - 1
-                    if (lastPage > 0) {
-                        if (displayId == 0 && homePagerDual != null) {
-                            val currentPage = homePager.currentItem
-                            if (currentPage == 0) {
-                                homePagerDual.setCurrentItem(lastPage, true)
-                            } else {
-                                homePagerDual.setCurrentItem(currentPage - 1, true)
+
+                if (dualityLauncherApplication.arePagersInitialized()) {
+                    if (settingsPreferences.getBoolean("linked_viewpager", false)) {
+                        val lastPage =
+                            Integer.parseInt(
+                                settingsPreferences.getString(
+                                    "home_grid_pages",
+                                    "1"
+                                )
+                            ) - 1
+                        if (lastPage > 0) {
+                            if (displayId == 0) {
+                                val currentPage = homePager.currentItem
+                                if (currentPage == 0) {
+                                    homePagerDual.setCurrentItem(lastPage, true)
+                                } else {
+                                    homePagerDual.setCurrentItem(currentPage - 1, true)
+                                }
                             }
-                        }
-                        if (displayId == 1 && homePagerMain != null) {
-                            val currentPage = homePager.currentItem
-                            if (currentPage == lastPage) {
-                                homePagerMain.setCurrentItem(0, true)
-                            } else {
-                                homePagerMain.setCurrentItem(currentPage + 1, true)
+                            if (displayId == 1) {
+                                val currentPage = homePager.currentItem
+                                if (currentPage == lastPage) {
+                                    homePagerMain.setCurrentItem(0, true)
+                                } else {
+                                    homePagerMain.setCurrentItem(currentPage + 1, true)
+                                }
                             }
                         }
                     }
                 }
-                 */
             }
         })
         homePagerAdapter.setListener(this)
+        if (displayId == 1) {
+            val lastPage =
+                Integer.parseInt(
+                    settingsPreferences.getString(
+                        "home_grid_pages",
+                        "1"
+                    )
+                ) - 1
+            homePager.setCurrentItem(lastPage, false)
+        }
 
         setupHomePageIndicator()
 
@@ -619,9 +635,7 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
             }
 
             if (key == "apps") {
-                if (dock != null) {
-                    dock.populateDock()
-                }
+                dock.populateDock()
             }
 
             if (key == "home_grid_pages" || key == "home_grid_columns" || key == "home_grid_rows") {

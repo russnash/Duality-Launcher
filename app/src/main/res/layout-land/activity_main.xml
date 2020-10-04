@@ -6,21 +6,13 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <ImageView
-        android:id="@+id/homeDelete"
-        android:layout_width="25dp"
-        android:layout_height="0dp"
-        android:layout_gravity="center"
-        android:layout_weight="0"
-        android:src="@drawable/delete"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
     <FrameLayout
         android:id="@+id/dockContainer"
         android:layout_width="match_parent"
         android:layout_height="56dp"
-        app:layout_constraintBottom_toBottomOf="parent" />
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 
     <LinearLayout
         android:id="@+id/frameLayout"
@@ -32,7 +24,7 @@
         <androidx.viewpager2.widget.ViewPager2
             android:id="@+id/homePager"
             android:layout_width="400dp"
-            android:layout_height="wrap_content"
+            android:layout_height="332dp"
             android:layout_gravity="center"
             android:layout_weight="1">
 
@@ -114,15 +106,6 @@
         </FrameLayout>
     </FrameLayout>
 
-    <TextView
-        android:id="@+id/menuAnchor"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
     <include
         android:id="@+id/homeMenu"
         layout="@layout/home_screen_menu"
@@ -130,6 +113,17 @@
         android:layout_height="match_parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:id="@+id/homeDelete"
+        android:layout_width="40dp"
+        android:layout_height="100dp"
+        android:layout_gravity="center"
+        android:layout_weight="0"
+        android:src="@drawable/delete"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 

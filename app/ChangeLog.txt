@@ -1,3 +1,13 @@
+Version ?
+Changes:
+Bug fixes:
+
+Version 2020.10.4.1-internal
+Changes:
+- Removed the drag shadow for widgets.
+- Trashcan is now displayed as an overlay so that the home screen grid stretches to the top of the display.
+- Added 'Linked carousel' option to home screen options, enabling this causes the home screen pages on both displays to page together like pages of a book.
+
 Version 2020.10.1.1-internal
 Changes:
 - Implemented new drag and drop system.

@@ -8,7 +8,8 @@ class WidgetDragShadowBuilder(view: View) : View.DragShadowBuilder(view) {
 
     override fun onProvideShadowMetrics(outShadowSize: Point?, outShadowTouchPoint: Point?) {
         if (outShadowSize != null) {
-            outShadowSize.set(view.width, view.height)
+            //outShadowSize.set(view.width, view.height)
+            outShadowSize.set(1, 1)
         }
         if (outShadowTouchPoint != null) {
             outShadowTouchPoint.set(0, 0)

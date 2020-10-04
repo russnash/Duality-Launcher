@@ -8,6 +8,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.graymatterapps.graymatterutils.GrayMatterUtils
 import kotlinx.android.synthetic.main.folder.view.*
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
@@ -67,7 +68,6 @@ class HomePagerAdapter(private val parent: MainActivity, private val container: 
         val textShadowColor = settingsPreferences.getInt("home_text_shadow_color", Color.BLACK)
 
         homeIconsTable.removeAllViews()
-
         homeIconsTable.setGridSize(numRows, numCols)
 
         for (row in 0 until numRows) {

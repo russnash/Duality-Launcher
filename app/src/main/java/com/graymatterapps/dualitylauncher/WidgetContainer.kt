@@ -6,10 +6,7 @@ import android.content.ClipData
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.util.Log
-import android.view.GestureDetector
-import android.view.Gravity
-import android.view.MotionEvent
-import android.view.ViewGroup
+import android.view.*
 import android.widget.FrameLayout
 import androidx.core.view.GestureDetectorCompat
 import com.graymatterapps.graymatterutils.GrayMatterUtils
@@ -166,8 +163,7 @@ class WidgetContainer(
                                 Log.d(TAG, "onScroll() distance: $distance")
                                 if (distance > touchSlop
                                 ) {
-                                    resizeFrame.setResize(false)
-                                    eventHistory.clear()
+                                    resize(false)
                                     startDrag()
                                 }
                             }
