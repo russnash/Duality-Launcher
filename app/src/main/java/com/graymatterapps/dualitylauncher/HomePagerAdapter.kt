@@ -212,6 +212,10 @@ class HomePagerAdapter(private val parent: MainActivity, private val container: 
         listener.resetResize()
     }
 
+    override fun onUninstall(launchInfo: LaunchInfo) {
+        listener.onUninstall(launchInfo)
+    }
+
     fun setListener(homeIconsInterface: HomeIconsInterface) {
         listener = homeIconsInterface
     }
@@ -225,6 +229,7 @@ class HomePagerAdapter(private val parent: MainActivity, private val container: 
         fun onSetupFolder(apps: ArrayList<LaunchInfo>, name: Editable, folder: Folder)
         fun onFolderChanged()
         fun resetResize()
+        fun onUninstall(launchInfo: LaunchInfo)
     }
 
     override fun onShowFolder(state: Boolean) {

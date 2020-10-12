@@ -48,7 +48,7 @@
             android:textColor="?android:attr/textColorPrimary"
             android:textSize="14sp" />
 
-        <GridView
+        <com.graymatterapps.dualitylauncher.CustomGridView
             android:id="@+id/folderGrid"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

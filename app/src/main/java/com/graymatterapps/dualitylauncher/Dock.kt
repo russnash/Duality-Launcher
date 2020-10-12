@@ -174,6 +174,7 @@ class Dock(val parentActivity: MainActivity, attrs: AttributeSet?) : LinearLayou
 
     interface DockInterface {
         fun onDragStarted(view: View, clipData: ClipData)
+        fun onUninstall(launchInfo: LaunchInfo)
     }
 
     override fun onDragStarted(view: View, clipData: ClipData) {
@@ -190,6 +191,10 @@ class Dock(val parentActivity: MainActivity, attrs: AttributeSet?) : LinearLayou
 
     override fun resetResize() {
         // Do nothing
+    }
+
+    override fun onUninstall(launchInfo: LaunchInfo) {
+        listener.onUninstall(launchInfo)
     }
 
     fun startDrag(view: View, clipData: ClipData) {

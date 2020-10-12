@@ -6,7 +6,10 @@ import android.content.Context
 import android.content.DialogInterface
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
+import android.graphics.Canvas
 import android.graphics.Color
+import android.graphics.drawable.BitmapDrawable
+import android.graphics.drawable.Drawable
 import android.hardware.display.DisplayManager
 import android.os.VibrationEffect
 import android.os.Vibrator
@@ -15,6 +18,7 @@ import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import com.graymatterapps.dualitylauncher.MainActivity
+
 
 object GrayMatterUtils {
     fun getVersionCode(con: Context): Int {
@@ -128,9 +132,12 @@ object GrayMatterUtils {
     }
 
     fun getDistance(x1: Float, y1: Float, x2: Float, y2: Float) : Double {
-        return Math.sqrt(Math.pow(x2.toDouble() - x1.toDouble(), 2.0) + Math.pow(y2.toDouble() - y1.toDouble(),
-            2.0
-        ))
+        return Math.sqrt(
+            Math.pow(x2.toDouble() - x1.toDouble(), 2.0) + Math.pow(
+                y2.toDouble() - y1.toDouble(),
+                2.0
+            )
+        )
     }
 
     fun getScreenshotOfRoot(view: View) : Bitmap {
@@ -138,6 +145,27 @@ object GrayMatterUtils {
         root.setDrawingCacheEnabled(true)
         val bitmap = Bitmap.createBitmap(root.getDrawingCache())
         root.setDrawingCacheEnabled(false)
+        return bitmap
+    }
+
+    fun resizeDrawable(context: Context, image: Drawable, size: Int): Drawable? {
+        val bitmap = drawableToBitmap(image)
+        val bitmapResized = Bitmap.createScaledBitmap(bitmap, size, size, false)
+        return BitmapDrawable(context.getResources(), bitmapResized)
+    }
+
+    fun drawableToBitmap(drawable: Drawable): Bitmap {
+        if (drawable is BitmapDrawable) {
+            return drawable.bitmap
+        }
+        val bitmap = Bitmap.createBitmap(
+            drawable.intrinsicWidth,
+            drawable.intrinsicHeight,
+            Bitmap.Config.ARGB_8888
+        )
+        val canvas = Canvas(bitmap)
+        drawable.setBounds(0, 0, canvas.width, canvas.height)
+        drawable.draw(canvas)
         return bitmap
     }
 }

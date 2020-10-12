@@ -1,6 +1,12 @@
-Version ?
+Version 2020.10.12.1-internal
 Changes:
+- Added context menus to icons.
+- Added app shortcuts to icon context menus.
+
 Bug fixes:
+- Fixed a bug where icon text was being cutoff on the home screen and in folders.
+- Fixed a bug where icons were not being persisted on the home screen.
+- Fixed a bug where icon removal from the home screen was not replicating to the dual display.
 
 Version 2020.10.4.1-internal
 Changes:

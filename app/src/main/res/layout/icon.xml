@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/iconLayout"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -12,16 +13,19 @@
         android:layout_centerVertical="true"
         android:adjustViewBounds="true"
         android:padding="10dp"
-        android:scaleType="fitStart" />
+        android:scaleType="fitStart"
+        app:srcCompat="@drawable/ic_launcher_background" />
 
     <TextView
         android:id="@+id/label"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:elegantTextHeight="false"
         android:ellipsize="end"
         android:maxLines="2"
         android:padding="2dp"
+        android:paddingBottom="10dp"
         android:singleLine="false"
-        android:text="Name"
+        android:text="Name big enough for two lines"
         android:textAlignment="center" />
 </LinearLayout>

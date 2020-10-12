@@ -76,12 +76,17 @@ class HomeLayout(context: Context, attributeSet: AttributeSet?) : ViewGroup(
                             val id = dragEvent.clipData.getItemAt(0).text.toString()
                             val info = dragAndDropData.retrieveLaunchInfo(id)
                             if (info.getType() == LaunchInfo.ICON) {
+                                val textColor = settingsPreferences.getInt("home_text_color", Color.WHITE)
+                                val textShadowColor = settingsPreferences.getInt("home_text_shadow_color", Color.BLACK)
                                 val icon = Icon(parentActivity, null, true, page)
                                 val params = dragImage.layoutParams as HomeLayout.LayoutParams
                                 params.columnSpan = 1
                                 params.rowSpan = 1
                                 params.freeForm = false
                                 icon.layoutParams = params
+                                icon.label.maxLines = 1
+                                icon.label.setTextColor(textColor)
+                                icon.label.setShadowLayer(6F, 0F, 0F, textShadowColor)
                                 icon.setListener(parentActivity.homePagerAdapter as Icon.IconInterface)
                                 icon.setLaunchInfo(info)
                                 this.addView(icon, params)
@@ -103,6 +108,7 @@ class HomeLayout(context: Context, attributeSet: AttributeSet?) : ViewGroup(
                                 folder.setListener(parentActivity.homePagerAdapter as Folder.FolderInterface)
                                 this.addView(folder, params)
                             }
+                            parentActivity.persistGrid(page)
                         }
                         if (dragType == "widget") {
                             val id = dragEvent.clipData.getItemAt(0).text.toString()

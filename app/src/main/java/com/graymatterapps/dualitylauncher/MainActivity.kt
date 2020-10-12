@@ -15,25 +15,26 @@ import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Color
 import android.hardware.display.DisplayManager
+import android.net.Uri
 import android.os.Bundle
 import android.text.Editable
 import android.util.Log
-import android.view.DragEvent
-import android.view.View
-import android.view.ViewGroup
-import android.view.WindowManager
+import android.view.*
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
+import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.ImageView
 import android.widget.TableRow
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.view.menu.MenuBuilder
 import androidx.core.app.ActivityCompat
 import androidx.core.graphics.ColorUtils
 import androidx.core.view.ViewCompat.startDragAndDrop
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.viewpager2.widget.ViewPager2
+import com.graymatterapps.graymatterutils.GrayMatterUtils
 import com.graymatterapps.graymatterutils.GrayMatterUtils.getVersionCode
 import com.graymatterapps.graymatterutils.GrayMatterUtils.shortToast
 import com.graymatterapps.graymatterutils.GrayMatterUtils.showOkDialog
@@ -43,11 +44,13 @@ import kotlinx.android.synthetic.main.home_folder.*
 import kotlinx.android.synthetic.main.home_screen_menu.*
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import java.nio.file.Files.delete
 
 const val PREFS_FILENAME = "com.graymatterapps.dualitylauncher.prefs"
 const val REQUEST_PERMISSION = 1
 const val CONFIGURE_WIDGET = 2
 const val WIDE_SCREENSHOT = 3
+const val UNINSTALL = 4
 var isFolderOpen = false
 lateinit var generalContext: Context
 var dragWidgetBitmap: Bitmap? = null
@@ -571,6 +574,13 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
         appList.launchPackage(launchInfo, displayId)
     }
 
+    override fun onUninstall(launchInfo: LaunchInfo) {
+        val intent = Intent(Intent.ACTION_UNINSTALL_PACKAGE)
+        intent.setData(Uri.parse("package:" + launchInfo.getPackageName()))
+        intent.putExtra(Intent.EXTRA_RETURN_RESULT, true)
+        startActivityForResult(intent, UNINSTALL)
+    }
+
     fun showWidgetFragment() {
         gestureLayout.setGesturesOn(false)
         supportFragmentManager
@@ -968,7 +978,14 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
                 val widgetId = extras!!.getInt(AppWidgetManager.EXTRA_APPWIDGET_ID)
                 buildWidget(widgetId)
             }
+
+            if (requestCode == UNINSTALL) {
+                shortToast(this, "Package uninstalled")
+            }
         } else {
+            if (requestCode == UNINSTALL) {
+                shortToast(this, "Package uninstall failed")
+            }
             try {
                 val extras = data!!.extras
                 val widgetId = extras!!.getInt(AppWidgetManager.EXTRA_APPWIDGET_ID)
@@ -1005,6 +1022,7 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
 
         homeFolderBackground.setOnClickListener {
             showHomeFolder(false)
+            folder.verifyApps()
         }
 
         folderName.setOnFocusChangeListener { view, hasFocus ->

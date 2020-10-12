@@ -58,6 +58,10 @@ class FolderAdapter(var parentActivity: MainActivity, var apps: ArrayList<Launch
         // Do nothing
     }
 
+    override fun onUninstall(launchInfo: LaunchInfo) {
+        listener.onUninstall(launchInfo)
+    }
+
     fun setListener(ear: FolderAdapterInterface) {
         listener = ear
     }
@@ -65,6 +69,7 @@ class FolderAdapter(var parentActivity: MainActivity, var apps: ArrayList<Launch
     interface FolderAdapterInterface {
         fun onDragStarted(view: View, clipData: ClipData)
         fun onLaunch(launchInfo: LaunchInfo, displayId: Int)
+        fun onUninstall(launchInfo: LaunchInfo)
     }
 
     override fun onSharedPreferenceChanged(sharedPref: SharedPreferences?, key: String?) {

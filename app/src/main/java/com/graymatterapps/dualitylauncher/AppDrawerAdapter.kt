@@ -82,6 +82,7 @@ class AppDrawerAdapter(
     interface DrawerAdapterInterface {
         fun onDragStarted(view: View, clipData: ClipData)
         fun onLaunch(launchInfo: LaunchInfo, displayId: Int)
+        fun onUninstall(launchInfo: LaunchInfo)
     }
 
     override fun onDragStarted(view: View, clipData: ClipData) {
@@ -98,5 +99,9 @@ class AppDrawerAdapter(
 
     override fun resetResize() {
         // Do nothing
+    }
+
+    override fun onUninstall(launchInfo: LaunchInfo) {
+        listener.onUninstall(launchInfo)
     }
 }

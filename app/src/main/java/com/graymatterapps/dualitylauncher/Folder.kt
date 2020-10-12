@@ -100,6 +100,20 @@ class Folder(
         }
     }
 
+    fun verifyApps() {
+        appList.lock.lock()
+        val tempApps = ArrayList<LaunchInfo>()
+        folderApps.forEach {
+            if(appList.isAppInstalled(it)) {
+                tempApps.add(it)
+            }
+        }
+        appList.lock.unlock()
+        folderApps = tempApps
+        persistFolderApps()
+        makeFolderIcon()
+    }
+
     private fun setupDragListener() {
         folderIcon.setOnDragListener { view, dragEvent ->
             if (dragEvent != null) {
@@ -254,6 +268,7 @@ class Folder(
     }
 
     private fun showFolder() {
+        verifyApps()
         listener.onShowFolder(true)
         listener.onSetupFolder(folderApps, SpannableStringBuilder(folderLabel.text), this)
     }

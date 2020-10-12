@@ -4,15 +4,19 @@ import android.app.ActivityOptions
 import android.content.ComponentName
 import android.content.Context
 import android.content.pm.LauncherApps
+import android.content.pm.ShortcutInfo
 import android.graphics.Color
 import android.graphics.drawable.Drawable
 import android.graphics.drawable.ShapeDrawable
 import android.graphics.drawable.shapes.OvalShape
+import android.os.Process
 import android.os.UserHandle
 import android.os.UserManager
 import androidx.core.content.ContextCompat
 import com.graymatterapps.graymatterutils.GrayMatterUtils.longToast
+import java.util.*
 import java.util.concurrent.locks.ReentrantLock
+import kotlin.collections.ArrayList
 
 class AppList(val context: Context) : LauncherApps.Callback() {
     val apps: ArrayList<AppListDataType> = ArrayList()
@@ -28,7 +32,7 @@ class AppList(val context: Context) : LauncherApps.Callback() {
         launcherApps.registerCallback(this)
     }
 
-    fun waitForReady(){
+    fun waitForReady() {
         while (!ready) {
             Thread.sleep(100)
         }
@@ -74,6 +78,15 @@ class AppList(val context: Context) : LauncherApps.Callback() {
             lock.unlock()
             ready = true
         }).start()
+    }
+
+    fun isAppInstalled(launchInfo: LaunchInfo): Boolean {
+        apps.forEach {
+            if (it.packageName == launchInfo.getPackageName() && it.activityName == launchInfo.getActivityName()) {
+                return true
+            }
+        }
+        return false
     }
 
     fun getIcon(launchInfo: LaunchInfo): Drawable {
@@ -128,6 +141,35 @@ class AppList(val context: Context) : LauncherApps.Callback() {
         }
     }
 
+    fun getAppShortcuts(packageName: String): List<Shortcut> {
+        val shortcutQuery = LauncherApps.ShortcutQuery()
+        shortcutQuery.setQueryFlags(LauncherApps.ShortcutQuery.FLAG_MATCH_DYNAMIC or LauncherApps.ShortcutQuery.FLAG_MATCH_MANIFEST or LauncherApps.ShortcutQuery.FLAG_MATCH_PINNED)
+        shortcutQuery.setPackage(packageName)
+        return try {
+            launcherApps.getShortcuts(shortcutQuery, Process.myUserHandle())!!
+                .map { Shortcut(it.id, it.`package`, it.shortLabel.toString(), it) }
+        } catch (e: SecurityException) {
+            Collections.emptyList()
+        }
+    }
+
+    fun loadShortcutIcon(shortcutInfo: ShortcutInfo): Drawable? {
+        var drawable: Drawable? = null
+        try {
+            drawable = launcherApps.getShortcutIconDrawable(
+                shortcutInfo,
+                context.resources.displayMetrics.densityDpi
+            )
+        } catch (e: Exception) {
+            drawable = null
+        }
+        return drawable
+    }
+
+    fun startShortcut(shortcut : Shortcut) {
+        launcherApps.startShortcut(shortcut.packageName, shortcut.id, null, null, Process.myUserHandle())
+    }
+
     data class AppListDataType(
         var name: String,
         var icon: Drawable,
@@ -135,6 +177,13 @@ class AppList(val context: Context) : LauncherApps.Callback() {
         var packageName: String,
         var handle: UserHandle,
         var userSerial: Long
+    )
+
+    data class Shortcut(
+        val id: String,
+        val packageName: String,
+        val label: String,
+        val shortcutInfo: ShortcutInfo
     )
 
     override fun onPackageRemoved(p0: String?, p1: UserHandle?) {
