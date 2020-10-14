@@ -13,8 +13,7 @@
         android:layout_centerVertical="true"
         android:adjustViewBounds="true"
         android:padding="10dp"
-        android:scaleType="fitStart"
-        app:srcCompat="@drawable/ic_launcher_background" />
+        android:scaleType="fitStart" />
 
     <TextView
         android:id="@+id/label"
@@ -26,6 +25,5 @@
         android:padding="2dp"
         android:paddingBottom="10dp"
         android:singleLine="false"
-        android:text="Name big enough for two lines"
         android:textAlignment="center" />
 </LinearLayout>

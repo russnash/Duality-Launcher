@@ -242,7 +242,7 @@ class Icon(
                 val menuItemShortcut = menu.menu.add(1, menuItemID, 1, shortcut.label)
                 val shortcutIcon = appList.loadShortcutIcon(shortcut.shortcutInfo)
                 if(shortcutIcon != null) {
-                    val icon = GrayMatterUtils.resizeDrawable(parentActivity, shortcutIcon, 50)
+                    val icon = GrayMatterUtils.resizeDrawable(parentActivity, shortcutIcon, 63)
                     menuItemShortcut.setIcon(icon)
                 }
                 menuItemShortcut.setOnMenuItemClickListener {
@@ -345,6 +345,7 @@ class Icon(
         val params = this.layoutParams as HomeLayout.LayoutParams
         replicator.deleteViews(parentActivity.displayId, page, params.row, params.column)
         parentLayout.removeView(this)
+        parentActivity.persistGrid(page)
     }
 
     fun setListener(iconInterface: IconInterface) {
@@ -397,6 +398,7 @@ class Icon(
         replicator.deleteViews(parentActivity.displayId, page, params.row, params.column)
         parentLayout.addView(folder)
         parentLayout.removeView(this)
+        parentActivity.persistGrid(page)
     }
 
     /*

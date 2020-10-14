@@ -1,3 +1,17 @@
+Version ?
+Changes:
+
+Bug fixes:
+
+Version 2020.10.14.1-internal
+Changes:
+- Widget resizing can now be cancelled with the back button.
+
+Bug fixes:
+- Fixed a spacing issue in the context menu where the app shortcuts weren't inline with the other actions.
+- Fixed a bug causing a crash if the dual screen wasn't controlled by Duality Launcher when performing a wide screenshot.
+- Fixed a bug where removing an icon or folder from the home screen didn't remove it from persistence when only one display is active.
+
 Version 2020.10.12.1-internal
 Changes:
 - Added context menus to icons.

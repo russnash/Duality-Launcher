@@ -281,6 +281,7 @@ class Folder(
         val params = this.layoutParams as HomeLayout.LayoutParams
         replicator.deleteViews(parentActivity.displayId, page, params.row, params.column)
         parentLayout.removeView(this)
+        parentActivity.persistGrid(page)
     }
 
     interface FolderInterface {

@@ -32,8 +32,14 @@ class WidgetContainer(
     val TAG = javaClass.simpleName
 
     init {
-        containerParams = HomeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
-        viewParams = FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT)
+        containerParams = HomeLayout.LayoutParams(
+            ViewGroup.LayoutParams.MATCH_PARENT,
+            ViewGroup.LayoutParams.MATCH_PARENT
+        )
+        viewParams = FrameLayout.LayoutParams(
+            FrameLayout.LayoutParams.MATCH_PARENT,
+            FrameLayout.LayoutParams.MATCH_PARENT
+        )
     }
 
     override fun onInterceptTouchEvent(event: MotionEvent?): Boolean {
@@ -214,27 +220,17 @@ class WidgetContainer(
     }
 
     private fun resize(state: Boolean) {
-        if (state) {
-            GrayMatterUtils.vibrate(parentActivity, 50)
-            /*
-            val resizeParams = FrameLayout.LayoutParams(
-                FrameLayout.LayoutParams.MATCH_PARENT,
-                FrameLayout.LayoutParams.MATCH_PARENT
-            )
-            val containerParams = this.layoutParams as HomeLayout.LayoutParams
-            resizeParams.width = parentLayout.getCellWidth() * containerParams.columnSpan
-            resizeParams.height = parentLayout.getCellHeight() * containerParams.rowSpan
-            resizeParams.gravity = Gravity.CENTER
-            resizeFrame.layoutParams = resizeParams
-
-             */
-            resizeFrame.setResize(true)
-            resizeFrame.bringToFront()
-            resizing = true
-        } else {
-            resizeFrame.setResize(false)
-            resizing = false
-            eventHistory.clear()
+        if (::resizeFrame.isInitialized) {
+            if (state) {
+                GrayMatterUtils.vibrate(parentActivity, 50)
+                resizeFrame.setResize(true)
+                resizeFrame.bringToFront()
+                resizing = true
+            } else {
+                resizeFrame.setResize(false)
+                resizing = false
+                eventHistory.clear()
+            }
         }
     }
 
@@ -399,7 +395,12 @@ class WidgetContainer(
     }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
-        Log.d(TAG, "onMeasure() width:${MeasureSpec.getSize(widthMeasureSpec)} height:${MeasureSpec.getSize(heightMeasureSpec)}")
+        Log.d(
+            TAG,
+            "onMeasure() width:${MeasureSpec.getSize(widthMeasureSpec)} height:${
+                MeasureSpec.getSize(heightMeasureSpec)
+            }"
+        )
         setMeasuredDimension(
             MeasureSpec.getSize(widthMeasureSpec),
             MeasureSpec.getSize(heightMeasureSpec)

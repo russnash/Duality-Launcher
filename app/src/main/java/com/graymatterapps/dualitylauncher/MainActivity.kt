@@ -289,10 +289,6 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
         prefs = this.getSharedPreferences(PREFS_FILENAME, 0)
 
         setWindowBackground()
-
-        homePageIndicator.setOnClickListener {
-            setWideMode()
-        }
     }
 
     override fun onDestroy() {
@@ -385,7 +381,6 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
             showHomeMenu(false)
         }
         buttonActionWideshot.setOnClickListener {
-            Log.d(TAG, "buttonActionWideshot.setOnClickListener()")
             if (checkSelfPermission(android.Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
                 wideScreenshot()
             } else {
@@ -531,6 +526,8 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
         if (widgetFragment.isVisible) {
             showHomeFragment(widgetFragment)
         }
+
+        resetResize()
     }
 
     fun showHomeFragment(visible: Fragment) {
@@ -1081,11 +1078,13 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
 
     override fun resetResize() {
         val view = frameLayout.findViewWithTag<View>(getCurrentHomePagerItem())
-        val homeIconsTable = view.findViewById<HomeLayout>(R.id.homeIconsTable)
-        for (n in 0 until homeIconsTable.childCount) {
-            if (homeIconsTable.getChildAt(n) is WidgetContainer) {
-                val child = homeIconsTable.getChildAt(n) as WidgetContainer
-                child.resetResize()
+        if (view != null) {
+            val homeIconsTable = view.findViewById<HomeLayout>(R.id.homeIconsTable)
+            for (n in 0 until homeIconsTable.childCount) {
+                if (homeIconsTable.getChildAt(n) is WidgetContainer) {
+                    val child = homeIconsTable.getChildAt(n) as WidgetContainer
+                    child.resetResize()
+                }
             }
         }
     }
@@ -1134,33 +1133,35 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
     override fun addIcon(launchInfo: LaunchInfo, page: Int, row: Int, column: Int) {
         homePagerAdapter.lock.lock()
         val view = frameLayout.findViewWithTag<View>(page)
-        val homeIconsTable = view.findViewById<HomeLayout>(R.id.homeIconsTable)
-        val textColor = settingsPreferences.getInt("home_text_color", Color.WHITE)
-        val textShadowColor = settingsPreferences.getInt("home_text_shadow_color", Color.BLACK)
-        var icon = Icon(this, null, false, page)
-        var iconParams = HomeLayout.LayoutParams(
-            ViewGroup.LayoutParams.WRAP_CONTENT,
-            ViewGroup.LayoutParams.WRAP_CONTENT
-        )
-        iconParams.row = row
-        iconParams.column = column
-        iconParams.rowSpan = 1
-        iconParams.columnSpan = 1
-        icon.layoutParams = iconParams
-        icon.label.maxLines = 1
-        icon.label.setTextColor(textColor)
-        icon.label.setShadowLayer(6F, 0F, 0F, textShadowColor)
-        icon.setListener(homePagerAdapter)
-        icon.setBlankOnDrag(true)
-        icon.setDockIcon(false)
-        icon.setLaunchInfo(
-            launchInfo.getActivityName(),
-            launchInfo.getPackageName(),
-            launchInfo.getUserSerial()
-        )
-        homeIconsTable.addView(icon, iconParams)
-        homePagerAdapter.lock.unlock()
-        persistGrid(page)
+        if(view != null) {
+            val homeIconsTable = view.findViewById<HomeLayout>(R.id.homeIconsTable)
+            val textColor = settingsPreferences.getInt("home_text_color", Color.WHITE)
+            val textShadowColor = settingsPreferences.getInt("home_text_shadow_color", Color.BLACK)
+            var icon = Icon(this, null, false, page)
+            var iconParams = HomeLayout.LayoutParams(
+                ViewGroup.LayoutParams.WRAP_CONTENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+            )
+            iconParams.row = row
+            iconParams.column = column
+            iconParams.rowSpan = 1
+            iconParams.columnSpan = 1
+            icon.layoutParams = iconParams
+            icon.label.maxLines = 1
+            icon.label.setTextColor(textColor)
+            icon.label.setShadowLayer(6F, 0F, 0F, textShadowColor)
+            icon.setListener(homePagerAdapter)
+            icon.setBlankOnDrag(true)
+            icon.setDockIcon(false)
+            icon.setLaunchInfo(
+                launchInfo.getActivityName(),
+                launchInfo.getPackageName(),
+                launchInfo.getUserSerial()
+            )
+            homeIconsTable.addView(icon, iconParams)
+            homePagerAdapter.lock.unlock()
+            persistGrid(page)
+        }
     }
 
     override fun changeIcon(launchInfo: LaunchInfo, page: Int, row: Int, column: Int) {
