@@ -48,12 +48,19 @@
             android:textColor="?android:attr/textColorPrimary"
             android:textSize="14sp" />
 
-        <com.graymatterapps.dualitylauncher.CustomGridView
-            android:id="@+id/folderGrid"
+        <ScrollView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:numColumns="5"
-            android:paddingBottom="48dp" />
+            android:scrollbarStyle="insideOverlay">
+
+            <us.graymatterapps.dualitylauncher.CustomGridView
+                android:id="@+id/folderGrid"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:numColumns="5"
+                android:paddingBottom="48dp" />
+
+        </ScrollView>
 
     </LinearLayout>
 

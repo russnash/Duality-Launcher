@@ -1,14 +1,14 @@
 <PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:android="http://schemas.android.com/apk/res/android">
-    <com.graymatterapps.dualitylauncher.ColorPreference
+    <us.graymatterapps.dualitylauncher.ColorPreference
         android:defaultValue="-16777216"
         android:key="folder_background"
         android:title="Background color" />
-    <com.graymatterapps.dualitylauncher.ColorPreference
+    <us.graymatterapps.dualitylauncher.ColorPreference
         android:defaultValue="-1"
         android:key="folder_text"
         android:title="Text color" />
-    <com.graymatterapps.dualitylauncher.ColorPreference
+    <us.graymatterapps.dualitylauncher.ColorPreference
         android:defaultValue="-16777216"
         android:key="folder_text_shadow"
         android:title="Text shadow color" />

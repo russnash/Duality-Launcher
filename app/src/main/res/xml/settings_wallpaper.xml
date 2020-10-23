@@ -3,8 +3,8 @@
         android:key="wallpaper_main"
         android:title="Main Screen Wallpaper"
         android:summary="Set the main screen wallpaper">
-        <intent android:targetPackage="com.graymatterapps.dualitylauncher"
-            android:targetClass="com.graymatterapps.dualitylauncher.WallpaperActivity"
+        <intent android:targetPackage="us.graymatterapps.dualitylauncher"
+            android:targetClass="us.graymatterapps.dualitylauncher.WallpaperActivity"
             android:action="android.intent.action.SET_WALLPAPER"
             android:data="main"/>
     </Preference>
@@ -12,8 +12,8 @@
         android:key="wallpaper_dual"
         android:title="Dual Screen Wallpaper"
         android:summary="Set the dual screen wallpaper">
-        <intent android:targetPackage="com.graymatterapps.dualitylauncher"
-            android:targetClass="com.graymatterapps.dualitylauncher.WallpaperActivity"
+        <intent android:targetPackage="us.graymatterapps.dualitylauncher"
+            android:targetClass="us.graymatterapps.dualitylauncher.WallpaperActivity"
             android:action="android.intent.action.SET_WALLPAPER"
             android:data="dual"/>
     </Preference>
@@ -21,8 +21,8 @@
         android:key="wallpaper_wide"
         android:title="Wide Wallpaper"
         android:summary="Set a wide wallpaper across both screens">
-        <intent android:targetPackage="com.graymatterapps.dualitylauncher"
-            android:targetClass="com.graymatterapps.dualitylauncher.WallpaperActivity"
+        <intent android:targetPackage="us.graymatterapps.dualitylauncher"
+            android:targetClass="us.graymatterapps.dualitylauncher.WallpaperActivity"
             android:action="android.intent.action.SET_WALLPAPER"
             android:data="wide"/>
     </Preference>

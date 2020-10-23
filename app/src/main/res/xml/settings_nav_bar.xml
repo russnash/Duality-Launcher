@@ -1,6 +1,6 @@
 <PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:android="http://schemas.android.com/apk/res/android">
-    <com.graymatterapps.dualitylauncher.ColorPreference
+    <us.graymatterapps.dualitylauncher.ColorPreference
         android:defaultValue="-16777216"
         android:key="nav_background"
         android:title="Background color" />

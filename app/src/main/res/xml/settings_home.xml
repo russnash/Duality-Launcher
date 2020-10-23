@@ -34,14 +34,14 @@
             android:key="dock_background"
             android:title="@string/pref_dock_background"
             android:defaultValue="false"/>
-        <com.graymatterapps.dualitylauncher.ColorPreference
+        <us.graymatterapps.dualitylauncher.ColorPreference
             android:defaultValue="-16777216"
             android:key="dock_background_color"
             android:title="@string/pref_dock_background_color" />
         <Preference
             android:title="Dock Search"
             android:summary="Display a custom search widget in the dock"
-            app:fragment="com.graymatterapps.dualitylauncher.SettingsDockSearch" />
+            app:fragment="us.graymatterapps.dualitylauncher.SettingsDockSearch" />
 
     </PreferenceCategory>
 
@@ -74,18 +74,29 @@
             android:key="linked_viewpager"
             android:summary="Links the home page carousels on the main and dual screens so that they page in sequence with one another"
             android:title="Linked carousels" />
-        <com.graymatterapps.dualitylauncher.ColorPreference
+        <us.graymatterapps.dualitylauncher.ColorPreference
             android:key="home_widget_color"
             android:title="Widget color"
             android:defaultValue="-1" />
-        <com.graymatterapps.dualitylauncher.ColorPreference
+        <us.graymatterapps.dualitylauncher.ColorPreference
             android:key="home_text_color"
             android:title="Text color"
             android:defaultValue="-1" />
-        <com.graymatterapps.dualitylauncher.ColorPreference
+        <us.graymatterapps.dualitylauncher.ColorPreference
             android:key="home_text_shadow_color"
             android:title="Text shadow color"
             android:defaultValue="-16777216" />
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:title="Widgets">
+
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="free_form_widgets"
+            android:summary="Enables free form (non-grid) positioning for widgets"
+            android:title="Free form positioning" />
+
     </PreferenceCategory>
 
 </PreferenceScreen>

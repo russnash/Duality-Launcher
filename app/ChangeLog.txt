@@ -1,7 +1,24 @@
-Version ?
+Version 2020.10.23.1-internal
 Changes:
+- Decreased padding around icons to allow for larger icons in the dock.
 
 Bug fixes:
+- Clicking a blank icon on the dock no longer generates an error toast.
+- Empty dock icons are now much easier to drag a new icon to.
+- Fixed empty folder names reverting back to 'New Folder'.
+
+Version 2020.10.18.2-internal
+Changes:
+- Changed namespace to match my owned domain.
+- Added long click context menu to widgets.
+- Reduced the distance an icon needs to be pulled before dragging is started.
+- Added 'Launch on other display' to icon context menus.
+- Added scrolling to folders that were larger than the screen.
+
+Bug fixes:
+- Fixed a bug where removing an icon from the dock using the menu caused a crash.
+- Fixed a bug where removing an icon from a folder using the menu did not work.
+- Dual display page now defaults to first if linked carousel is off.
 
 Version 2020.10.14.1-internal
 Changes:

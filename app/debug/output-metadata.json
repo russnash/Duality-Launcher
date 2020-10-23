@@ -4,7 +4,7 @@
     "type": "APK",
     "kind": "Directory"
   },
-  "applicationId": "com.graymatterapps.dualitylauncher",
+  "applicationId": "us.graymatterapps.dualitylauncher",
   "variantName": "debug",
   "elements": [
     {

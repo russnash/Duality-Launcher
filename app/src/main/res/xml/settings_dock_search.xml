@@ -19,7 +19,7 @@
         android:key="dock_search_provider"
         android:title="Search provider"
         app:useSimpleSummaryProvider="true" />
-    <com.graymatterapps.dualitylauncher.ColorPreference
+    <us.graymatterapps.dualitylauncher.ColorPreference
         android:defaultValue="-16777216"
         android:key="dock_search_color"
         android:title="@string/dock_search_color" />

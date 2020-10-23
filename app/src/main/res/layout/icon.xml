@@ -12,7 +12,7 @@
         android:layout_height="wrap_content"
         android:layout_centerVertical="true"
         android:adjustViewBounds="true"
-        android:padding="10dp"
+        android:padding="5dp"
         android:scaleType="fitStart" />
 
     <TextView
