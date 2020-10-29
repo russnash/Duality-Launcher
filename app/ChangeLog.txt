@@ -1,3 +1,12 @@
+Version 2020.10.29.1-internal
+Changes:
+- Initial build of Dual Launch feature is now live. Dual Launches can only be created / stored on the home screen (not in folders yet). To create a dual launch, drag an icon to the home screen, bring up the long-click menu and select 'Create dual launch'.  To modify the dual launch, long-click and select 'Edit dual launch'.
+- Enabled auto correct and capitalization for folder names.
+
+Bugs:
+- Over sensitive long press rectified.
+- Dock search provider now correctly defaults to Google in settings.
+
 Version 2020.10.23.1-internal
 Changes:
 - Decreased padding around icons to allow for larger icons in the dock.

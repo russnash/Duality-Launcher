@@ -78,7 +78,6 @@ class Folder(
             var clipData = ClipData.newPlainText("launchInfo", id)
             listener.onDragStarted(this, clipData)
             convertToEmpty()
-            //listener.onFolderChanged()
             true
         }
     }

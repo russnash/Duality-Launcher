@@ -27,6 +27,7 @@ import android.view.animation.Animation
 import android.view.animation.AnimationUtils
 import android.widget.ArrayAdapter
 import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.TableRow
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
@@ -35,9 +36,11 @@ import androidx.core.view.ViewCompat.startDragAndDrop
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.viewpager2.widget.ViewPager2
-import us.graymatterapps.dualitylauncher.R
 import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.android.synthetic.main.dual_launch.*
+import kotlinx.android.synthetic.main.dual_launch.view.*
 import kotlinx.android.synthetic.main.folder.view.*
+import kotlinx.android.synthetic.main.home_dual_launch.*
 import kotlinx.android.synthetic.main.home_folder.*
 import kotlinx.android.synthetic.main.home_screen_menu.*
 import kotlinx.serialization.encodeToString
@@ -52,6 +55,7 @@ const val CONFIGURE_WIDGET = 2
 const val WIDE_SCREENSHOT = 3
 const val UNINSTALL = 4
 var isFolderOpen = false
+var isDualLaunchOpen = false
 lateinit var generalContext: Context
 var dragWidgetBitmap: Bitmap? = null
 
@@ -121,6 +125,7 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
         setupHomeMenu()
         showHomeMenu(false)
         showHomeFolder(false)
+        showHomeDualLaunch(false)
 
         displayManager.registerDisplayListener(object : DisplayManager.DisplayListener {
             override fun onDisplayAdded(p0: Int) {
@@ -349,6 +354,15 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
                     child.getLaunchInfo()
                 )
             }
+            if(homeIconsTable.getChildAt(n) is DualLaunch) {
+                val child = homeIconsTable.getChildAt(n) as DualLaunch
+                val childParams = child.layoutParams as HomeLayout.LayoutParams
+                homeIconsGrid.changeLaunchInfo(
+                    childParams.row,
+                    childParams.column,
+                    child.getLaunchInfo()
+                )
+            }
             if (homeIconsTable.getChildAt(n) is WidgetContainer) {
                 val child = homeIconsTable.getChildAt(n) as WidgetContainer
                 val childParams = child.layoutParams as HomeLayout.LayoutParams
@@ -454,6 +468,21 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
         isFolderOpen = state
     }
 
+    fun showHomeDualLaunch(state: Boolean) {
+        if (state) {
+            homeDualLaunch.visibility = View.VISIBLE
+            val animation =
+                AnimationUtils.loadAnimation(this@MainActivity, R.anim.grow_fade_in_center)
+            homeDualLaunch.startAnimation(animation)
+        } else {
+            homeDualLaunch.visibility = View.INVISIBLE
+            val animation =
+                AnimationUtils.loadAnimation(this@MainActivity, R.anim.shrink_fade_out_center)
+            homeDualLaunch.startAnimation(animation)
+        }
+        isDualLaunchOpen = state
+    }
+
     @SuppressLint("NewApi")
     fun isMainDisplay(): Boolean {
         val displays = displayManager.displays
@@ -515,6 +544,10 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
     override fun onBackPressed() {
         if (homeFolder.visibility == View.VISIBLE && !drawerFragment.isVisible) {
             showHomeFolder(false)
+        }
+
+        if (homeDualLaunch.visibility == View.VISIBLE && !drawerFragment.isVisible) {
+            showHomeDualLaunch(false)
         }
 
         if (drawerFragment.isVisible) {
@@ -1000,6 +1033,10 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
         showHomeFolder(state)
     }
 
+    override fun onShowDualLaunch(state: Boolean) {
+        showHomeDualLaunch(state)
+    }
+
     override fun onSetupFolder(apps: ArrayList<LaunchInfo>, name: Editable, folder: Folder) {
         val textColor = settingsPreferences.getInt("folder_text", Color.WHITE)
         val textShadowColor = settingsPreferences.getInt("folder_text_shadow", Color.BLACK)
@@ -1074,6 +1111,71 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
         }
     }
 
+    override fun onSetupDualLaunch(
+        apps: ArrayList<LaunchInfo>,
+        name: Editable,
+        dualLaunch: DualLaunch
+    ) {
+        val textColor = settingsPreferences.getInt("folder_text", Color.WHITE)
+        val textShadowColor = settingsPreferences.getInt("folder_text_shadow", Color.BLACK)
+        dualLaunchName.text = name
+        dualLaunchName.setTextColor(textColor)
+        dualLaunchName.setShadowLayer(6F, 0F, 0F, textShadowColor)
+        dualLaunchWindow.backgroundTintList =
+            ColorStateList.valueOf(settingsPreferences.getInt("folder_background", Color.BLACK))
+
+        val iconParams = LinearLayout.LayoutParams(180, 170)
+        val dualLaunchLeft = Icon(this, null, false, 0)
+        dualLaunchLeft.icon.layoutParams = iconParams
+        dualLaunchLeft.setLaunchInfo(apps[0])
+        dualLaunchLeft.setBlankOnDrag(true)
+        dualLaunchLeft.setDockIcon(true)
+        dualLaunchLeft.setDragTarget(true)
+        dualLaunchLeft.setDualLaunch(true)
+        dualLaunchLeft.label.setTextColor(textColor)
+        dualLaunchLeft.label.setShadowLayer(6F, 0F, 0F, textShadowColor)
+        val dualLaunchRight = Icon(this, null, false, 0)
+        dualLaunchRight.icon.layoutParams = iconParams
+        dualLaunchRight.setLaunchInfo(apps[1])
+        dualLaunchRight.setBlankOnDrag(true)
+        dualLaunchRight.setDockIcon(true)
+        dualLaunchRight.setDragTarget(true)
+        dualLaunchRight.setDualLaunch(true)
+        dualLaunchRight.label.setTextColor(textColor)
+        dualLaunchRight.label.setShadowLayer(6F, 0F, 0F, textShadowColor)
+        dualLaunchIconsLayout.removeAllViews()
+        dualLaunchIconsLayout.addView(dualLaunchLeft)
+        dualLaunchIconsLayout.addView(dualLaunchRight)
+
+        buttonDLOk.setOnClickListener {
+            dualLaunch.addFirstApp(dualLaunchLeft.getLaunchInfo())
+            dualLaunch.addSecondApp(dualLaunchRight.getLaunchInfo())
+            showHomeDualLaunch(false)
+        }
+
+        buttonSwap.setOnClickListener {
+            val launchRight = dualLaunchRight.getLaunchInfo().copy()
+            val launchLeft = dualLaunchLeft.getLaunchInfo().copy()
+            dualLaunch.addFirstApp(launchRight)
+            dualLaunch.addSecondApp(launchLeft)
+            dualLaunchLeft.setLaunchInfo(apps[0])
+            dualLaunchRight.setLaunchInfo(apps[1])
+        }
+
+        homeDualLaunchBackground.setOnClickListener {
+            dualLaunch.addFirstApp(dualLaunchLeft.getLaunchInfo())
+            dualLaunch.addSecondApp(dualLaunchRight.getLaunchInfo())
+            showHomeDualLaunch(false)
+        }
+
+        dualLaunchName.setOnFocusChangeListener { view, hasFocus ->
+            if (!hasFocus) {
+                dualLaunch.setDualLaunchName(dualLaunchName.text.toString())
+                persistGrid(getCurrentHomePagerItem())
+            }
+        }
+    }
+
     override fun onFolderChanged() {
         persistGrid(getCurrentHomePagerItem())
     }
@@ -1119,7 +1221,7 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
     override fun deleteViews(page: Int, row: Int, column: Int) {
         homePagerAdapter.lock.lock()
         val view = frameLayout.findViewWithTag<View>(page)
-        if(view != null) {
+        if (view != null) {
             val homeIconsTable = view.findViewById<HomeLayout>(R.id.homeIconsTable)
             for (i in 0 until homeIconsTable.childCount) {
                 val child = homeIconsTable.getChildAt(i)
@@ -1138,7 +1240,7 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
     override fun addIcon(launchInfo: LaunchInfo, page: Int, row: Int, column: Int) {
         homePagerAdapter.lock.lock()
         val view = frameLayout.findViewWithTag<View>(page)
-        if(view != null) {
+        if (view != null) {
             val homeIconsTable = view.findViewById<HomeLayout>(R.id.homeIconsTable)
             val textColor = settingsPreferences.getInt("home_text_color", Color.WHITE)
             val textShadowColor = settingsPreferences.getInt("home_text_shadow_color", Color.BLACK)
@@ -1221,6 +1323,37 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
         persistGrid(page)
     }
 
+    override fun addDualLaunch(launchInfo: LaunchInfo, page: Int, row: Int, column: Int) {
+        homePagerAdapter.lock.lock()
+        val view = frameLayout.findViewWithTag<View>(page)
+        val homeIconsTable = view.findViewById<HomeLayout>(R.id.homeIconsTable)
+        val textColor = settingsPreferences.getInt("home_text_color", Color.WHITE)
+        val textShadowColor = settingsPreferences.getInt("home_text_shadow_color", Color.BLACK)
+        var dualLaunch = DualLaunch(
+            this,
+            null,
+            launchInfo.getDualLaunchName(),
+            launchInfo,
+            false,
+            page
+        )
+        dualLaunch.setListener(homePagerAdapter)
+        var dualLaunchParams = HomeLayout.LayoutParams(
+            ViewGroup.LayoutParams.WRAP_CONTENT,
+            ViewGroup.LayoutParams.WRAP_CONTENT
+        )
+        dualLaunchParams.row = row
+        dualLaunchParams.column = column
+        dualLaunchParams.rowSpan = 1
+        dualLaunchParams.columnSpan = 1
+        dualLaunch.layoutParams = dualLaunchParams
+        dualLaunch.dualLaunchLabel.setTextColor(textColor)
+        dualLaunch.dualLaunchLabel.setShadowLayer(6F, 0F, 0F, textShadowColor)
+        homeIconsTable.addView(dualLaunch, dualLaunchParams)
+        homePagerAdapter.lock.unlock()
+        persistGrid(page)
+    }
+
     override fun changeFolder(launchInfo: LaunchInfo, page: Int, row: Int, column: Int) {
         homePagerAdapter.lock.lock()
         val view = frameLayout.findViewWithTag<View>(page)
@@ -1228,6 +1361,26 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
         for (i in 0 until homeIconsTable.childCount) {
             if (homeIconsTable.getChildAt(i) is Folder) {
                 val child = homeIconsTable.getChildAt(i) as Folder
+                if (child != null) {
+                    val params = child.layoutParams as HomeLayout.LayoutParams
+                    if (params.row == row && params.column == column) {
+                        child.replicate = false
+                        child.setLaunchInfo(launchInfo)
+                    }
+                }
+            }
+        }
+        homePagerAdapter.lock.unlock()
+        persistGrid(page)
+    }
+
+    override fun changeDualLaunch(launchInfo: LaunchInfo, page: Int, row: Int, column: Int) {
+        homePagerAdapter.lock.lock()
+        val view = frameLayout.findViewWithTag<View>(page)
+        val homeIconsTable = view.findViewById<HomeLayout>(R.id.homeIconsTable)
+        for (i in 0 until homeIconsTable.childCount) {
+            if (homeIconsTable.getChildAt(i) is DualLaunch) {
+                val child = homeIconsTable.getChildAt(i) as DualLaunch
                 if (child != null) {
                     val params = child.layoutParams as HomeLayout.LayoutParams
                     if (params.row == row && params.column == column) {

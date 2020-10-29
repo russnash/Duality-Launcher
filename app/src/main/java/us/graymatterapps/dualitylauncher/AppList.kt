@@ -172,6 +172,34 @@ class AppList(val context: Context) : LauncherApps.Callback() {
         }
     }
 
+    fun launchDualLaunch(parentActivity: MainActivity, launchLeft: LaunchInfo, launchRight: LaunchInfo) {
+        var isDisplayAvailable: Boolean = true
+
+        val displays = parentActivity.displayManager.displays
+        try {
+            displays.get(1)
+        } catch (e: IndexOutOfBoundsException) {
+            isDisplayAvailable = false
+        }
+
+        if(isDisplayAvailable) {
+            if(displays[1].state != 2) {
+                isDisplayAvailable = false
+            }
+        }
+
+        if(isDisplayAvailable) {
+            if(launchLeft.getActivityName() != "") {
+                launchPackage(launchLeft, 1)
+            }
+            if(launchRight.getActivityName() != "") {
+                launchPackage(launchRight, 0)
+            }
+        } else {
+            shortToast(parentActivity, "Dual display is not available")
+        }
+    }
+
     fun getAppShortcuts(packageName: String): List<Shortcut> {
         val shortcutQuery = LauncherApps.ShortcutQuery()
         shortcutQuery.setQueryFlags(LauncherApps.ShortcutQuery.FLAG_MATCH_DYNAMIC or LauncherApps.ShortcutQuery.FLAG_MATCH_MANIFEST or LauncherApps.ShortcutQuery.FLAG_MATCH_PINNED)

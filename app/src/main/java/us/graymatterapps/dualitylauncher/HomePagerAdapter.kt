@@ -8,7 +8,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import us.graymatterapps.graymatterutils.GrayMatterUtils
+import kotlinx.android.synthetic.main.dual_launch.view.*
 import kotlinx.android.synthetic.main.folder.view.*
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
@@ -16,7 +16,7 @@ import java.util.concurrent.locks.ReentrantLock
 
 class HomePagerAdapter(private val parent: MainActivity, private val container: ViewGroup) :
     RecyclerView.Adapter<HomePagerAdapter.HomePagerHolder>(), Icon.IconInterface,
-    Folder.FolderInterface {
+    Folder.FolderInterface, DualLaunch.DualLaunchInterface {
 
     var homeIconsGrid = HomeIconsGrid()
     var homeWidgetsGrid = HomeWidgetsGrid()
@@ -95,7 +95,7 @@ class HomePagerAdapter(private val parent: MainActivity, private val container: 
                 } else {
                     val launchInfo = homeIconsGrid.getLaunchInfo(row, column)
                     if (launchInfo.getType() == LaunchInfo.ICON) {
-                        if(launchInfo.getActivityName() != "") {
+                        if (launchInfo.getActivityName() != "") {
                             var icon = Icon(parent, null, false, position)
                             var iconParams = HomeLayout.LayoutParams(
                                 ViewGroup.LayoutParams.WRAP_CONTENT,
@@ -142,6 +142,29 @@ class HomePagerAdapter(private val parent: MainActivity, private val container: 
                         folder.folderLabel.setTextColor(textColor)
                         folder.folderLabel.setShadowLayer(6F, 0F, 0F, textShadowColor)
                         homeIconsTable.addView(folder, folderParams)
+                    }
+                    if (launchInfo.getType() == LaunchInfo.DUALLAUNCH) {
+                        val dualLaunch = DualLaunch(
+                            parent,
+                            null,
+                            launchInfo.getDualLaunchName(),
+                            launchInfo,
+                            false,
+                            position
+                        )
+                        dualLaunch.setListener(this)
+                        var dualLaunchParams = HomeLayout.LayoutParams(
+                            ViewGroup.LayoutParams.WRAP_CONTENT,
+                            ViewGroup.LayoutParams.WRAP_CONTENT
+                        )
+                        dualLaunchParams.row = row
+                        dualLaunchParams.column = column
+                        dualLaunchParams.rowSpan = 1
+                        dualLaunchParams.columnSpan = 1
+                        dualLaunch.layoutParams = dualLaunchParams
+                        dualLaunch.dualLaunchLabel.setTextColor(textColor)
+                        dualLaunch.dualLaunchLabel.setShadowLayer(6F, 0F, 0F, textShadowColor)
+                        homeIconsTable.addView(dualLaunch, dualLaunchParams)
                     }
                 }
             }
@@ -230,7 +253,9 @@ class HomePagerAdapter(private val parent: MainActivity, private val container: 
         fun onIconChanged()
         fun onLongClick(view: View)
         fun onShowFolder(state: Boolean)
+        fun onShowDualLaunch(state: Boolean)
         fun onSetupFolder(apps: ArrayList<LaunchInfo>, name: Editable, folder: Folder)
+        fun onSetupDualLaunch(apps: ArrayList<LaunchInfo>, name: Editable, dualLaunch: DualLaunch)
         fun onFolderChanged()
         fun resetResize()
         fun onUninstall(launchInfo: LaunchInfo)
@@ -242,5 +267,17 @@ class HomePagerAdapter(private val parent: MainActivity, private val container: 
 
     override fun onSetupFolder(apps: ArrayList<LaunchInfo>, name: Editable, folder: Folder) {
         listener.onSetupFolder(apps, name, folder)
+    }
+
+    override fun onShowDualLaunch(state: Boolean) {
+        listener.onShowDualLaunch(state)
+    }
+
+    override fun onSetupDualLaunch(
+        apps: ArrayList<LaunchInfo>,
+        name: Editable,
+        dualLaunch: DualLaunch
+    ) {
+        listener.onSetupDualLaunch(apps, name, dualLaunch)
     }
 }

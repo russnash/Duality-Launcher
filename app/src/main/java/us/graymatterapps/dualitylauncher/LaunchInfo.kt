@@ -9,7 +9,9 @@ data class LaunchInfo(
     private var userSerial: Long = 0,
     private var type: Int = 0,
     private var folderName: String = "",
-    private var folderUniqueId: Long = 0L
+    private var dualLaunchName: String = "",
+    private var folderUniqueId: Long = 0L,
+    private var dualLaunchUniqueId: Long = 0L
 ) {
     val TAG = javaClass.simpleName
 
@@ -53,6 +55,14 @@ data class LaunchInfo(
         return folderName
     }
 
+    fun setDualLaunchName(name: String) {
+        dualLaunchName = name
+    }
+
+    fun getDualLaunchName(): String {
+        return dualLaunchName
+    }
+
     fun setFolderUniqueId(id: Long) {
         folderUniqueId = id
     }
@@ -61,8 +71,17 @@ data class LaunchInfo(
         return folderUniqueId
     }
 
+    fun setDualLaunchUniqueId(id: Long) {
+        dualLaunchUniqueId = id
+    }
+
+    fun getDualLaunchUniqueId() : Long {
+        return dualLaunchUniqueId
+    }
+
     companion object {
         const val ICON = 0
         const val FOLDER = 1
+        const val DUALLAUNCH = 2
     }
 }

@@ -1,9 +1,7 @@
 package us.graymatterapps.dualitylauncher
 
 import android.content.ClipData
-import android.graphics.Bitmap
 import android.graphics.Color
-import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.ColorDrawable
 import android.util.AttributeSet
 import android.util.Log
@@ -13,7 +11,7 @@ import android.view.View
 import android.view.animation.AnimationUtils
 import android.widget.*
 import androidx.core.graphics.ColorUtils
-import androidx.core.graphics.drawable.toBitmap
+import kotlinx.android.synthetic.main.dual_launch.view.*
 import us.graymatterapps.graymatterutils.GrayMatterUtils
 
 class Icon(
@@ -57,6 +55,7 @@ class Icon(
     private var dragTarget = true
     private var blankOnDrag = false
     private var isDockIcon = false
+    private var isDualLaunch = false
     private val touchSlop = 7
     private val longClickTime = android.view.ViewConfiguration.getLongPressTimeout()
     private val enteredColor = ColorUtils.setAlphaComponent(Color.GREEN, 20)
@@ -171,7 +170,9 @@ class Icon(
             Log.d(TAG, "onTouchEvent() ${MotionEvent.actionToString(event.action)}")
             if(downTime > 0 && System.currentTimeMillis() - downTime > longClickTime) {
                 downTime = 0
-                showPopupMenu()
+                if(!isDualLaunch) {
+                    showPopupMenu()
+                }
             }
             when(event.action) {
                 MotionEvent.ACTION_DOWN -> {
@@ -180,7 +181,9 @@ class Icon(
                 }
                 MotionEvent.ACTION_UP -> {
                     if( System.currentTimeMillis() - downTime < longClickTime) {
-                        launch()
+                        if(!isDualLaunch) {
+                            launch()
+                        }
                     }
                     downTime = 0
                     return true
@@ -196,8 +199,12 @@ class Icon(
                             )
                             Log.d(TAG, "distance = $distance, touchSlop = $touchSlop")
                             if (distance > touchSlop) {
+                                downTime = 0
                                 menu.dismiss()
                                 startDragging()
+                            }
+                            if(distance > 2) {
+                                downTime = 0
                             }
                         }
                     }
@@ -248,6 +255,15 @@ class Icon(
                     parentActivity.displayId
                 )
                 true
+            }
+
+            if(::parentLayout.isInitialized) {
+                val menuItemCreateDL = menu.menu.add(1, 5, 1, "Create dual launch")
+                menuItemCreateDL.setIcon(R.drawable.ic_dual_launch)
+                menuItemCreateDL.setOnMenuItemClickListener {
+                    convertToDualLaunch()
+                    true
+                }
             }
 
             val shortcuts = appList.getAppShortcuts(launchInfo.getPackageName())
@@ -332,6 +348,9 @@ class Icon(
                     params.column
                 )
             }
+        } else {
+            icon.setImageDrawable(ColorDrawable(Color.TRANSPARENT))
+            label.text = ""
         }
         if (isDockIcon) {
             parentActivity.dock.persistDock()
@@ -400,8 +419,16 @@ class Icon(
         blankOnDrag = state
     }
 
+    fun setDragTarget(state: Boolean) {
+        dragTarget = state
+    }
+
     fun setDockIcon(state: Boolean) {
         isDockIcon = state
+    }
+
+    fun setDualLaunch(state: Boolean) {
+        isDualLaunch = state
     }
 
     fun convertToFolder(info: LaunchInfo) {
@@ -425,6 +452,22 @@ class Icon(
         folder.setListener(parentActivity.homePagerAdapter as Folder.FolderInterface)
         replicator.deleteViews(parentActivity.displayId, page, params.row, params.column)
         parentLayout.addView(folder)
+        parentLayout.removeView(this)
+        parentActivity.persistGrid(page)
+    }
+
+    fun convertToDualLaunch() {
+        val dualLaunch = DualLaunch(parentActivity, null, "New Dual Launch", null, true, page)
+        dualLaunch.addFirstApp(getLaunchInfo())
+        val params = this.layoutParams as HomeLayout.LayoutParams
+        dualLaunch.layoutParams = params
+        dualLaunch.setListener(parentActivity.homePagerAdapter as DualLaunch.DualLaunchInterface)
+        val textColor = settingsPreferences.getInt("folder_text", Color.WHITE)
+        val textShadowColor = settingsPreferences.getInt("folder_text_shadow", Color.BLACK)
+        dualLaunch.dualLaunchLabel.setTextColor(textColor)
+        dualLaunch.dualLaunchLabel.setShadowLayer(6F, 0F, 0F, textShadowColor)
+        replicator.deleteViews(parentActivity.displayId, page, params.row, params.column)
+        parentLayout.addView(dualLaunch)
         parentLayout.removeView(this)
         parentActivity.persistGrid(page)
     }

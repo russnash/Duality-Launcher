@@ -64,6 +64,26 @@ class HomeIconsGrid {
         longArrayOf(0, 0, 0, 0, 0, 0, 0, 0),
         longArrayOf(0, 0, 0, 0, 0, 0, 0, 0)
     )
+    var dualLaunchNames = arrayOf(
+        arrayOf("", "", "", "", "", "", "", ""),
+        arrayOf("", "", "", "", "", "", "", ""),
+        arrayOf("", "", "", "", "", "", "", ""),
+        arrayOf("", "", "", "", "", "", "", ""),
+        arrayOf("", "", "", "", "", "", "", ""),
+        arrayOf("", "", "", "", "", "", "", ""),
+        arrayOf("", "", "", "", "", "", "", ""),
+        arrayOf("", "", "", "", "", "", "", "")
+    )
+    var dualLaunchUniqueIds = arrayOf(
+        longArrayOf(0, 0, 0, 0, 0, 0, 0, 0),
+        longArrayOf(0, 0, 0, 0, 0, 0, 0, 0),
+        longArrayOf(0, 0, 0, 0, 0, 0, 0, 0),
+        longArrayOf(0, 0, 0, 0, 0, 0, 0, 0),
+        longArrayOf(0, 0, 0, 0, 0, 0, 0, 0),
+        longArrayOf(0, 0, 0, 0, 0, 0, 0, 0),
+        longArrayOf(0, 0, 0, 0, 0, 0, 0, 0),
+        longArrayOf(0, 0, 0, 0, 0, 0, 0, 0)
+    )
     val TAG = javaClass.simpleName
 
     fun changeLaunchInfo(row: Int, column: Int, launchInfo: LaunchInfo) {
@@ -73,6 +93,8 @@ class HomeIconsGrid {
         types[row][column] = launchInfo.getType()
         folderNames[row][column] = launchInfo.getFolderName()
         folderUniqueIds[row][column] = launchInfo.getFolderUniqueId()
+        dualLaunchNames[row][column] = launchInfo.getDualLaunchName()
+        dualLaunchUniqueIds[row][column] = launchInfo.getDualLaunchUniqueId()
     }
 
     fun getLaunchInfo(row: Int, column: Int): LaunchInfo {
@@ -83,6 +105,8 @@ class HomeIconsGrid {
         launchInfo.setType(types[row][column])
         launchInfo.setFolderName(folderNames[row][column])
         launchInfo.setFolderUniqueId(folderUniqueIds[row][column])
+        launchInfo.setDualLaunchName(dualLaunchNames[row][column])
+        launchInfo.setDualLaunchUniqueId(dualLaunchUniqueIds[row][column])
         return launchInfo
     }
 }

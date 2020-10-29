@@ -70,6 +70,24 @@ class Replicator {
         }
     }
 
+    fun addDualLaunch(displayId: Int, launchInfo: LaunchInfo, page: Int, row: Int, column: Int) {
+        participants.forEach{
+            if(it.displayId != displayId) {
+                Log.d(TAG, "addDualLaunch() to display:${it.displayId} page:$page")
+                it.listener.addDualLaunch(launchInfo, page, row, column)
+            }
+        }
+    }
+
+    fun changeDualLaunch(displayId: Int, launchInfo: LaunchInfo, page: Int, row: Int, column: Int) {
+        participants.forEach {
+            if(it.displayId != displayId) {
+                Log.d(TAG, "changeDualLaunch() on display:${it.displayId} page:$page")
+                it.listener.changeDualLaunch(launchInfo, page, row, column)
+            }
+        }
+    }
+
     fun deleteViews(displayId: Int, page: Int, row: Int, column: Int){
         participants.forEach {
             if(it.displayId != displayId) {
@@ -90,5 +108,7 @@ class Replicator {
         fun changeIcon(launchInfo: LaunchInfo, page: Int, row: Int, column: Int)
         fun addFolder(launchInfo: LaunchInfo, page: Int, row: Int, column: Int)
         fun changeFolder(launchInfo: LaunchInfo, page: Int, row: Int, column: Int)
+        fun addDualLaunch(launchInfo: LaunchInfo, page: Int, row: Int, column: Int)
+        fun changeDualLaunch(launchInfo: LaunchInfo, page: Int, row: Int, column: Int)
     }
 }
