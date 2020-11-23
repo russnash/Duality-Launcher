@@ -5,7 +5,7 @@
         android:title="Overall theme">
         <Preference
             android:key="full_screen_mode"
-            android:title="Full Screen Mode"
+            android:title="Full screen mode"
             android:summary="Sets the status and navigation bars to fully transparent"/>
         <Preference
             android:key="auto_color"
@@ -102,17 +102,13 @@
             android:key="home_text_shadow_color"
             android:title="Text shadow color"
             android:defaultValue="-16777216" />
-    </PreferenceCategory>
-
-    <PreferenceCategory
-        android:title="Widgets">
-
-        <CheckBoxPreference
-            android:defaultValue="false"
-            android:key="free_form_widgets"
-            android:summary="Enables free form (non-grid) positioning for widgets"
-            android:title="Free form positioning" />
-
+        <SeekBarPreference
+            android:defaultValue="14"
+            android:key="home_text_size"
+            android:max="30"
+            app:min="5"
+            android:title="Text size"
+            app:showSeekBarValue="true"/>
     </PreferenceCategory>
 
 </PreferenceScreen>

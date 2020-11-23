@@ -12,6 +12,20 @@
         android:defaultValue="-16777216"
         android:key="app_drawer_text_shadow"
         android:title="@string/pref_app_drawer_text_shadow" />
+    <SeekBarPreference
+        android:defaultValue="14"
+        android:key="drawer_text_size"
+        android:max="30"
+        app:min="5"
+        android:title="Text size"
+        app:showSeekBarValue="true"/>
+    <SeekBarPreference
+        android:defaultValue="6"
+        android:key="app_drawer_columns"
+        android:max="8"
+        app:min="4"
+        android:title="Number of columns"
+        app:showSeekBarValue="true"/>
     <CheckBoxPreference
         android:defaultValue="true"
         android:key="app_drawer_nav_status_sync"

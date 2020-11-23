@@ -29,6 +29,7 @@ class FolderAdapter(var parentActivity: MainActivity, var apps: ArrayList<Launch
 
     override fun getView(position: Int, view: View?, viewGroup: ViewGroup?): View {
         val iconPadding = settingsPreferences.getInt("folder_icon_padding", 5)
+        val textSize = settingsPreferences.getInt("folder_text_size", 14)
         val icon = Icon(parentActivity, null, false, 0)
         icon.setLaunchInfo(apps[position])
         icon.setDockIcon(true)
@@ -37,6 +38,7 @@ class FolderAdapter(var parentActivity: MainActivity, var apps: ArrayList<Launch
         val textShadowColor = settingsPreferences.getInt("folder_text_shadow", Color.BLACK)
         icon.label.setTextColor(textColor)
         icon.label.setShadowLayer(6F, 0F, 0F, textShadowColor)
+        icon.label.textSize = textSize.toFloat()
         icon.setPadding(iconPadding, iconPadding, iconPadding, 25)
         return icon
     }

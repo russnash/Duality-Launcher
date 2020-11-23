@@ -13,6 +13,7 @@ import android.widget.*
 import androidx.core.graphics.ColorUtils
 import androidx.core.view.setPadding
 import kotlinx.android.synthetic.main.dual_launch.view.*
+import kotlinx.android.synthetic.main.folder.view.*
 import us.graymatterapps.graymatterutils.GrayMatterUtils
 
 class Icon(
@@ -455,6 +456,9 @@ class Icon(
     }
 
     fun convertToFolder(info: LaunchInfo) {
+        val textColor = settingsPreferences.getInt("home_text_color", Color.WHITE)
+        val textShadowColor = settingsPreferences.getInt("home_text_shadow_color", Color.BLACK)
+        val textSize = settingsPreferences.getInt("home_text_size", 14)
         var folder: Folder
         val params = this.layoutParams as HomeLayout.LayoutParams
         if (info.getType() == LaunchInfo.ICON) {
@@ -472,6 +476,9 @@ class Icon(
             folder = Folder(parentActivity, null, info.getFolderName(), info, true, page)
         }
         folder.layoutParams = params
+        folder.folderLabel.setTextColor(textColor)
+        folder.folderLabel.setShadowLayer(6F, 0F, 0F, textShadowColor)
+        folder.folderLabel.textSize = textSize.toFloat()
         folder.setListener(parentActivity.homePagerAdapter as Folder.FolderInterface)
         replicator.deleteViews(parentActivity.displayId, page, params.row, params.column)
         parentLayout.addView(folder)

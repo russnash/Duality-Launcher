@@ -461,6 +461,7 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
                 AnimationUtils.loadAnimation(this@MainActivity, R.anim.grow_fade_in_center)
             homeFolder.startAnimation(animation)
         } else {
+            gestureLayout.setDialogOpen(false)
             homeFolder.visibility = View.INVISIBLE
             val animation =
                 AnimationUtils.loadAnimation(this@MainActivity, R.anim.shrink_fade_out_center)
@@ -476,6 +477,7 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
                 AnimationUtils.loadAnimation(this@MainActivity, R.anim.grow_fade_in_center)
             homeDualLaunch.startAnimation(animation)
         } else {
+            gestureLayout.setDialogOpen(false)
             homeDualLaunch.visibility = View.INVISIBLE
             val animation =
                 AnimationUtils.loadAnimation(this@MainActivity, R.anim.shrink_fade_out_center)
@@ -711,6 +713,11 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
                 homePagerAdapter.notifyDataSetChanged()
                 homePagerAdapter.lock.unlock()
             }
+            if (key == "home_text_size") {
+                homePagerAdapter.lock.lock()
+                homePagerAdapter.notifyDataSetChanged()
+                homePagerAdapter.lock.unlock()
+            }
             if (key == "widget_info") {
                 showWidgets()
             }
@@ -743,15 +750,12 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
 
     fun showDrawerFragment() {
         dock.clearSearchFocus()
-        gestureLayout.setDrawerOpen(true)
         supportFragmentManager
             .beginTransaction()
             .replace(R.id.fragmentFrame, drawerFragment, "drawer")
             .commitNowAllowingStateLoss()
         val animation = AnimationUtils.loadAnimation(this@MainActivity, R.anim.drawer_slide_up)
         fragmentFrame.startAnimation(animation)
-        //val animation2 = AnimationUtils.loadAnimation(this@MainActivity, R.anim.home_slide_up)
-        //gestureLayout.startAnimation(animation2)
         var color = settingsPreferences.getInt(
             "app_drawer_background",
             Color.BLACK
@@ -775,6 +779,7 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
     override fun onSwipeUp() {
         if (!drawerFragment.isVisible) {
             showDrawerFragment()
+            gestureLayout.setDrawerOpen(true)
         }
     }
 
@@ -1052,6 +1057,7 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
     }
 
     override fun onSetupFolder(apps: ArrayList<LaunchInfo>, name: Editable, folder: Folder) {
+        gestureLayout.setDialogOpen(true)
         val textColor = settingsPreferences.getInt("folder_text", Color.WHITE)
         val textShadowColor = settingsPreferences.getInt("folder_text_shadow", Color.BLACK)
         folderName.text = name
@@ -1071,8 +1077,12 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
         folderAdapter.notifyDataSetChanged()
 
         homeFolderBackground.setOnClickListener {
-            showHomeFolder(false)
-            folder.verifyApps()
+            if (drawerFragment.isVisible) {
+                // Do nothing
+            } else {
+                showHomeFolder(false)
+                folder.verifyApps()
+            }
         }
 
         folderName.setOnFocusChangeListener { view, hasFocus ->
@@ -1130,6 +1140,7 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
         name: Editable,
         dualLaunch: DualLaunch
     ) {
+        gestureLayout.setDialogOpen(true)
         val textColor = settingsPreferences.getInt("folder_text", Color.WHITE)
         val textShadowColor = settingsPreferences.getInt("folder_text_shadow", Color.BLACK)
         dualLaunchName.text = name
@@ -1177,9 +1188,13 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
         }
 
         homeDualLaunchBackground.setOnClickListener {
-            dualLaunch.addFirstApp(dualLaunchLeft.getLaunchInfo())
-            dualLaunch.addSecondApp(dualLaunchRight.getLaunchInfo())
-            showHomeDualLaunch(false)
+            if (drawerFragment.isVisible) {
+                // Do nothing
+            } else {
+                dualLaunch.addFirstApp(dualLaunchLeft.getLaunchInfo())
+                dualLaunch.addSecondApp(dualLaunchRight.getLaunchInfo())
+                showHomeDualLaunch(false)
+            }
         }
 
         dualLaunchName.setOnFocusChangeListener { view, hasFocus ->

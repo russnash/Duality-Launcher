@@ -9,6 +9,7 @@ import android.view.DragEvent
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import kotlinx.android.synthetic.main.folder.view.*
 import kotlin.math.floor
 
 class HomeLayout(context: Context, attributeSet: AttributeSet?) : ViewGroup(
@@ -78,6 +79,7 @@ class HomeLayout(context: Context, attributeSet: AttributeSet?) : ViewGroup(
                             if (info.getType() == LaunchInfo.ICON) {
                                 val textColor = settingsPreferences.getInt("home_text_color", Color.WHITE)
                                 val textShadowColor = settingsPreferences.getInt("home_text_shadow_color", Color.BLACK)
+                                val textSize = settingsPreferences.getInt("home_text_size", 14)
                                 val icon = Icon(parentActivity, null, true, page)
                                 val params = dragImage.layoutParams as HomeLayout.LayoutParams
                                 params.columnSpan = 1
@@ -87,11 +89,16 @@ class HomeLayout(context: Context, attributeSet: AttributeSet?) : ViewGroup(
                                 icon.label.maxLines = 1
                                 icon.label.setTextColor(textColor)
                                 icon.label.setShadowLayer(6F, 0F, 0F, textShadowColor)
+                                icon.label.textSize = textSize.toFloat()
                                 icon.setListener(parentActivity.homePagerAdapter as Icon.IconInterface)
                                 icon.setLaunchInfo(info)
                                 this.addView(icon, params)
                             }
                             if (info.getType() == LaunchInfo.FOLDER) {
+                                val textColor = settingsPreferences.getInt("home_text_color", Color.WHITE)
+                                val textShadowColor = settingsPreferences.getInt("home_text_shadow_color", Color.BLACK)
+                                val textSize = settingsPreferences.getInt("home_text_size", 14)
+                                val icon = Icon(parentActivity, null, true, page)
                                 val folder = Folder(
                                     parentActivity,
                                     null,
@@ -105,6 +112,9 @@ class HomeLayout(context: Context, attributeSet: AttributeSet?) : ViewGroup(
                                 params.rowSpan = 1
                                 params.freeForm = false
                                 folder.layoutParams = params
+                                folder.folderLabel.setTextColor(textColor)
+                                folder.folderLabel.setShadowLayer(6F, 0F, 0F, textShadowColor)
+                                folder.folderLabel.textSize = textSize.toFloat()
                                 folder.setListener(parentActivity.homePagerAdapter as Folder.FolderInterface)
                                 this.addView(folder, params)
                             }

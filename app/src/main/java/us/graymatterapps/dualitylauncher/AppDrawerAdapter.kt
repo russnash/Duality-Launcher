@@ -66,6 +66,7 @@ class AppDrawerAdapter(
 
     override fun onBindViewHolder(holder: AppDrawerHolder, position: Int) {
         val iconPadding = settingsPreferences.getInt("drawer_icon_padding", 5)
+        val textSize = settingsPreferences.getInt("drawer_text_size", 14)
         val icon = holder.itemView as Icon
         icon.page = position
         icon.label.setTextColor(
@@ -82,6 +83,7 @@ class AppDrawerAdapter(
             filteredList[position].userSerial
         )
         icon.setPadding(iconPadding, iconPadding, iconPadding, iconPadding)
+        icon.label.textSize = textSize.toFloat()
         icon.setListener(this)
     }
 

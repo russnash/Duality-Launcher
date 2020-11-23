@@ -37,10 +37,11 @@ class DrawerFragment() : Fragment(), SharedPreferences.OnSharedPreferenceChangeL
         super.onViewCreated(view, savedInstanceState)
 
         parent = activity as MainActivity
+        val drawerColumns = settingsPreferences.getInt("app_drawer_columns", 6)
         gridLayoutManager = if(GrayMatterUtils.isLandscape(parent)){
-            GridLayoutManager(context?.applicationContext, 12)
+            GridLayoutManager(context?.applicationContext, drawerColumns * 2)
         } else {
-            GridLayoutManager(context?.applicationContext, 6)
+            GridLayoutManager(context?.applicationContext, drawerColumns)
         }
 
         drawer.layoutManager = gridLayoutManager

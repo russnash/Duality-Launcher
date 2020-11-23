@@ -13,6 +13,13 @@
         android:key="folder_text_shadow"
         android:title="Text shadow color" />
     <SeekBarPreference
+        android:defaultValue="14"
+        android:key="folder_text_size"
+        android:max="30"
+        app:min="5"
+        android:title="Text size"
+        app:showSeekBarValue="true"/>
+    <SeekBarPreference
         android:defaultValue="5"
         android:key="folder_icon_padding"
         android:max="20"
