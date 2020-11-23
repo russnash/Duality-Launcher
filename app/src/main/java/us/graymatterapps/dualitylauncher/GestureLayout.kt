@@ -10,13 +10,13 @@ import androidx.constraintlayout.widget.ConstraintLayout
 class GestureLayout(context: Context, attributeSet: AttributeSet): ConstraintLayout(context, attributeSet) {
 
     lateinit var listener: GestureEvents
-    private var areGesturesOn: Boolean = false
+    private var gesturesOn: Boolean = false
+    private var drawerOpen: Boolean = false
     private val touchSlop: Int = android.view.ViewConfiguration.get(context).scaledTouchSlop
     val TAG = javaClass.simpleName
 
     override fun onInterceptTouchEvent(event: MotionEvent?): Boolean {
-        //Log.d(TAG, "areGesturesOn:$areGesturesOn")
-        if(areGesturesOn) {
+        if(gesturesOn) {
             if (event != null) {
                 when (event.action) {
                     MotionEvent.ACTION_CANCEL, MotionEvent.ACTION_UP -> {
@@ -37,11 +37,11 @@ class GestureLayout(context: Context, attributeSet: AttributeSet): ConstraintLay
                             }
                             if(swipeUpDistance > touchSlop) {
                                 listener.onSwipeUp()
-                                return true
+                                return !drawerOpen
                             }
                             if(swipeDownDistance > touchSlop) {
                                 listener.onSwipeDown()
-                                return true
+                                return !drawerOpen
                             }
                         }
                         return false
@@ -68,6 +68,10 @@ class GestureLayout(context: Context, attributeSet: AttributeSet): ConstraintLay
     }
 
     fun setGesturesOn(state: Boolean){
-        areGesturesOn = state
+        gesturesOn = state
+    }
+
+    fun setDrawerOpen(state: Boolean){
+        drawerOpen = state
     }
 }

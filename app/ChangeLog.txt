@@ -1,3 +1,18 @@
+Version 2020.11.22.1-internal
+Changes:
+- Padding (icon size) now adjustable for dock, home grid, folders and app drawer.
+
+Bugs:
+- Fixed a potential resource conflict crash when filtering the app drawer.
+
+Version 2020.11.18.1-internal
+Changes:
+- App drawer can now be closed by swiping down at the top of the list.
+- Work apps can now be manually designated from the icon long-click menu.
+
+Bugs:
+- Widgets that don't provide a preview now use their default icon in the widget chooser.
+
 Version 2020.10.29.1-internal
 Changes:
 - Initial build of Dual Launch feature is now live. Dual Launches can only be created / stored on the home screen (not in folders yet). To create a dual launch, drag an icon to the home screen, bring up the long-click menu and select 'Create dual launch'.  To modify the dual launch, long-click and select 'Edit dual launch'.

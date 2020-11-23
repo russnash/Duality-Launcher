@@ -7,6 +7,7 @@ import android.graphics.Color
 import android.util.Log
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.setPadding
 import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.RecyclerView
 import us.graymatterapps.graymatterutils.GrayMatterUtils.colorPrefToColor
@@ -28,13 +29,17 @@ class AppDrawerAdapter(
     fun filterWork(work: Boolean) {
         val currentUser = android.os.Process.myUserHandle()
 
+        appList.lock.lock()
+
         if (work) {
             filteredList =
-                apps.filter { it.handle != currentUser } as MutableList<AppList.AppListDataType>
+                apps.filter { it.handle != currentUser || appList.isManualWorkApp(LaunchInfo(it.activityName, it.packageName, it.userSerial))} as MutableList<AppList.AppListDataType>
         } else {
             filteredList =
-                apps.filter { it.handle.equals(currentUser) } as MutableList<AppList.AppListDataType>
+                apps.filter { it.handle.equals(currentUser) && !appList.isManualWorkApp(LaunchInfo(it.activityName, it.packageName, it.userSerial)) } as MutableList<AppList.AppListDataType>
         }
+
+        appList.lock.unlock()
 
         filteredWork = work
     }
@@ -60,6 +65,7 @@ class AppDrawerAdapter(
     }
 
     override fun onBindViewHolder(holder: AppDrawerHolder, position: Int) {
+        val iconPadding = settingsPreferences.getInt("drawer_icon_padding", 5)
         val icon = holder.itemView as Icon
         icon.page = position
         icon.label.setTextColor(
@@ -75,6 +81,7 @@ class AppDrawerAdapter(
             filteredList[position].packageName,
             filteredList[position].userSerial
         )
+        icon.setPadding(iconPadding, iconPadding, iconPadding, iconPadding)
         icon.setListener(this)
     }
 
@@ -115,5 +122,10 @@ class AppDrawerAdapter(
 
     override fun onRemoveFromFolder(launchInfo: LaunchInfo) {
         // Do nothing
+    }
+
+    override fun onReloadAppDrawer() {
+        filterWork(filteredWork)
+        this.notifyDataSetChanged()
     }
 }

@@ -11,6 +11,7 @@ import android.view.View
 import android.view.animation.AnimationUtils
 import android.widget.*
 import androidx.core.graphics.ColorUtils
+import androidx.core.view.setPadding
 import kotlinx.android.synthetic.main.dual_launch.view.*
 import us.graymatterapps.graymatterutils.GrayMatterUtils
 
@@ -63,6 +64,7 @@ class Icon(
     private lateinit var menu: PopupMenu
     private var isPopupMenuVisible: Boolean = false
     private var downTime: Long = 0
+    private var padding: Int = 5
     val TAG = javaClass.simpleName
 
     init {
@@ -266,6 +268,22 @@ class Icon(
                 }
             }
 
+            var itemText = "Set as work app"
+            if(appList.isManualWorkApp(launchInfo)) {
+                itemText = "Set as non-work app"
+            }
+            val menuItemManualWorkApp = menu.menu.add(1, 6, 1, itemText)
+            menuItemManualWorkApp.setIcon(R.drawable.ic_work)
+            menuItemManualWorkApp.setOnMenuItemClickListener {
+                if(appList.isManualWorkApp(launchInfo)) {
+                    appList.desetAsManualWorkApp(launchInfo)
+                } else {
+                    appList.setAsManualWorkApp(launchInfo)
+                }
+                listener.onReloadAppDrawer()
+                true
+            }
+
             val shortcuts = appList.getAppShortcuts(launchInfo.getPackageName())
             var menuItemID: Int = 100
             if (shortcuts.isNotEmpty()) {
@@ -415,6 +433,11 @@ class Icon(
         return launchInfo
     }
 
+    fun setPadding(padSize: Int) {
+        padding = padSize
+        icon.setPadding(padding)
+    }
+
     fun setBlankOnDrag(state: Boolean) {
         blankOnDrag = state
     }
@@ -496,5 +519,6 @@ class Icon(
         fun resetResize()
         fun onUninstall(launchInfo: LaunchInfo)
         fun onRemoveFromFolder(launchInfo: LaunchInfo)
+        fun onReloadAppDrawer()
     }
 }

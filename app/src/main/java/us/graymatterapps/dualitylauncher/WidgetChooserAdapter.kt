@@ -32,8 +32,14 @@ class WidgetChooserAdapter(
         val preview = rowView.findViewById<ImageView>(R.id.widgetPreview)
         val description = rowView.findViewById<TextView>(R.id.widgetDescription)
         val textColor = settingsPreferences.getInt("app_drawer_text", Color.WHITE)
-        icon.setImageDrawable(widgets[position].loadIcon(context, -1))
-        preview.setImageDrawable(widgets[position].loadPreviewImage(context, -1))
+        val iconImage = widgets[position].loadIcon(context, -1)
+        icon.setImageDrawable(iconImage)
+        val previewImage = widgets[position].loadPreviewImage(context, -1)
+        if(previewImage == null) {
+            preview.setImageDrawable(iconImage)
+        } else {
+            preview.setImageDrawable(previewImage)
+        }
         description.text = widgets[position].loadLabel(context.packageManager)
         description.setTextColor(textColor)
         preview.setOnLongClickListener {

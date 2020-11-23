@@ -17,4 +17,12 @@
         android:key="app_drawer_nav_status_sync"
         android:summary="Synchronize navigation and status bar backgrounds with the app drawer background when open."
         android:title="Sync bars with drawer when open" />
+    <SeekBarPreference
+        android:defaultValue="5"
+        android:key="drawer_icon_padding"
+        android:max="20"
+        app:min="0"
+        android:title="Icon padding"
+        android:summary="Adjusts icon padding to change the size of the icons"
+        app:showSeekBarValue="true"/>
 </PreferenceScreen>

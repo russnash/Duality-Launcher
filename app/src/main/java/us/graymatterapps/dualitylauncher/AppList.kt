@@ -13,6 +13,9 @@ import android.os.Process
 import android.os.UserHandle
 import android.os.UserManager
 import androidx.core.content.ContextCompat
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 import us.graymatterapps.graymatterutils.GrayMatterUtils.longToast
 import us.graymatterapps.graymatterutils.GrayMatterUtils.shortToast
 import java.util.*
@@ -21,6 +24,7 @@ import kotlin.collections.ArrayList
 
 class AppList(val context: Context) : LauncherApps.Callback() {
     val apps: ArrayList<AppListDataType> = ArrayList()
+    var manualWorkApps: ArrayList<LaunchInfo> = ArrayList()
     var ready: Boolean = false
     val lock = ReentrantLock()
     var launcherApps: LauncherApps =
@@ -30,6 +34,7 @@ class AppList(val context: Context) : LauncherApps.Callback() {
 
     init {
         updateApps()
+        depersist()
         launcherApps.registerCallback(this)
     }
 
@@ -37,6 +42,34 @@ class AppList(val context: Context) : LauncherApps.Callback() {
         while (!ready) {
             Thread.sleep(100)
         }
+    }
+
+    fun depersist() {
+        var loadItJson = prefs.getString("manualWorkApps", "")
+        if(loadItJson != "") {
+            manualWorkApps = loadItJson?.let { Json.decodeFromString(it)}!!
+        }
+    }
+
+    fun persist() {
+        var saveItJson = Json.encodeToString(manualWorkApps)
+        val editor = prefs.edit()
+        editor.putString("manualWorkApps", saveItJson)
+        editor.apply()
+    }
+
+    fun isManualWorkApp(info: LaunchInfo) : Boolean {
+        return manualWorkApps.contains(info)
+    }
+
+    fun setAsManualWorkApp(info: LaunchInfo) {
+        manualWorkApps.add(info)
+        persist()
+    }
+
+    fun desetAsManualWorkApp(info: LaunchInfo) {
+        manualWorkApps.remove(info)
+        persist()
     }
 
     fun updateApps() {

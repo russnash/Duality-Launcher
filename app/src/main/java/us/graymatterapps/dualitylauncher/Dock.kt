@@ -11,6 +11,7 @@ import android.widget.LinearLayout
 import android.widget.TableLayout
 import android.widget.TableRow
 import androidx.core.graphics.ColorUtils
+import androidx.core.view.setPadding
 import androidx.preference.PreferenceManager
 import us.graymatterapps.graymatterutils.GrayMatterUtils.colorPrefToColor
 import kotlinx.serialization.decodeFromString
@@ -66,6 +67,7 @@ class Dock(val parentActivity: MainActivity, attrs: AttributeSet?) : LinearLayou
     fun populateDock() {
         val totalItemsString = settingsPreferences.getString("dock_icons", "6")
         val totalItems = Integer.parseInt(totalItemsString.toString())
+        val dockIconPadding = settingsPreferences.getInt("dock_icon_padding", 5)
         dockRow.removeAllViews()
 
         if (totalItems != null) {
@@ -87,6 +89,7 @@ class Dock(val parentActivity: MainActivity, attrs: AttributeSet?) : LinearLayou
                 dockIcon.setListener(this)
                 dockIcon.setBlankOnDrag(true)
                 dockIcon.setDockIcon(true)
+                dockIcon.icon.setPadding(dockIconPadding, dockIconPadding, dockIconPadding, dockIconPadding)
                 dockRow.addView(dockIcon)
             }
         }
@@ -128,6 +131,14 @@ class Dock(val parentActivity: MainActivity, attrs: AttributeSet?) : LinearLayou
         }
     }
 
+    fun adjustPadding() {
+        val dockIconPadding = settingsPreferences.getInt("dock_icon_padding", 5)
+        for (n in 0 until dockRow.childCount) {
+            val dockIcon = dockRow.getChildAt(n) as Icon
+            dockIcon.setPadding(dockIconPadding, dockIconPadding, dockIconPadding, dockIconPadding)
+        }
+    }
+
     override fun onSharedPreferenceChanged(sharedPrefences: SharedPreferences?, key: String?) {
         if (key == "dockItems") {
             depersistDock()
@@ -166,6 +177,10 @@ class Dock(val parentActivity: MainActivity, attrs: AttributeSet?) : LinearLayou
         if(key == "dock_search_color") {
             setupDockSearch()
         }
+
+        if(key == "dock_icon_padding") {
+            adjustPadding()
+        }
     }
 
     fun setListener(mainActivity: MainActivity) {
@@ -198,6 +213,10 @@ class Dock(val parentActivity: MainActivity, attrs: AttributeSet?) : LinearLayou
     }
 
     override fun onRemoveFromFolder(launchInfo: LaunchInfo) {
+        // Do nothing
+    }
+
+    override fun onReloadAppDrawer() {
         // Do nothing
     }
 

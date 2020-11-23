@@ -9,14 +9,14 @@
             android:summary="Sets the status and navigation bars to fully transparent"/>
         <Preference
             android:key="auto_color"
-            android:title="Automatic Color Scheme"
+            android:title="Automatic color scheme"
             android:summary="Automatically sets Dock, Dock Search, Folder and App Drawer colors to the wallpapers primary color" />
         <SeekBarPreference
             android:defaultValue="200"
             android:key="auto_color_alpha"
             android:max="255"
             android:summary="Alpha value to use when setting automatic colors"
-            android:title="Automatic Color Alpha"
+            android:title="Automatic color alpha"
             app:min="0"
             app:showSeekBarValue="true" />
     </PreferenceCategory>
@@ -30,6 +30,14 @@
             android:entries="@array/values_5_to_8"
             android:entryValues="@array/values_5_to_8"
             android:defaultValue="6"/>
+        <SeekBarPreference
+            android:defaultValue="5"
+            android:key="dock_icon_padding"
+            android:max="20"
+            app:min="0"
+            android:title="Icon padding"
+            android:summary="Adjusts icon padding to change the size of the icons"
+            app:showSeekBarValue="true"/>
         <CheckBoxPreference
             android:key="dock_background"
             android:title="@string/pref_dock_background"
@@ -69,6 +77,14 @@
             android:entries="@array/values_5_to_8"
             android:entryValues="@array/values_5_to_8"
             android:defaultValue="7"/>
+        <SeekBarPreference
+            android:defaultValue="5"
+            android:key="home_icon_padding"
+            android:max="20"
+            app:min="0"
+            android:title="Icon padding"
+            android:summary="Adjusts icon padding to change the size of the icons"
+            app:showSeekBarValue="true"/>
         <CheckBoxPreference
             android:defaultValue="false"
             android:key="linked_viewpager"

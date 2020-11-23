@@ -40,6 +40,7 @@ import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.dual_launch.*
 import kotlinx.android.synthetic.main.dual_launch.view.*
 import kotlinx.android.synthetic.main.folder.view.*
+import kotlinx.android.synthetic.main.fragment_drawer.*
 import kotlinx.android.synthetic.main.home_dual_launch.*
 import kotlinx.android.synthetic.main.home_folder.*
 import kotlinx.android.synthetic.main.home_screen_menu.*
@@ -354,7 +355,7 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
                     child.getLaunchInfo()
                 )
             }
-            if(homeIconsTable.getChildAt(n) is DualLaunch) {
+            if (homeIconsTable.getChildAt(n) is DualLaunch) {
                 val child = homeIconsTable.getChildAt(n) as DualLaunch
                 val childParams = child.layoutParams as HomeLayout.LayoutParams
                 homeIconsGrid.changeLaunchInfo(
@@ -533,7 +534,7 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
     }
 
     fun closeAppDrawer() {
-        gestureLayout.setGesturesOn(true)
+        gestureLayout.setDrawerOpen(false)
         val animation = AnimationUtils.loadAnimation(this@MainActivity, R.anim.drawer_slide_down)
         animation.setAnimationListener(this)
         fragmentFrame.startAnimation(animation)
@@ -705,6 +706,11 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
                 homePagerAdapter.notifyDataSetChanged()
                 homePagerAdapter.lock.unlock()
             }
+            if (key == "home_icon_padding") {
+                homePagerAdapter.lock.lock()
+                homePagerAdapter.notifyDataSetChanged()
+                homePagerAdapter.lock.unlock()
+            }
             if (key == "widget_info") {
                 showWidgets()
             }
@@ -737,7 +743,7 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
 
     fun showDrawerFragment() {
         dock.clearSearchFocus()
-        gestureLayout.setGesturesOn(false)
+        gestureLayout.setDrawerOpen(true)
         supportFragmentManager
             .beginTransaction()
             .replace(R.id.fragmentFrame, drawerFragment, "drawer")
@@ -767,15 +773,23 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
     }
 
     override fun onSwipeUp() {
-        showDrawerFragment()
+        if (!drawerFragment.isVisible) {
+            showDrawerFragment()
+        }
     }
 
     @SuppressLint("WrongConstant")
     override fun onSwipeDown() {
-        val statusBarService = getSystemService("statusbar")
-        val statusBarManager = Class.forName("android.app.StatusBarManager")
-        val expand = statusBarManager.getMethod("expandNotificationsPanel")
-        expand.invoke(statusBarService)
+        if (drawerFragment.isVisible) {
+            if (drawerFragment.gridLayoutManager.findFirstVisibleItemPosition() == 0) {
+                closeAppDrawer()
+            }
+        } else {
+            val statusBarService = getSystemService("statusbar")
+            val statusBarManager = Class.forName("android.app.StatusBarManager")
+            val expand = statusBarManager.getMethod("expandNotificationsPanel")
+            expand.invoke(statusBarService)
+        }
     }
 
     fun setWideMode() {
