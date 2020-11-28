@@ -1125,7 +1125,7 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
                         if (dragEvent.clipDescription.label.toString().equals("launchInfo")) {
                             val id = dragEvent.clipData.getItemAt(0).text.toString()
                             val info = dragAndDropData.retrieveLaunchInfo(id)
-                            folder.addFolderApp(info)
+                            folder.addFolderItem(info)
                             folderAdapter.notifyDataSetChanged()
                         }
                     }

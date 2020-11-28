@@ -45,6 +45,7 @@ class Folder(
 
     init {
         prefs.registerOnSharedPreferenceChangeListener(this)
+        settingsPreferences.registerOnSharedPreferenceChangeListener(this)
 
         inflate(parentActivity, R.layout.folder, this)
         folderLayout = findViewById(R.id.folderLayout)
@@ -103,7 +104,7 @@ class Folder(
         appList.lock.lock()
         val tempApps = ArrayList<LaunchInfo>()
         folderApps.forEach {
-            if(appList.isAppInstalled(it)) {
+            if (appList.isAppInstalled(it)) {
                 tempApps.add(it)
             }
         }
@@ -152,7 +153,10 @@ class Folder(
                                 val id = dragEvent.clipData.getItemAt(0).text.toString()
                                 val info = dragAndDropData.retrieveLaunchInfo(id)
                                 if (info.getType() == LaunchInfo.ICON) {
-                                    addFolderApp(info)
+                                    addFolderItem(info)
+                                }
+                                if (info.getType() == LaunchInfo.DUALLAUNCH) {
+                                    addFolderItem(info)
                                 }
                             }
                         }
@@ -171,26 +175,126 @@ class Folder(
         var canvas = Canvas(bitmap!!)
         canvas.drawRect(0F, 0F, canvas.width.toFloat(), canvas.height.toFloat(), clearPaint)
 
-        var firstBitmap =
-            ContextCompat.getDrawable(parentActivity, R.drawable.ic_folder)!!.toBitmap()
-        if (folderApps.size != 0) {
-            firstBitmap = appList.getIcon(folderApps[0]).toBitmap()
+        // Background
+        var backDrawable: Drawable? = null
+        var skip: Boolean = false
+        when (settingsPreferences.getString("folder_icon_background", "None")) {
+            "Square" -> backDrawable =
+                ContextCompat.getDrawable(parentActivity, R.drawable.square_background)
+            "Rounded Square" -> backDrawable =
+                ContextCompat.getDrawable(parentActivity, R.drawable.rounded_square_background)
+            "Circle" -> backDrawable =
+                ContextCompat.getDrawable(parentActivity, R.drawable.circle_background)
+            "Shelf" -> backDrawable =
+                ContextCompat.getDrawable(parentActivity, R.drawable.shelf_background)
+            else -> skip = true
         }
-        var srcRect: Rect = Rect(0, 0, firstBitmap.width, firstBitmap.height)
-        var dstRect: Rect = Rect(
-            0, 0, (canvas.width * 0.66).toInt(),
-            (canvas.height * 0.66).toInt()
-        )
-        canvas.drawBitmap(firstBitmap, srcRect, dstRect, null)
+        if (!skip) {
+            if (backDrawable != null) {
+                backDrawable.setTint(
+                    settingsPreferences.getInt(
+                        "folder_icon_background_color",
+                        Color.BLACK
+                    )
+                )
+                var backBitmap = Bitmap.createBitmap(
+                    backDrawable.intrinsicWidth,
+                    backDrawable.intrinsicHeight,
+                    Bitmap.Config.ARGB_8888
+                )
+                backDrawable.setBounds(0, 0, canvas.width, canvas.height)
+                backDrawable.draw(canvas)
+            }
+        }
 
-        var secondBitmap =
-            ContextCompat.getDrawable(parentActivity, R.drawable.ic_folder)!!.toBitmap()
-        if (folderApps.size != 0) {
-            secondBitmap = appList.getIcon(folderApps[folderApps.size - 1]).toBitmap()
+        if (settingsPreferences.getString(
+                "folder_icon_preview",
+                "First and Last"
+            ) == "First and Last"
+        ) {
+            // First icon
+            var firstBitmap =
+                ContextCompat.getDrawable(parentActivity, R.drawable.ic_folder)!!.toBitmap()
+            if (folderApps.size != 0) {
+                firstBitmap = appList.getIcon(folderApps[0]).toBitmap()
+            }
+            var srcRect: Rect = Rect(0, 0, firstBitmap.width, firstBitmap.height)
+            var dstRect: Rect = Rect(
+                0, 0, (canvas.width * 0.66).toInt(),
+                (canvas.height * 0.66).toInt()
+            )
+            canvas.drawBitmap(firstBitmap, srcRect, dstRect, null)
+
+            // Last icon
+            var secondBitmap =
+                ContextCompat.getDrawable(parentActivity, R.drawable.ic_folder)!!.toBitmap()
+            if (folderApps.size != 0) {
+                secondBitmap = appList.getIcon(folderApps[folderApps.size - 1]).toBitmap()
+            }
+            srcRect = Rect(0, 0, secondBitmap.width, secondBitmap.height)
+            dstRect = Rect(canvas.width / 3, canvas.height / 3, canvas.width, canvas.height)
+            canvas.drawBitmap(secondBitmap, srcRect, dstRect, null)
+        } else {
+            // First icon
+            var firstBitmap =
+                ContextCompat.getDrawable(parentActivity, R.drawable.ic_folder)!!.toBitmap()
+            if (folderApps.size != 0) {
+                firstBitmap = appList.getIcon(folderApps[0]).toBitmap()
+            }
+            var srcRect: Rect = Rect(0, 0, firstBitmap.width, firstBitmap.height)
+            var dstRect: Rect = Rect(
+                0,
+                0,
+                (canvas.width * 0.5).toInt(),
+                (canvas.height * 0.5).toInt()
+            )
+            canvas.drawBitmap(firstBitmap, srcRect, dstRect, null)
+
+            // Second icon
+            var secondBitmap =
+                ContextCompat.getDrawable(parentActivity, R.drawable.ic_folder)!!.toBitmap()
+            if (folderApps.size >= 2) {
+                secondBitmap = appList.getIcon(folderApps[1]).toBitmap()
+            }
+            srcRect = Rect(0, 0, secondBitmap.width, secondBitmap.height)
+            dstRect = Rect(
+                (canvas.width * 0.5).toInt(),
+                0,
+                canvas.width,
+                (canvas.height * 0.5).toInt()
+            )
+            canvas.drawBitmap(secondBitmap, srcRect, dstRect, null)
+
+            // Third icon
+            var thirdBitmap =
+                ContextCompat.getDrawable(parentActivity, R.drawable.ic_folder)!!.toBitmap()
+            if (folderApps.size >= 3) {
+                thirdBitmap = appList.getIcon(folderApps[2]).toBitmap()
+            }
+            srcRect = Rect(0, 0, thirdBitmap.width, thirdBitmap.height)
+            dstRect = Rect(
+                0,
+                (canvas.height * 0.5).toInt(),
+                (canvas.width * 0.5).toInt(),
+                canvas.height
+            )
+            canvas.drawBitmap(thirdBitmap, srcRect, dstRect, null)
+
+            // Fourth icon
+            var fourthBitmap =
+                ContextCompat.getDrawable(parentActivity, R.drawable.ic_folder)!!.toBitmap()
+            if (folderApps.size >= 4) {
+                fourthBitmap = appList.getIcon(folderApps[3]).toBitmap()
+            }
+            srcRect = Rect(0, 0, fourthBitmap.width, fourthBitmap.height)
+            dstRect = Rect(
+                (canvas.width * 0.5).toInt(),
+                (canvas.height * 0.5).toInt(),
+                canvas.width,
+                canvas.height
+            )
+            canvas.drawBitmap(fourthBitmap, srcRect, dstRect, null)
         }
-        srcRect = Rect(0, 0, secondBitmap.width, secondBitmap.height)
-        dstRect = Rect(canvas.width / 3, canvas.height / 3, canvas.width, canvas.height)
-        canvas.drawBitmap(secondBitmap, srcRect, dstRect, null)
 
         return bitmap
     }
@@ -218,6 +322,10 @@ class Folder(
         }
         folderApps.clear()
         folderApps.addAll(tempFolderApps)
+        folderIcon.setImageBitmap(makeFolderIcon())
+    }
+
+    private fun updateIcon() {
         folderIcon.setImageBitmap(makeFolderIcon())
     }
 
@@ -251,7 +359,7 @@ class Folder(
         return launchInfo
     }
 
-    fun addFolderApp(info: LaunchInfo) {
+    fun addFolderItem(info: LaunchInfo) {
         if (!folderApps.contains(info)) {
             folderApps.add(info)
             folderApps.sortBy { appList.getLabel(it).toLowerCase() }
@@ -293,6 +401,15 @@ class Folder(
         if (key != null) {
             if (key == "folder" + launchInfo.getFolderUniqueId()) {
                 depersistFolderApps()
+            }
+            if (key == "folder_icon_background") {
+                updateIcon()
+            }
+            if (key == "folder_icon_background_color") {
+                updateIcon()
+            }
+            if (key == "folder_icon_preview") {
+                updateIcon()
             }
         }
     }

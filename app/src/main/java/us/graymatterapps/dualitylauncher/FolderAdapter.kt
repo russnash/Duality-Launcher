@@ -7,6 +7,7 @@ import android.graphics.Color
 import android.view.View
 import android.view.ViewGroup
 import android.widget.BaseAdapter
+import kotlinx.android.synthetic.main.dual_launch.view.*
 
 class FolderAdapter(var parentActivity: MainActivity, var apps: ArrayList<LaunchInfo>, val folder: Folder) : BaseAdapter(), Icon.IconInterface, SharedPreferences.OnSharedPreferenceChangeListener{
     private lateinit var listener: FolderAdapterInterface
@@ -30,17 +31,29 @@ class FolderAdapter(var parentActivity: MainActivity, var apps: ArrayList<Launch
     override fun getView(position: Int, view: View?, viewGroup: ViewGroup?): View {
         val iconPadding = settingsPreferences.getInt("folder_icon_padding", 5)
         val textSize = settingsPreferences.getInt("folder_text_size", 14)
-        val icon = Icon(parentActivity, null, false, 0)
-        icon.setLaunchInfo(apps[position])
-        icon.setDockIcon(true)
-        icon.setListener(this)
         val textColor = settingsPreferences.getInt("folder_text", Color.WHITE)
         val textShadowColor = settingsPreferences.getInt("folder_text_shadow", Color.BLACK)
-        icon.label.setTextColor(textColor)
-        icon.label.setShadowLayer(6F, 0F, 0F, textShadowColor)
-        icon.label.textSize = textSize.toFloat()
-        icon.setPadding(iconPadding, iconPadding, iconPadding, 25)
-        return icon
+        val info = apps[position]
+        if(info.getType() == LaunchInfo.ICON) {
+            val icon = Icon(parentActivity, null, false, 0)
+            icon.setLaunchInfo(info)
+            icon.setDockIcon(true)
+            icon.setListener(this)
+            icon.label.setTextColor(textColor)
+            icon.label.setShadowLayer(6F, 0F, 0F, textShadowColor)
+            icon.label.textSize = textSize.toFloat()
+            icon.setPadding(iconPadding, iconPadding, iconPadding, 25)
+            return icon
+        }
+        if(info.getType() == LaunchInfo.DUALLAUNCH) {
+            val dualLaunch = DualLaunch(parentActivity, null, info.getDualLaunchName(), info, false, 0)
+            dualLaunch.dualLaunchLabel.setTextColor(textColor)
+            dualLaunch.dualLaunchLabel.setShadowLayer(6F, 0F, 0F, textShadowColor)
+            dualLaunch.dualLaunchLabel.textSize = textSize.toFloat()
+            dualLaunch.setPadding(iconPadding, iconPadding, iconPadding, 25)
+            return dualLaunch
+        }
+        return View(parentActivity, null)
     }
 
     override fun onDragStarted(view: View, clipData: ClipData) {

@@ -9,6 +9,7 @@ import android.view.DragEvent
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import kotlinx.android.synthetic.main.dual_launch.view.*
 import kotlinx.android.synthetic.main.folder.view.*
 import kotlin.math.floor
 
@@ -93,6 +94,23 @@ class HomeLayout(context: Context, attributeSet: AttributeSet?) : ViewGroup(
                                 icon.setListener(parentActivity.homePagerAdapter as Icon.IconInterface)
                                 icon.setLaunchInfo(info)
                                 this.addView(icon, params)
+                            }
+                            if(info.getType() == LaunchInfo.DUALLAUNCH){
+                                val textColor = settingsPreferences.getInt("home_text_color", Color.WHITE)
+                                val textShadowColor = settingsPreferences.getInt("home_text_shadow_color", Color.BLACK)
+                                val textSize = settingsPreferences.getInt("home_text_size", 14)
+                                val dualLaunch = DualLaunch(parentActivity, null, info.getDualLaunchName(), info, true, page)
+                                val params = dragImage.layoutParams as HomeLayout.LayoutParams
+                                params.columnSpan = 1
+                                params.rowSpan = 1
+                                params.freeForm = false
+                                dualLaunch.layoutParams = params
+                                dualLaunch.dualLaunchLabel.maxLines = 1
+                                dualLaunch.dualLaunchLabel.setTextColor(textColor)
+                                dualLaunch.dualLaunchLabel.setShadowLayer(6F, 0F, 0F, textShadowColor)
+                                dualLaunch.dualLaunchLabel.textSize = textSize.toFloat()
+                                dualLaunch.setListener(parentActivity.homePagerAdapter as DualLaunch.DualLaunchInterface)
+                                this.addView(dualLaunch, params)
                             }
                             if (info.getType() == LaunchInfo.FOLDER) {
                                 val textColor = settingsPreferences.getInt("home_text_color", Color.WHITE)

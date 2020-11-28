@@ -27,4 +27,22 @@
         android:title="Icon padding"
         android:summary="Adjusts icon padding to change the size of the icons"
         app:showSeekBarValue="true"/>
+    <ListPreference
+        android:key="folder_icon_background"
+        android:title="Folder icon background"
+        app:useSimpleSummaryProvider="true"
+        android:entries="@array/folder_icon_backgrounds"
+        android:entryValues="@array/folder_icon_backgrounds"
+        android:defaultValue="None"/>
+    <us.graymatterapps.dualitylauncher.ColorPreference
+        android:defaultValue="-16777216"
+        android:key="folder_icon_background_color"
+        android:title="Folder icon background color" />
+    <ListPreference
+        android:key="folder_icon_preview"
+        android:title="Folder icon preview"
+        app:useSimpleSummaryProvider="true"
+        android:entries="@array/folder_icon_preview"
+        android:entryValues="@array/folder_icon_preview"
+        android:defaultValue="First and Last"/>
 </PreferenceScreen>

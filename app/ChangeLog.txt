@@ -1,3 +1,13 @@
+Version 2020.11.28.1-internal
+Changes:
+- Removed support for SDK 28 (Android 9 Pie) as SECONDARY_HOME intent is not supported.
+- Added basic support for customizable folder icon backgrounds.
+- Added option for a 'four icon' preview in the folder icon.
+
+Bugs:
+- Moving a dual launch does not lose it to the void.
+- Fixed folder and dual launch icon sizing issue, now matches regular icons.
+
 Version 2020.11.23.1-internal
 Changes:
 - Font size now adjustable for home grid, folders and app drawer.

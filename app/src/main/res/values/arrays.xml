@@ -45,4 +45,17 @@
         <item>prefs</item>
         <item>settingsPreferences</item>
     </string-array>
+
+    <string-array name="folder_icon_backgrounds">
+        <item>None</item>
+        <item>Square</item>
+        <item>Rounded Square</item>
+        <item>Circle</item>
+        <item>Shelf</item>
+    </string-array>
+
+    <string-array name="folder_icon_preview">
+        <item>First and Last</item>
+        <item>First four</item>
+    </string-array>
 </resources>

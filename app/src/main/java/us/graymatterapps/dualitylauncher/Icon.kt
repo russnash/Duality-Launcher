@@ -470,8 +470,8 @@ class Icon(
                 true,
                 page
             )
-            folder.addFolderApp(launchInfo)
-            folder.addFolderApp(info)
+            folder.addFolderItem(launchInfo)
+            folder.addFolderItem(info)
         } else {
             folder = Folder(parentActivity, null, info.getFolderName(), info, true, page)
         }
