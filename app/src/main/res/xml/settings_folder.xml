@@ -3,22 +3,26 @@
     <us.graymatterapps.dualitylauncher.ColorPreference
         android:defaultValue="-16777216"
         android:key="folder_background"
-        android:title="Background color" />
+        android:title="Background color"
+        app:icon="@drawable/ic_color"/>
     <us.graymatterapps.dualitylauncher.ColorPreference
         android:defaultValue="-1"
         android:key="folder_text"
-        android:title="Text color" />
+        android:title="Text color"
+        app:icon="@drawable/ic_color"/>
     <us.graymatterapps.dualitylauncher.ColorPreference
         android:defaultValue="-16777216"
         android:key="folder_text_shadow"
-        android:title="Text shadow color" />
+        android:title="Text shadow color"
+        app:icon="@drawable/ic_color"/>
     <SeekBarPreference
         android:defaultValue="14"
         android:key="folder_text_size"
         android:max="30"
         app:min="5"
         android:title="Text size"
-        app:showSeekBarValue="true"/>
+        app:showSeekBarValue="true"
+        app:icon="@drawable/ic_text_size"/>
     <SeekBarPreference
         android:defaultValue="5"
         android:key="folder_icon_padding"
@@ -26,23 +30,27 @@
         app:min="0"
         android:title="Icon padding"
         android:summary="Adjusts icon padding to change the size of the icons"
-        app:showSeekBarValue="true"/>
+        app:showSeekBarValue="true"
+        app:icon="@drawable/ic_padding"/>
     <ListPreference
         android:key="folder_icon_background"
         android:title="Folder icon background"
         app:useSimpleSummaryProvider="true"
         android:entries="@array/folder_icon_backgrounds"
         android:entryValues="@array/folder_icon_backgrounds"
-        android:defaultValue="None"/>
+        android:defaultValue="None"
+        app:icon="@drawable/ic_background"/>
     <us.graymatterapps.dualitylauncher.ColorPreference
         android:defaultValue="-16777216"
         android:key="folder_icon_background_color"
-        android:title="Folder icon background color" />
+        android:title="Folder icon background color"
+        app:icon="@drawable/ic_color"/>
     <ListPreference
         android:key="folder_icon_preview"
         android:title="Folder icon preview"
         app:useSimpleSummaryProvider="true"
         android:entries="@array/folder_icon_preview"
         android:entryValues="@array/folder_icon_preview"
-        android:defaultValue="First and Last"/>
+        android:defaultValue="First and Last"
+        app:icon="@drawable/ic_preview"/>
 </PreferenceScreen>

@@ -3,34 +3,40 @@
     <us.graymatterapps.dualitylauncher.ColorPreference
         android:defaultValue="-16777216"
         android:key="app_drawer_background"
-        android:title="@string/pref_app_drawer_background" />
+        android:title="@string/pref_app_drawer_background"
+        app:icon="@drawable/ic_color"/>
     <us.graymatterapps.dualitylauncher.ColorPreference
         android:defaultValue="-1"
         android:key="app_drawer_text"
-        android:title="@string/pref_app_drawer_text" />
+        android:title="@string/pref_app_drawer_text"
+        app:icon="@drawable/ic_color"/>
     <us.graymatterapps.dualitylauncher.ColorPreference
         android:defaultValue="-16777216"
         android:key="app_drawer_text_shadow"
-        android:title="@string/pref_app_drawer_text_shadow" />
+        android:title="@string/pref_app_drawer_text_shadow"
+        app:icon="@drawable/ic_color"/>
     <SeekBarPreference
         android:defaultValue="14"
         android:key="drawer_text_size"
         android:max="30"
         app:min="5"
         android:title="Text size"
-        app:showSeekBarValue="true"/>
+        app:showSeekBarValue="true"
+        app:icon="@drawable/ic_text_size"/>
     <SeekBarPreference
         android:defaultValue="6"
         android:key="app_drawer_columns"
         android:max="8"
         app:min="4"
         android:title="Number of columns"
-        app:showSeekBarValue="true"/>
+        app:showSeekBarValue="true"
+        app:icon="@drawable/ic_column"/>
     <CheckBoxPreference
         android:defaultValue="true"
         android:key="app_drawer_nav_status_sync"
         android:summary="Synchronize navigation and status bar backgrounds with the app drawer background when open."
-        android:title="Sync bars with drawer when open" />
+        android:title="Sync bars with drawer when open"
+        app:icon="@drawable/ic_sync"/>
     <SeekBarPreference
         android:defaultValue="5"
         android:key="drawer_icon_padding"
@@ -38,5 +44,6 @@
         app:min="0"
         android:title="Icon padding"
         android:summary="Adjusts icon padding to change the size of the icons"
-        app:showSeekBarValue="true"/>
+        app:showSeekBarValue="true"
+        app:icon="@drawable/ic_padding"/>
 </PreferenceScreen>

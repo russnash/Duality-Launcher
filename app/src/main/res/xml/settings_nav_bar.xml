@@ -3,5 +3,6 @@
     <us.graymatterapps.dualitylauncher.ColorPreference
         android:defaultValue="-16777216"
         android:key="nav_background"
-        android:title="Background color" />
+        android:title="Background color"
+        app:icon="@drawable/ic_color"/>
 </PreferenceScreen>

@@ -1,3 +1,11 @@
+Version 2020.11.29.1-internal
+Changes:
+- Updated settings menus with new theme and icons.
+- Dock search now supports either searching from the dock or directly from Google.
+- Dock search icons and text can now be custom colored.
+- Reduced duration of drawer open / close animation by 25%.
+- Changed popup menu backgrounds to black.
+
 Version 2020.11.28.1-internal
 Changes:
 - Removed support for SDK 28 (Android 9 Pie) as SECONDARY_HOME intent is not supported.

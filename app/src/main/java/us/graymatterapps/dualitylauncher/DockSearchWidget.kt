@@ -10,6 +10,7 @@ import android.graphics.Color
 import android.net.Uri
 import android.util.AttributeSet
 import android.view.KeyEvent
+import android.view.View
 import android.view.WindowManager
 import android.widget.EditText
 import android.widget.ImageView
@@ -52,6 +53,18 @@ class DockSearchWidget(val con: Context, attributeSet: AttributeSet? = null) :
             true
         }
 
+        setupDockSearchText()
+
+        dockSearchLayout.setOnClickListener {
+            if(settingsPreferences.getString("dock_search_click_action", "Search from dock search") == "Search from Google") {
+                val shortcuts = appList.getAppShortcuts("com.google.android.googlequicksearchbox")
+                val search = shortcuts.find { it.label == "Search" }
+                if (search != null) {
+                    appList.startShortcut(search)
+                }
+            }
+        }
+
         dockSearchIcon.setOnClickListener {
             val launchInfo = LaunchInfo("com.google.android.googlequicksearchbox.SearchActivity", "com.google.android.googlequicksearchbox", 0, LaunchInfo.ICON)
             try {
@@ -74,6 +87,14 @@ class DockSearchWidget(val con: Context, attributeSet: AttributeSet? = null) :
         }
     }
 
+    fun setupDockSearchText() {
+        if(settingsPreferences.getString("dock_search_click_action", "Search from dock search") == "Search from Google") {
+            dockSearchText.visibility = View.INVISIBLE
+        } else {
+            dockSearchText.visibility = View.VISIBLE
+        }
+    }
+
     fun clearSearchFocus() {
         dockSearchText.clearFocus()
     }
@@ -81,6 +102,9 @@ class DockSearchWidget(val con: Context, attributeSet: AttributeSet? = null) :
     private fun setColorScheme() {
         dockSearchLayout.backgroundTintList =
             ColorStateList.valueOf(settingsPreferences.getInt("dock_search_color", Color.BLACK))
+        dockSearchIcon.imageTintList = ColorStateList.valueOf(settingsPreferences.getInt("dock_search_foreground_color", Color.WHITE))
+        dockSpeakIcon.imageTintList = ColorStateList.valueOf(settingsPreferences.getInt("dock_search_foreground_color", Color.WHITE))
+        dockSearchText.backgroundTintList = ColorStateList.valueOf(settingsPreferences.getInt("dock_search_foreground_color", Color.WHITE))
     }
 
     private fun launchSearch(terms: String) {
@@ -130,6 +154,14 @@ class DockSearchWidget(val con: Context, attributeSet: AttributeSet? = null) :
         if (key != null) {
             if (key == "dock_search_color") {
                 setColorScheme()
+            }
+
+            if (key == "dock_search_foreground_color") {
+                setColorScheme()
+            }
+
+            if(key == "dock_search_click_action") {
+                setupDockSearchText()
             }
         }
     }

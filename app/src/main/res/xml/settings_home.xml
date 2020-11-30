@@ -6,11 +6,13 @@
         <Preference
             android:key="full_screen_mode"
             android:title="Full screen mode"
-            android:summary="Sets the status and navigation bars to fully transparent"/>
+            android:summary="Sets the status and navigation bars to fully transparent"
+            app:icon="@drawable/ic_full_screen_mode"/>
         <Preference
             android:key="auto_color"
             android:title="Automatic color scheme"
-            android:summary="Automatically sets Dock, Dock Search, Folder and App Drawer colors to the wallpapers primary color" />
+            android:summary="Automatically sets Dock, Dock Search, Folder and App Drawer colors to the wallpapers primary color"
+            app:icon="@drawable/ic_color"/>
         <SeekBarPreference
             android:defaultValue="200"
             android:key="auto_color_alpha"
@@ -18,7 +20,8 @@
             android:summary="Alpha value to use when setting automatic colors"
             android:title="Automatic color alpha"
             app:min="0"
-            app:showSeekBarValue="true" />
+            app:showSeekBarValue="true"
+            app:icon="@drawable/ic_alpha"/>
     </PreferenceCategory>
     <PreferenceCategory
         android:title="Dock">
@@ -29,7 +32,8 @@
             app:useSimpleSummaryProvider="true"
             android:entries="@array/values_5_to_8"
             android:entryValues="@array/values_5_to_8"
-            android:defaultValue="6"/>
+            android:defaultValue="6"
+            app:icon="@drawable/ic_rows"/>
         <SeekBarPreference
             android:defaultValue="5"
             android:key="dock_icon_padding"
@@ -37,19 +41,23 @@
             app:min="0"
             android:title="Icon padding"
             android:summary="Adjusts icon padding to change the size of the icons"
-            app:showSeekBarValue="true"/>
+            app:showSeekBarValue="true"
+            app:icon="@drawable/ic_padding"/>
         <CheckBoxPreference
             android:key="dock_background"
             android:title="@string/pref_dock_background"
-            android:defaultValue="false"/>
+            android:defaultValue="false"
+            app:icon="@drawable/ic_background"/>
         <us.graymatterapps.dualitylauncher.ColorPreference
             android:defaultValue="-16777216"
             android:key="dock_background_color"
-            android:title="@string/pref_dock_background_color" />
+            android:title="@string/pref_dock_background_color"
+            app:icon="@drawable/ic_color"/>
         <Preference
             android:title="Dock Search"
             android:summary="Display a custom search widget in the dock"
-            app:fragment="us.graymatterapps.dualitylauncher.SettingsDockSearch" />
+            app:fragment="us.graymatterapps.dualitylauncher.SettingsDockSearch"
+            app:icon="@drawable/ic_search"/>
 
     </PreferenceCategory>
 
@@ -62,21 +70,24 @@
             app:useSimpleSummaryProvider="true"
             android:entries="@array/values_1_to_5"
             android:entryValues="@array/values_1_to_5"
-            android:defaultValue="1"/>
+            android:defaultValue="1"
+            app:icon="@drawable/ic_pages"/>
         <ListPreference
             android:key="home_grid_columns"
             android:title="Number of columns"
             app:useSimpleSummaryProvider="true"
             android:entries="@array/values_5_to_8"
             android:entryValues="@array/values_5_to_8"
-            android:defaultValue="6"/>
+            android:defaultValue="6"
+            app:icon="@drawable/ic_column"/>
         <ListPreference
             android:key="home_grid_rows"
             android:title="Number of rows"
             app:useSimpleSummaryProvider="true"
             android:entries="@array/values_5_to_8"
             android:entryValues="@array/values_5_to_8"
-            android:defaultValue="7"/>
+            android:defaultValue="7"
+            app:icon="@drawable/ic_rows"/>
         <SeekBarPreference
             android:defaultValue="5"
             android:key="home_icon_padding"
@@ -84,31 +95,37 @@
             app:min="0"
             android:title="Icon padding"
             android:summary="Adjusts icon padding to change the size of the icons"
-            app:showSeekBarValue="true"/>
+            app:showSeekBarValue="true"
+            app:icon="@drawable/ic_padding"/>
         <CheckBoxPreference
             android:defaultValue="false"
             android:key="linked_viewpager"
             android:summary="Links the home page carousels on the main and dual screens so that they page in sequence with one another"
-            android:title="Linked carousels" />
+            android:title="Linked carousels"
+            app:icon="@drawable/ic_link"/>
         <us.graymatterapps.dualitylauncher.ColorPreference
             android:key="home_widget_color"
             android:title="Widget color"
-            android:defaultValue="-1" />
+            android:defaultValue="-1"
+            app:icon="@drawable/ic_color"/>
         <us.graymatterapps.dualitylauncher.ColorPreference
             android:key="home_text_color"
             android:title="Text color"
-            android:defaultValue="-1" />
+            android:defaultValue="-1"
+            app:icon="@drawable/ic_color"/>
         <us.graymatterapps.dualitylauncher.ColorPreference
             android:key="home_text_shadow_color"
             android:title="Text shadow color"
-            android:defaultValue="-16777216" />
+            android:defaultValue="-16777216"
+            app:icon="@drawable/ic_color"/>
         <SeekBarPreference
             android:defaultValue="14"
             android:key="home_text_size"
             android:max="30"
             app:min="5"
             android:title="Text size"
-            app:showSeekBarValue="true"/>
+            app:showSeekBarValue="true"
+            app:icon="@drawable/ic_text_size"/>
     </PreferenceCategory>
 
 </PreferenceScreen>

@@ -58,4 +58,9 @@
         <item>First and Last</item>
         <item>First four</item>
     </string-array>
+
+    <string-array name="dock_search_click_action">
+        <item>Search from dock search</item>
+        <item>Search from Google</item>
+    </string-array>
 </resources>

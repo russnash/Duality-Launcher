@@ -1,8 +1,10 @@
-<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
     <Preference
         android:key="wallpaper_main"
         android:title="Main Screen Wallpaper"
-        android:summary="Set the main screen wallpaper">
+        android:summary="Set the main screen wallpaper"
+        app:icon="@drawable/ic_wallpaper">
         <intent android:targetPackage="us.graymatterapps.dualitylauncher"
             android:targetClass="us.graymatterapps.dualitylauncher.WallpaperActivity"
             android:action="android.intent.action.SET_WALLPAPER"
@@ -11,7 +13,8 @@
     <Preference
         android:key="wallpaper_dual"
         android:title="Dual Screen Wallpaper"
-        android:summary="Set the dual screen wallpaper">
+        android:summary="Set the dual screen wallpaper"
+        app:icon="@drawable/ic_wallpaper">
         <intent android:targetPackage="us.graymatterapps.dualitylauncher"
             android:targetClass="us.graymatterapps.dualitylauncher.WallpaperActivity"
             android:action="android.intent.action.SET_WALLPAPER"
@@ -20,7 +23,8 @@
     <Preference
         android:key="wallpaper_wide"
         android:title="Wide Wallpaper"
-        android:summary="Set a wide wallpaper across both screens">
+        android:summary="Set a wide wallpaper across both screens"
+        app:icon="@drawable/ic_wallpaper">
         <intent android:targetPackage="us.graymatterapps.dualitylauncher"
             android:targetClass="us.graymatterapps.dualitylauncher.WallpaperActivity"
             android:action="android.intent.action.SET_WALLPAPER"
@@ -30,6 +34,6 @@
         android:key="dual_wallpaper_hack"
         android:title="Override dual screen wallpaper"
         android:summary="Show the chosen dual screen wallpaper instead of the OS wallpaper"
-        android:defaultValue="true">
-    </CheckBoxPreference>
+        android:defaultValue="true"
+        app:icon="@drawable/ic_check" />
 </PreferenceScreen>
