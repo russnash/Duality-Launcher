@@ -416,15 +416,13 @@ class Folder(
     fun addFolderItemAtPosition(addInfo: LaunchInfo, posInfo: LaunchInfo) {
         var pos = folderApps.indexOf(posInfo)
         folderApps.add(pos, addInfo)
-        if (settingsPreferences.getBoolean("sort_folders", true)) {
-            folderApps.sortBy { appList.getLabel(it).toLowerCase() }
-        }
+        sortFolder()
         persistFolderApps()
     }
 
     fun removeFolderApp(info: LaunchInfo) {
         folderApps.remove(info)
-        folderApps.sortBy { appList.getLabel(it) }
+        sortFolder()
         persistFolderApps()
         folderIcon.setImageBitmap(makeFolderIcon())
     }
@@ -467,9 +465,7 @@ class Folder(
                 updateIcon()
             }
             if (key == "sort_folders") {
-                if (settingsPreferences.getBoolean("sort_folders", true)) {
-                    folderApps.sortBy { appList.getLabel(it).toLowerCase() }
-                }
+                sortFolder()
                 persistFolderApps()
             }
         }

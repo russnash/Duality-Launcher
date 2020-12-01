@@ -1,3 +1,7 @@
+Version 2020.12.1.2-internal
+Bugs:
+- Folder reverting to sorted after moving icons when sort is disabled.
+
 Version 2020.12.1.1-internal
 Changes:
 - Folder icons can now be sorted either alphabetically or by hand.
