@@ -104,7 +104,11 @@ class Folder(
         appList.lock.lock()
         val tempApps = ArrayList<LaunchInfo>()
         folderApps.forEach {
-            if (appList.isAppInstalled(it)) {
+            if (it.getType() == LaunchInfo.ICON) {
+                if (appList.isAppInstalled(it)) {
+                    tempApps.add(it)
+                }
+            } else {
                 tempApps.add(it)
             }
         }
@@ -216,7 +220,12 @@ class Folder(
             var firstBitmap =
                 ContextCompat.getDrawable(parentActivity, R.drawable.ic_folder)!!.toBitmap()
             if (folderApps.size != 0) {
-                firstBitmap = appList.getIcon(folderApps[0]).toBitmap()
+                if(folderApps[0].getType() == LaunchInfo.ICON) {
+                    firstBitmap = appList.getIcon(folderApps[0]).toBitmap()
+                } else {
+                    val dl = DualLaunch(parentActivity, null, folderApps[0].getDualLaunchName(), folderApps[0], false, 0)
+                    firstBitmap = dl.makeDualLaunchIcon()
+                }
             }
             var srcRect: Rect = Rect(0, 0, firstBitmap.width, firstBitmap.height)
             var dstRect: Rect = Rect(
@@ -229,7 +238,12 @@ class Folder(
             var secondBitmap =
                 ContextCompat.getDrawable(parentActivity, R.drawable.ic_folder)!!.toBitmap()
             if (folderApps.size != 0) {
-                secondBitmap = appList.getIcon(folderApps[folderApps.size - 1]).toBitmap()
+                if(folderApps[folderApps.size -1].getType() == LaunchInfo.ICON) {
+                    secondBitmap = appList.getIcon(folderApps[folderApps.size -1]).toBitmap()
+                } else {
+                    val dl = DualLaunch(parentActivity, null, folderApps[folderApps.size -1].getDualLaunchName(), folderApps[folderApps.size -1], false, 0)
+                    secondBitmap = dl.makeDualLaunchIcon()
+                }
             }
             srcRect = Rect(0, 0, secondBitmap.width, secondBitmap.height)
             dstRect = Rect(canvas.width / 3, canvas.height / 3, canvas.width, canvas.height)
@@ -239,7 +253,12 @@ class Folder(
             var firstBitmap =
                 ContextCompat.getDrawable(parentActivity, R.drawable.ic_folder)!!.toBitmap()
             if (folderApps.size != 0) {
-                firstBitmap = appList.getIcon(folderApps[0]).toBitmap()
+                if(folderApps[0].getType() == LaunchInfo.ICON) {
+                    firstBitmap = appList.getIcon(folderApps[0]).toBitmap()
+                } else {
+                    val dl = DualLaunch(parentActivity, null, folderApps[0].getDualLaunchName(), folderApps[0], false, 0)
+                    firstBitmap = dl.makeDualLaunchIcon()
+                }
             }
             var srcRect: Rect = Rect(0, 0, firstBitmap.width, firstBitmap.height)
             var dstRect: Rect = Rect(
@@ -254,7 +273,12 @@ class Folder(
             var secondBitmap =
                 ContextCompat.getDrawable(parentActivity, R.drawable.ic_folder)!!.toBitmap()
             if (folderApps.size >= 2) {
-                secondBitmap = appList.getIcon(folderApps[1]).toBitmap()
+                if(folderApps[1].getType() == LaunchInfo.ICON) {
+                    secondBitmap = appList.getIcon(folderApps[1]).toBitmap()
+                } else {
+                    val dl = DualLaunch(parentActivity, null, folderApps[1].getDualLaunchName(), folderApps[1], false, 0)
+                    secondBitmap = dl.makeDualLaunchIcon()
+                }
             }
             srcRect = Rect(0, 0, secondBitmap.width, secondBitmap.height)
             dstRect = Rect(
@@ -269,7 +293,12 @@ class Folder(
             var thirdBitmap =
                 ContextCompat.getDrawable(parentActivity, R.drawable.ic_folder)!!.toBitmap()
             if (folderApps.size >= 3) {
-                thirdBitmap = appList.getIcon(folderApps[2]).toBitmap()
+                if(folderApps[2].getType() == LaunchInfo.ICON) {
+                    thirdBitmap = appList.getIcon(folderApps[2]).toBitmap()
+                } else {
+                    val dl = DualLaunch(parentActivity, null, folderApps[2].getDualLaunchName(), folderApps[2], false, 0)
+                    thirdBitmap = dl.makeDualLaunchIcon()
+                }
             }
             srcRect = Rect(0, 0, thirdBitmap.width, thirdBitmap.height)
             dstRect = Rect(
@@ -284,7 +313,12 @@ class Folder(
             var fourthBitmap =
                 ContextCompat.getDrawable(parentActivity, R.drawable.ic_folder)!!.toBitmap()
             if (folderApps.size >= 4) {
-                fourthBitmap = appList.getIcon(folderApps[3]).toBitmap()
+                if(folderApps[3].getType() == LaunchInfo.ICON) {
+                    fourthBitmap = appList.getIcon(folderApps[3]).toBitmap()
+                } else {
+                    val dl = DualLaunch(parentActivity, null, folderApps[3].getDualLaunchName(), folderApps[3], false, 0)
+                    fourthBitmap = dl.makeDualLaunchIcon()
+                }
             }
             srcRect = Rect(0, 0, fourthBitmap.width, fourthBitmap.height)
             dstRect = Rect(
@@ -329,7 +363,7 @@ class Folder(
         folderIcon.setImageBitmap(makeFolderIcon())
     }
 
-    private fun persistFolderApps() {
+    fun persistFolderApps() {
         val saveItJson = Json.encodeToString(folderApps)
         val editor = prefs.edit()
         editor.putString("folder" + launchInfo.getFolderUniqueId(), saveItJson)
@@ -362,9 +396,30 @@ class Folder(
     fun addFolderItem(info: LaunchInfo) {
         if (!folderApps.contains(info)) {
             folderApps.add(info)
-            folderApps.sortBy { appList.getLabel(it).toLowerCase() }
+            sortFolder()
             persistFolderApps()
         }
+    }
+
+    fun sortFolder() {
+        if (settingsPreferences.getBoolean("sort_folders", true)) {
+            folderApps.sortBy {
+                if(it.getType() == LaunchInfo.DUALLAUNCH) {
+                    it.getDualLaunchName().toLowerCase()
+                } else {
+                    appList.getLabel(it).toLowerCase()
+                }
+            }
+        }
+    }
+
+    fun addFolderItemAtPosition(addInfo: LaunchInfo, posInfo: LaunchInfo) {
+        var pos = folderApps.indexOf(posInfo)
+        folderApps.add(pos, addInfo)
+        if (settingsPreferences.getBoolean("sort_folders", true)) {
+            folderApps.sortBy { appList.getLabel(it).toLowerCase() }
+        }
+        persistFolderApps()
     }
 
     fun removeFolderApp(info: LaunchInfo) {
@@ -410,6 +465,12 @@ class Folder(
             }
             if (key == "folder_icon_preview") {
                 updateIcon()
+            }
+            if (key == "sort_folders") {
+                if (settingsPreferences.getBoolean("sort_folders", true)) {
+                    folderApps.sortBy { appList.getLabel(it).toLowerCase() }
+                }
+                persistFolderApps()
             }
         }
     }

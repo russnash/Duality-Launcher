@@ -231,6 +231,10 @@ class HomePagerAdapter(private val parent: MainActivity, private val container: 
         listener.onDragStarted(view, clipData)
     }
 
+    override fun onDualLaunchUpdated() {
+        // Do nothing
+    }
+
     override fun onLaunch(launchInfo: LaunchInfo, displayId: Int) {
         listener.onLaunch(launchInfo, displayId)
     }

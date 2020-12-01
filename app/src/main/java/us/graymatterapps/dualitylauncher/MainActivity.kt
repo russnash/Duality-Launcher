@@ -558,17 +558,17 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
         }
 
         if (settingsFragment.isVisible) {
-            showHomeFragment(settingsFragment)
+            showHome(settingsFragment)
         }
 
         if (widgetFragment.isVisible) {
-            showHomeFragment(widgetFragment)
+            showHome(widgetFragment)
         }
 
         resetResize()
     }
 
-    fun showHomeFragment(visible: Fragment) {
+    fun showHome(visible: Fragment) {
         gestureLayout.setGesturesOn(true)
         supportFragmentManager
             .beginTransaction()
@@ -587,14 +587,17 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
         val dsb = View.DragShadowBuilder(view)
         startDragAndDrop(view, clipData, dsb, null, 0)
 
+        /*
         if (isFolderOpen) {
             if (!drawerFragment.isVisible) {
                 showHomeFolder(false)
             }
         }
 
+         */
+
         if (drawerFragment.isVisible) {
-            showHomeFragment(drawerFragment)
+            showHome(drawerFragment)
         }
     }
 
@@ -603,7 +606,7 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
         setStatusBars()
         setNavBarBackground()
         if (drawerFragment.isVisible) {
-            showHomeFragment(drawerFragment)
+            showHome(drawerFragment)
         }
         showHomeFolder(false)
         appList.launchPackage(launchInfo, displayId)
@@ -740,7 +743,7 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
     }
 
     override fun onAnimationEnd(p0: Animation?) {
-        showHomeFragment(drawerFragment)
+        showHome(drawerFragment)
     }
 
     override fun onAnimationStart(p0: Animation?) {
@@ -810,7 +813,7 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
         view.layout(view.left, view.top, view.right, view.bottom)
         view.draw(canvas)
         dragWidgetBitmap = bitmap
-        showHomeFragment(widgetFragment)
+        showHome(widgetFragment)
         if (homePager.startDragAndDrop(clipData, dsb, false, 0)) {
             Log.d(TAG, "onAddWidget() startDragAndDrop successful")
         } else {

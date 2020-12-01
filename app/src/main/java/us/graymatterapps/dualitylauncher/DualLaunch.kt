@@ -135,6 +135,10 @@ class DualLaunch(
                 )
             }
         }
+
+        if(launchInfo.getDualLaunchName() == "New Dual Launch" && replicate) {
+            showDualLaunch()
+        }
     }
 
     private fun showPopupMenu() {
@@ -174,7 +178,7 @@ class DualLaunch(
         convertToEmpty()
     }
 
-    private fun makeDualLaunchIcon(): Bitmap {
+    fun makeDualLaunchIcon(): Bitmap {
         val clearPaint = Paint().apply { xfermode = PorterDuffXfermode(PorterDuff.Mode.CLEAR) }
         val drawable: Drawable =
             ContextCompat.getDrawable(parentActivity, R.drawable.ic_launcher_background)!!
@@ -250,14 +254,18 @@ class DualLaunch(
     fun setDualLaunchName(name: String) {
         dualLaunchLabel.text = name
         launchInfo.setDualLaunchName(name)
-        val params = this.layoutParams as HomeLayout.LayoutParams
-        replicator.changeDualLaunch(
-            parentActivity.displayId,
-            launchInfo,
-            page,
-            params.row,
-            params.column
-        )
+        if(::parentLayout.isInitialized) {
+            val params = this.layoutParams as HomeLayout.LayoutParams
+            replicator.changeDualLaunch(
+                parentActivity.displayId,
+                launchInfo,
+                page,
+                params.row,
+                params.column
+            )
+        } else {
+            listener.onDualLaunchUpdated()
+        }
     }
 
     fun setLaunchInfo(info: LaunchInfo) {
@@ -303,16 +311,19 @@ class DualLaunch(
     }
 
     fun convertToEmpty() {
-        val params = this.layoutParams as HomeLayout.LayoutParams
-        replicator.deleteViews(parentActivity.displayId, page, params.row, params.column)
-        parentLayout.removeView(this)
-        parentActivity.persistGrid(page)
+        if(::parentLayout.isInitialized) {
+            val params = this.layoutParams as HomeLayout.LayoutParams
+            replicator.deleteViews(parentActivity.displayId, page, params.row, params.column)
+            parentLayout.removeView(this)
+            parentActivity.persistGrid(page)
+        }
     }
 
     interface DualLaunchInterface {
         fun onShowDualLaunch(state: Boolean)
         fun onSetupDualLaunch(apps: ArrayList<LaunchInfo>, name: Editable, dualLaunch: DualLaunch)
         fun onDragStarted(view: View, clipData: ClipData)
+        fun onDualLaunchUpdated()
     }
 
     override fun onSharedPreferenceChanged(sharedPrefs: SharedPreferences?, key: String?) {

@@ -1,5 +1,10 @@
 <PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:android="http://schemas.android.com/apk/res/android">
+    <CheckBoxPreference
+        android:key="sort_folders"
+        android:title="Sort folders alphabetically"
+        android:defaultValue="true"
+        app:icon="@drawable/ic_sort_abc"/>
     <us.graymatterapps.dualitylauncher.ColorPreference
         android:defaultValue="-16777216"
         android:key="folder_background"
@@ -26,7 +31,7 @@
     <SeekBarPreference
         android:defaultValue="5"
         android:key="folder_icon_padding"
-        android:max="20"
+        android:max="30"
         app:min="0"
         android:title="Icon padding"
         android:summary="Adjusts icon padding to change the size of the icons"
