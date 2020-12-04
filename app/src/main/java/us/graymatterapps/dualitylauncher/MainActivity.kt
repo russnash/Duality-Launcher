@@ -35,6 +35,7 @@ import androidx.core.graphics.ColorUtils
 import androidx.core.view.ViewCompat.startDragAndDrop
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
+import androidx.recyclerview.widget.GridLayoutManager
 import androidx.viewpager2.widget.ViewPager2
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.dual_launch.*
@@ -721,6 +722,11 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
                 homePagerAdapter.notifyDataSetChanged()
                 homePagerAdapter.lock.unlock()
             }
+            if (key == "icon_background") {
+                homePagerAdapter.lock.lock()
+                homePagerAdapter.notifyDataSetChanged()
+                homePagerAdapter.lock.unlock()
+            }
             if (key == "widget_info") {
                 showWidgets()
             }
@@ -1074,10 +1080,11 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
         } else {
             folderDebug.visibility = View.INVISIBLE
         }
+        val folderGridLayoutManager = GridLayoutManager(applicationContext, 5)
+        folderGrid.layoutManager = folderGridLayoutManager
         val folderAdapter = FolderAdapter(this, apps, folder)
         folderAdapter.setListener(this)
         folderGrid.adapter = folderAdapter
-        folderAdapter.notifyDataSetChanged()
 
         homeFolderBackground.setOnClickListener {
             if (drawerFragment.isVisible) {
@@ -1276,6 +1283,8 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
             val homeIconsTable = view.findViewById<HomeLayout>(R.id.homeIconsTable)
             val textColor = settingsPreferences.getInt("home_text_color", Color.WHITE)
             val textShadowColor = settingsPreferences.getInt("home_text_shadow_color", Color.BLACK)
+            val iconPadding = settingsPreferences.getInt("home_icon_padding", 5)
+            val textSize = settingsPreferences.getInt("home_text_size", 14)
             var icon = Icon(this, null, false, page)
             var iconParams = HomeLayout.LayoutParams(
                 ViewGroup.LayoutParams.WRAP_CONTENT,
@@ -1286,9 +1295,9 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
             iconParams.rowSpan = 1
             iconParams.columnSpan = 1
             icon.layoutParams = iconParams
-            icon.label.maxLines = 1
             icon.label.setTextColor(textColor)
             icon.label.setShadowLayer(6F, 0F, 0F, textShadowColor)
+            icon.label.textSize = textSize.toFloat()
             icon.setListener(homePagerAdapter)
             icon.setBlankOnDrag(true)
             icon.setDockIcon(false)
@@ -1297,6 +1306,7 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
                 launchInfo.getPackageName(),
                 launchInfo.getUserSerial()
             )
+            icon.setPadding(iconPadding, iconPadding, iconPadding, iconPadding)
             homeIconsTable.addView(icon, iconParams)
             homePagerAdapter.lock.unlock()
             persistGrid(page)
@@ -1330,6 +1340,8 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
         val homeIconsTable = view.findViewById<HomeLayout>(R.id.homeIconsTable)
         val textColor = settingsPreferences.getInt("home_text_color", Color.WHITE)
         val textShadowColor = settingsPreferences.getInt("home_text_shadow_color", Color.BLACK)
+        val iconPadding = settingsPreferences.getInt("home_icon_padding", 5)
+        val textSize = settingsPreferences.getInt("home_text_size", 14)
         var folder = Folder(
             this,
             null,
@@ -1350,6 +1362,8 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
         folder.layoutParams = folderParams
         folder.folderLabel.setTextColor(textColor)
         folder.folderLabel.setShadowLayer(6F, 0F, 0F, textShadowColor)
+        folder.folderLabel.textSize = textSize.toFloat()
+        folder.setPadding(iconPadding, iconPadding, iconPadding, iconPadding)
         homeIconsTable.addView(folder, folderParams)
         homePagerAdapter.lock.unlock()
         persistGrid(page)
@@ -1361,6 +1375,8 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
         val homeIconsTable = view.findViewById<HomeLayout>(R.id.homeIconsTable)
         val textColor = settingsPreferences.getInt("home_text_color", Color.WHITE)
         val textShadowColor = settingsPreferences.getInt("home_text_shadow_color", Color.BLACK)
+        val iconPadding = settingsPreferences.getInt("home_icon_padding", 5)
+        val textSize = settingsPreferences.getInt("home_text_size", 14)
         var dualLaunch = DualLaunch(
             this,
             null,
@@ -1381,6 +1397,8 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
         dualLaunch.layoutParams = dualLaunchParams
         dualLaunch.dualLaunchLabel.setTextColor(textColor)
         dualLaunch.dualLaunchLabel.setShadowLayer(6F, 0F, 0F, textShadowColor)
+        dualLaunch.dualLaunchLabel.textSize = textSize.toFloat()
+        dualLaunch.setPadding(iconPadding, iconPadding, iconPadding, iconPadding)
         homeIconsTable.addView(dualLaunch, dualLaunchParams)
         homePagerAdapter.lock.unlock()
         persistGrid(page)

@@ -9,34 +9,40 @@ import android.view.DragEvent
 import android.view.View
 import android.view.ViewGroup
 import android.widget.BaseAdapter
+import android.widget.LinearLayout
+import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.dual_launch.view.*
 
-class FolderAdapter(var parentActivity: MainActivity, var apps: ArrayList<LaunchInfo>, val folder: Folder) : BaseAdapter(), Icon.IconInterface, DualLaunch.DualLaunchInterface, SharedPreferences.OnSharedPreferenceChangeListener{
+class FolderAdapter(
+    var parentActivity: MainActivity,
+    var apps: ArrayList<LaunchInfo>,
+    val folder: Folder
+) : RecyclerView.Adapter<FolderAdapter.FolderHolder>(), Icon.IconInterface, DualLaunch.DualLaunchInterface,
+    SharedPreferences.OnSharedPreferenceChangeListener {
     private lateinit var listener: FolderAdapterInterface
 
     init {
         prefs.registerOnSharedPreferenceChangeListener(this)
     }
 
-    override fun getCount(): Int {
-        return apps.size
+    class FolderHolder(view: View) : RecyclerView.ViewHolder(view) {
     }
 
-    override fun getItem(position: Int): Any? {
-        return null
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FolderHolder {
+        return FolderHolder(LinearLayout(parentActivity))
     }
 
-    override fun getItemId(position: Int): Long {
-        return 0
-    }
-
-    override fun getView(position: Int, view: View?, viewGroup: ViewGroup?): View {
+    override fun onBindViewHolder(holder: FolderHolder, position: Int) {
         val iconPadding = settingsPreferences.getInt("folder_icon_padding", 5)
         val textSize = settingsPreferences.getInt("folder_text_size", 14)
         val textColor = settingsPreferences.getInt("folder_text", Color.WHITE)
         val textShadowColor = settingsPreferences.getInt("folder_text_shadow", Color.BLACK)
         val info = apps[position]
-        if(info.getType() == LaunchInfo.ICON) {
+
+        val layout = holder.itemView as LinearLayout
+        layout.removeAllViews()
+
+        if (info.getType() == LaunchInfo.ICON) {
             val icon = Icon(parentActivity, null, "", "", 0L, false, false, false, 0)
             icon.setLaunchInfo(info)
             icon.setDockIcon(true)
@@ -47,7 +53,7 @@ class FolderAdapter(var parentActivity: MainActivity, var apps: ArrayList<Launch
             icon.label.textSize = textSize.toFloat()
             icon.setPadding(iconPadding, iconPadding, iconPadding, 25)
             icon.setOnDragListener { view, dragEvent ->
-                if(dragEvent != null) {
+                if (dragEvent != null) {
                     when (dragEvent.action) {
                         DragEvent.ACTION_DROP -> {
                             val id = dragEvent.clipData.getItemAt(0).text.toString()
@@ -58,17 +64,18 @@ class FolderAdapter(var parentActivity: MainActivity, var apps: ArrayList<Launch
                 }
                 true
             }
-            return icon
+            layout.addView(icon)
         }
-        if(info.getType() == LaunchInfo.DUALLAUNCH) {
-            val dualLaunch = DualLaunch(parentActivity, null, info.getDualLaunchName(), info, false, 0)
+        if (info.getType() == LaunchInfo.DUALLAUNCH) {
+            val dualLaunch =
+                DualLaunch(parentActivity, null, info.getDualLaunchName(), info, false, 0)
             dualLaunch.dualLaunchLabel.setTextColor(textColor)
             dualLaunch.dualLaunchLabel.setShadowLayer(6F, 0F, 0F, textShadowColor)
             dualLaunch.dualLaunchLabel.textSize = textSize.toFloat()
             dualLaunch.setPadding(iconPadding, iconPadding, iconPadding, 25)
             dualLaunch.setListener(this)
             dualLaunch.setOnDragListener { view, dragEvent ->
-                if(dragEvent != null) {
+                if (dragEvent != null) {
                     when (dragEvent.action) {
                         DragEvent.ACTION_DROP -> {
                             val id = dragEvent.clipData.getItemAt(0).text.toString()
@@ -79,9 +86,12 @@ class FolderAdapter(var parentActivity: MainActivity, var apps: ArrayList<Launch
                 }
                 true
             }
-            return dualLaunch
+            layout.addView(dualLaunch)
         }
-        return View(parentActivity, null)
+    }
+
+    override fun getItemCount(): Int {
+        return apps.size
     }
 
     override fun onShowDualLaunch(state: Boolean) {
@@ -97,11 +107,11 @@ class FolderAdapter(var parentActivity: MainActivity, var apps: ArrayList<Launch
     }
 
     override fun onDragStarted(view: View, clipData: ClipData) {
-        if(view is Icon) {
+        if (view is Icon) {
             val icon = view as Icon
             folder.removeFolderApp(icon.getLaunchInfo())
         }
-        if(view is DualLaunch) {
+        if (view is DualLaunch) {
             val dualLaunch = view as DualLaunch
             folder.removeFolderApp(dualLaunch.getLaunchInfo())
         }
@@ -131,6 +141,7 @@ class FolderAdapter(var parentActivity: MainActivity, var apps: ArrayList<Launch
 
     override fun onRemoveFromFolder(launchInfo: LaunchInfo) {
         folder.removeFolderApp(launchInfo)
+        this.notifyDataSetChanged()
     }
 
     override fun onReloadAppDrawer() {
@@ -148,8 +159,12 @@ class FolderAdapter(var parentActivity: MainActivity, var apps: ArrayList<Launch
     }
 
     override fun onSharedPreferenceChanged(sharedPref: SharedPreferences?, key: String?) {
-        if(key != null) {
-            if(key.contains("folder")){
+        if (key != null) {
+            if (key.contains("folder")) {
+                this.notifyDataSetChanged()
+            }
+            if (key == "icon_background") {
+                folder.updateIcon()
                 this.notifyDataSetChanged()
             }
         }

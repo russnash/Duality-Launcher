@@ -12,6 +12,7 @@ import android.view.animation.AnimationUtils
 import android.widget.*
 import androidx.core.graphics.ColorUtils
 import androidx.core.view.setPadding
+import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.dual_launch.view.*
 import kotlinx.android.synthetic.main.folder.view.*
 import us.graymatterapps.graymatterutils.GrayMatterUtils
@@ -174,7 +175,17 @@ class Icon(
             if(downTime > 0 && System.currentTimeMillis() - downTime > longClickTime) {
                 downTime = 0
                 if(!isDualLaunch) {
-                    showPopupMenu()
+                    if(event.historySize != 0) {
+                        val distance = GrayMatterUtils.getDistance(
+                            event.getHistoricalX(0),
+                            event.getHistoricalY(0),
+                            event.getX(),
+                            event.getY()
+                        )
+                        if(distance < touchSlop) {
+                            showPopupMenu()
+                        }
+                    }
                 }
             }
             when(event.action) {
@@ -401,7 +412,7 @@ class Icon(
                 params.column
             )
         }
-        if(this.parent is GridView) {
+        if(this.parent is LinearLayout) {
             listener.onRemoveFromFolder(launchInfo)
         }
 

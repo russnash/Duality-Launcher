@@ -80,6 +80,7 @@ class HomeLayout(context: Context, attributeSet: AttributeSet?) : ViewGroup(
                             if (info.getType() == LaunchInfo.ICON) {
                                 val textColor = settingsPreferences.getInt("home_text_color", Color.WHITE)
                                 val textShadowColor = settingsPreferences.getInt("home_text_shadow_color", Color.BLACK)
+                                val iconPadding = settingsPreferences.getInt("home_icon_padding", 5)
                                 val textSize = settingsPreferences.getInt("home_text_size", 14)
                                 val icon = Icon(parentActivity, null, true, page)
                                 val params = dragImage.layoutParams as HomeLayout.LayoutParams
@@ -87,17 +88,18 @@ class HomeLayout(context: Context, attributeSet: AttributeSet?) : ViewGroup(
                                 params.rowSpan = 1
                                 params.freeForm = false
                                 icon.layoutParams = params
-                                icon.label.maxLines = 1
                                 icon.label.setTextColor(textColor)
                                 icon.label.setShadowLayer(6F, 0F, 0F, textShadowColor)
                                 icon.label.textSize = textSize.toFloat()
                                 icon.setListener(parentActivity.homePagerAdapter as Icon.IconInterface)
                                 icon.setLaunchInfo(info)
+                                icon.setPadding(iconPadding, iconPadding, iconPadding, iconPadding)
                                 this.addView(icon, params)
                             }
                             if(info.getType() == LaunchInfo.DUALLAUNCH){
                                 val textColor = settingsPreferences.getInt("home_text_color", Color.WHITE)
                                 val textShadowColor = settingsPreferences.getInt("home_text_shadow_color", Color.BLACK)
+                                val iconPadding = settingsPreferences.getInt("home_icon_padding", 5)
                                 val textSize = settingsPreferences.getInt("home_text_size", 14)
                                 val dualLaunch = DualLaunch(parentActivity, null, info.getDualLaunchName(), info, true, page)
                                 val params = dragImage.layoutParams as HomeLayout.LayoutParams
@@ -109,6 +111,7 @@ class HomeLayout(context: Context, attributeSet: AttributeSet?) : ViewGroup(
                                 dualLaunch.dualLaunchLabel.setTextColor(textColor)
                                 dualLaunch.dualLaunchLabel.setShadowLayer(6F, 0F, 0F, textShadowColor)
                                 dualLaunch.dualLaunchLabel.textSize = textSize.toFloat()
+                                dualLaunch.setPadding(iconPadding, iconPadding, iconPadding, iconPadding)
                                 dualLaunch.setListener(parentActivity.homePagerAdapter as DualLaunch.DualLaunchInterface)
                                 this.addView(dualLaunch, params)
                             }
@@ -116,7 +119,7 @@ class HomeLayout(context: Context, attributeSet: AttributeSet?) : ViewGroup(
                                 val textColor = settingsPreferences.getInt("home_text_color", Color.WHITE)
                                 val textShadowColor = settingsPreferences.getInt("home_text_shadow_color", Color.BLACK)
                                 val textSize = settingsPreferences.getInt("home_text_size", 14)
-                                val icon = Icon(parentActivity, null, true, page)
+                                val iconPadding = settingsPreferences.getInt("home_icon_padding", 5)
                                 val folder = Folder(
                                     parentActivity,
                                     null,
@@ -134,6 +137,7 @@ class HomeLayout(context: Context, attributeSet: AttributeSet?) : ViewGroup(
                                 folder.folderLabel.setShadowLayer(6F, 0F, 0F, textShadowColor)
                                 folder.folderLabel.textSize = textSize.toFloat()
                                 folder.setListener(parentActivity.homePagerAdapter as Folder.FolderInterface)
+                                folder.setPadding(iconPadding, iconPadding, iconPadding, iconPadding)
                                 this.addView(folder, params)
                             }
                             parentActivity.persistGrid(page)

@@ -32,4 +32,6 @@
     <string name="dock_search">Show a search widget in the dock</string>
     <string name="dock_search_color">Background color</string>
     <string name="dock_search_color_foreground">Foreground color</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

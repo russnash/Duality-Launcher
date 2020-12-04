@@ -32,6 +32,11 @@
         android:summary="Set the wallpaper"
         app:fragment="us.graymatterapps.dualitylauncher.SettingsWallpaperFragment"
         app:icon="@drawable/ic_wallpaper"/>
+    <Preference
+        android:title="Icons"
+        android:summary="Customize icon appearance"
+        app:fragment="us.graymatterapps.dualitylauncher.SettingsIcon"
+        app:icon="@drawable/ic_icons" />
 
     <PreferenceCategory>
         <Preference

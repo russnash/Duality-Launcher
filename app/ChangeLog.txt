@@ -1,3 +1,12 @@
+Version 2020.12.4.1-internal
+Changes:
+- Added EXPERIMENTAL option to remove the background from adaptive icons, note that the results can be far from desirable.
+
+Bugs:
+- Fixed newly added homescreen items not adopting icon padding or text size.
+- Amended icon touch detection to not register a long click if the touch coordinates moved more than a certain threshold.
+- Removed random deadspace at the bottom of folders.
+
 Version 2020.12.1.2-internal
 Bugs:
 - Folder reverting to sorted after moving icons when sort is disabled.

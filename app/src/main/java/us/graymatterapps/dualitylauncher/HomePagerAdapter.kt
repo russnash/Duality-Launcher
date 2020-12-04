@@ -108,7 +108,6 @@ class HomePagerAdapter(private val parent: MainActivity, private val container: 
                             iconParams.rowSpan = 1
                             iconParams.columnSpan = 1
                             icon.layoutParams = iconParams
-                            icon.label.maxLines = 1
                             icon.label.setTextColor(textColor)
                             icon.label.setShadowLayer(6F, 0F, 0F, textShadowColor)
                             icon.label.textSize = textSize.toFloat()

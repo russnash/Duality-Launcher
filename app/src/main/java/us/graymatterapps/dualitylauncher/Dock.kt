@@ -18,7 +18,8 @@ import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
-class Dock(val parentActivity: MainActivity, attrs: AttributeSet?) : LinearLayout(parentActivity, attrs),
+class Dock(val parentActivity: MainActivity, attrs: AttributeSet?) :
+    LinearLayout(parentActivity, attrs),
     SharedPreferences.OnSharedPreferenceChangeListener, Icon.IconInterface {
     val settingsPreferences: SharedPreferences =
         PreferenceManager.getDefaultSharedPreferences(context)
@@ -49,14 +50,19 @@ class Dock(val parentActivity: MainActivity, attrs: AttributeSet?) : LinearLayou
         dockSearchWidget.clearSearchFocus()
     }
 
-    fun setupDockSearch(){
-        val params = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT)
+    fun setupDockSearch() {
+        val params = LinearLayout.LayoutParams(
+            LinearLayout.LayoutParams.MATCH_PARENT,
+            LinearLayout.LayoutParams.WRAP_CONTENT
+        )
 
         searchRowTop.removeAllViews()
         searchRowBottom.removeAllViews()
 
-        if(settingsPreferences.getBoolean("dock_search", false)){
-            if(settingsPreferences.getString("dock_search_position", "Above dock").equals("Above dock")){
+        if (settingsPreferences.getBoolean("dock_search", false)) {
+            if (settingsPreferences.getString("dock_search_position", "Above dock")
+                    .equals("Above dock")
+            ) {
                 searchRowTop.addView(dockSearchWidget, params)
             } else {
                 searchRowBottom.addView(dockSearchWidget, params)
@@ -89,7 +95,12 @@ class Dock(val parentActivity: MainActivity, attrs: AttributeSet?) : LinearLayou
                 dockIcon.setListener(this)
                 dockIcon.setBlankOnDrag(true)
                 dockIcon.setDockIcon(true)
-                dockIcon.icon.setPadding(dockIconPadding, dockIconPadding, dockIconPadding, dockIconPadding)
+                dockIcon.icon.setPadding(
+                    dockIconPadding,
+                    dockIconPadding,
+                    dockIconPadding,
+                    dockIconPadding
+                )
                 dockRow.addView(dockIcon)
             }
         }
@@ -127,7 +138,12 @@ class Dock(val parentActivity: MainActivity, attrs: AttributeSet?) : LinearLayou
         if (!settingsPreferences.getBoolean("dock_background", false)) {
             dockTable.setBackgroundColor(Color.TRANSPARENT)
         } else {
-            dockTable.setBackgroundColor(settingsPreferences.getInt("dock_background_color", Color.BLACK))
+            dockTable.setBackgroundColor(
+                settingsPreferences.getInt(
+                    "dock_background_color",
+                    Color.BLACK
+                )
+            )
         }
     }
 
@@ -150,6 +166,10 @@ class Dock(val parentActivity: MainActivity, attrs: AttributeSet?) : LinearLayou
             populateDock()
         }
 
+        if (key == "icon_background") {
+            populateDock()
+        }
+
         if (key == "dock_background") {
             setDockBackground()
         }
@@ -166,19 +186,19 @@ class Dock(val parentActivity: MainActivity, attrs: AttributeSet?) : LinearLayou
             setupDockSearch()
         }
 
-        if(key == "dock_search_position") {
+        if (key == "dock_search_position") {
             setupDockSearch()
         }
 
-        if(key == "dock_search_provider") {
+        if (key == "dock_search_provider") {
             setupDockSearch()
         }
 
-        if(key == "dock_search_color") {
+        if (key == "dock_search_color") {
             setupDockSearch()
         }
 
-        if(key == "dock_icon_padding") {
+        if (key == "dock_icon_padding") {
             adjustPadding()
         }
     }

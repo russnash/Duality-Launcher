@@ -5,13 +5,12 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.pm.LauncherApps
 import android.content.pm.ShortcutInfo
-import android.graphics.Color
+import android.graphics.drawable.AdaptiveIconDrawable
 import android.graphics.drawable.Drawable
-import android.graphics.drawable.ShapeDrawable
-import android.graphics.drawable.shapes.OvalShape
 import android.os.Process
 import android.os.UserHandle
 import android.os.UserManager
+import android.util.Log
 import androidx.core.content.ContextCompat
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
@@ -22,6 +21,7 @@ import java.util.*
 import java.util.concurrent.locks.ReentrantLock
 import kotlin.collections.ArrayList
 
+
 class AppList(val context: Context) : LauncherApps.Callback() {
     val apps: ArrayList<AppListDataType> = ArrayList()
     var manualWorkApps: ArrayList<LaunchInfo> = ArrayList()
@@ -30,6 +30,7 @@ class AppList(val context: Context) : LauncherApps.Callback() {
     var launcherApps: LauncherApps =
         context.getSystemService(Context.LAUNCHER_APPS_SERVICE) as LauncherApps
     val userManager = context.getSystemService(Context.USER_SERVICE) as UserManager
+    val packageManager = context.packageManager
     val TAG = javaClass.simpleName
 
     init {
@@ -46,8 +47,8 @@ class AppList(val context: Context) : LauncherApps.Callback() {
 
     fun depersist() {
         var loadItJson = prefs.getString("manualWorkApps", "")
-        if(loadItJson != "") {
-            manualWorkApps = loadItJson?.let { Json.decodeFromString(it)}!!
+        if (loadItJson != "") {
+            manualWorkApps = loadItJson?.let { Json.decodeFromString(it) }!!
         }
     }
 
@@ -58,7 +59,7 @@ class AppList(val context: Context) : LauncherApps.Callback() {
         editor.apply()
     }
 
-    fun isManualWorkApp(info: LaunchInfo) : Boolean {
+    fun isManualWorkApp(info: LaunchInfo): Boolean {
         return manualWorkApps.contains(info)
     }
 
@@ -85,13 +86,34 @@ class AppList(val context: Context) : LauncherApps.Callback() {
                     val name = apps.label.toString()
                     val icon = apps.getBadgedIcon(0)
                     val packageName = apps.applicationInfo.packageName
+                    if (packageName == "us.graymatterapps.dualitylauncher") {
+                        Log.d(TAG, "DL")
+                    }
                     val activityName = apps.componentName.className
+                    var iconForeground: Drawable
+                    var iconBackground: Drawable
+                    try {
+                        val launchIntentForPackage = packageManager.getLaunchIntentForPackage(packageName)
+                        val fullPathToActivity = launchIntentForPackage!!.component!!.className
+                        val activityInfo =
+                            packageManager.getActivityInfo(ComponentName(packageName, fullPathToActivity), 0)
+                        val iconRes = activityInfo.iconResource
+                        val drawable =
+                            packageManager.getDrawable(packageName, iconRes, activityInfo.applicationInfo)
+                        iconForeground = (drawable as AdaptiveIconDrawable).foreground
+                        iconBackground = (drawable as AdaptiveIconDrawable).background
+                    } catch (e: Exception) {
+                        iconForeground = icon
+                        iconBackground = icon
+                    }
                     val handle = apps.user
                     val userSerial = userManager.getSerialNumberForUser(handle)
                     this.apps.add(
                         AppListDataType(
                             name,
                             icon,
+                            iconForeground,
+                            iconBackground,
                             activityName,
                             packageName,
                             handle,
@@ -130,7 +152,11 @@ class AppList(val context: Context) : LauncherApps.Callback() {
         }
         lock.unlock()
         if (app != null) {
-            return app.icon
+            if (settingsPreferences.getBoolean("icon_background", false)) {
+                return app.iconForeground
+            } else {
+                return app.icon
+            }
         } else {
             return ContextCompat.getDrawable(context, R.drawable.ic_launcher_foreground)!!
         }
@@ -175,11 +201,15 @@ class AppList(val context: Context) : LauncherApps.Callback() {
         }
     }
 
-    fun launchPackageOtherDisplay(parentActivity: MainActivity, launchInfo: LaunchInfo, display: Int) {
+    fun launchPackageOtherDisplay(
+        parentActivity: MainActivity,
+        launchInfo: LaunchInfo,
+        display: Int
+    ) {
         var targetDisplay: Int = 0
         var isDisplayAvailable: Boolean = true
 
-        if(display == 1) {
+        if (display == 1) {
             targetDisplay = 0
         } else {
             targetDisplay = 1
@@ -192,20 +222,24 @@ class AppList(val context: Context) : LauncherApps.Callback() {
             isDisplayAvailable = false
         }
 
-        if(isDisplayAvailable) {
-            if(displays[targetDisplay].state != 2) {
+        if (isDisplayAvailable) {
+            if (displays[targetDisplay].state != 2) {
                 isDisplayAvailable = false
             }
         }
 
-        if(isDisplayAvailable) {
+        if (isDisplayAvailable) {
             launchPackage(launchInfo, targetDisplay)
         } else {
             shortToast(parentActivity, "Other display is not available")
         }
     }
 
-    fun launchDualLaunch(parentActivity: MainActivity, launchLeft: LaunchInfo, launchRight: LaunchInfo) {
+    fun launchDualLaunch(
+        parentActivity: MainActivity,
+        launchLeft: LaunchInfo,
+        launchRight: LaunchInfo
+    ) {
         var isDisplayAvailable: Boolean = true
 
         val displays = parentActivity.displayManager.displays
@@ -215,17 +249,17 @@ class AppList(val context: Context) : LauncherApps.Callback() {
             isDisplayAvailable = false
         }
 
-        if(isDisplayAvailable) {
-            if(displays[1].state != 2) {
+        if (isDisplayAvailable) {
+            if (displays[1].state != 2) {
                 isDisplayAvailable = false
             }
         }
 
-        if(isDisplayAvailable) {
-            if(launchLeft.getActivityName() != "") {
+        if (isDisplayAvailable) {
+            if (launchLeft.getActivityName() != "") {
                 launchPackage(launchLeft, 1)
             }
-            if(launchRight.getActivityName() != "") {
+            if (launchRight.getActivityName() != "") {
                 launchPackage(launchRight, 0)
             }
         } else {
@@ -258,13 +292,21 @@ class AppList(val context: Context) : LauncherApps.Callback() {
         return drawable
     }
 
-    fun startShortcut(shortcut : Shortcut) {
-        launcherApps.startShortcut(shortcut.packageName, shortcut.id, null, null, Process.myUserHandle())
+    fun startShortcut(shortcut: Shortcut) {
+        launcherApps.startShortcut(
+            shortcut.packageName,
+            shortcut.id,
+            null,
+            null,
+            Process.myUserHandle()
+        )
     }
 
     data class AppListDataType(
         var name: String,
         var icon: Drawable,
+        var iconForeground: Drawable,
+        var iconBackground: Drawable,
         var activityName: String,
         var packageName: String,
         var handle: UserHandle,

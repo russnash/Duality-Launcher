@@ -248,7 +248,12 @@ class Folder(
             srcRect = Rect(0, 0, secondBitmap.width, secondBitmap.height)
             dstRect = Rect(canvas.width / 3, canvas.height / 3, canvas.width, canvas.height)
             canvas.drawBitmap(secondBitmap, srcRect, dstRect, null)
-        } else {
+        }
+
+        if(settingsPreferences.getString(
+                "folder_icon_preview",
+                "First and Last"
+            ) == "First four"){
             // First icon
             var firstBitmap =
                 ContextCompat.getDrawable(parentActivity, R.drawable.ic_folder)!!.toBitmap()
@@ -330,6 +335,25 @@ class Folder(
             canvas.drawBitmap(fourthBitmap, srcRect, dstRect, null)
         }
 
+        if(settingsPreferences.getString(
+                "folder_icon_preview",
+                "First and Last"
+            ) == "First") {
+            var firstBitmap = ContextCompat.getDrawable(parentActivity, R.drawable.ic_folder)!!.toBitmap()
+            if(folderApps.size >= 1) {
+                firstBitmap = appList.getIcon(folderApps[0]).toBitmap()
+            }
+
+            var srcRect = Rect(0, 0, firstBitmap.width, firstBitmap.height)
+            var dstRect = Rect(
+                0,
+                0,
+                canvas.width,
+                canvas.height
+            )
+            canvas.drawBitmap(firstBitmap, srcRect, dstRect, null)
+        }
+
         return bitmap
     }
 
@@ -359,7 +383,7 @@ class Folder(
         folderIcon.setImageBitmap(makeFolderIcon())
     }
 
-    private fun updateIcon() {
+    fun updateIcon() {
         folderIcon.setImageBitmap(makeFolderIcon())
     }
 
