@@ -170,32 +170,32 @@ class Icon(
     }
 
     override fun onTouchEvent(event: MotionEvent?): Boolean {
-        if(event != null) {
+        if (event != null) {
             Log.d(TAG, "onTouchEvent() ${MotionEvent.actionToString(event.action)}")
-            if(downTime > 0 && System.currentTimeMillis() - downTime > longClickTime) {
+            if (downTime > 0 && System.currentTimeMillis() - downTime > longClickTime) {
                 downTime = 0
-                if(!isDualLaunch) {
-                    if(event.historySize != 0) {
+                if (!isDualLaunch) {
+                    if (event.historySize != 0) {
                         val distance = GrayMatterUtils.getDistance(
                             event.getHistoricalX(0),
                             event.getHistoricalY(0),
                             event.getX(),
                             event.getY()
                         )
-                        if(distance < touchSlop) {
+                        if (distance < touchSlop) {
                             showPopupMenu()
                         }
                     }
                 }
             }
-            when(event.action) {
+            when (event.action) {
                 MotionEvent.ACTION_DOWN -> {
                     downTime = System.currentTimeMillis()
                     return true
                 }
                 MotionEvent.ACTION_UP -> {
-                    if( System.currentTimeMillis() - downTime < longClickTime) {
-                        if(!isDualLaunch) {
+                    if (System.currentTimeMillis() - downTime < longClickTime) {
+                        if (!isDualLaunch) {
                             launch()
                         }
                     }
@@ -203,7 +203,7 @@ class Icon(
                     return true
                 }
                 MotionEvent.ACTION_MOVE -> {
-                    if(isPopupMenuVisible) {
+                    if (isPopupMenuVisible) {
                         if (event.historySize != 0) {
                             val distance = GrayMatterUtils.getDistance(
                                 event.getHistoricalX(0),
@@ -217,7 +217,7 @@ class Icon(
                                 menu.dismiss()
                                 startDragging()
                             }
-                            if(distance > 2) {
+                            if (distance > 2) {
                                 downTime = 0
                             }
                         }
@@ -230,7 +230,7 @@ class Icon(
     }
 
     private fun showPopupMenu() {
-        if(launchInfo.getActivityName() != "") {
+        if (launchInfo.getActivityName() != "") {
             GrayMatterUtils.vibrate(parentActivity, 50)
             menu = PopupMenu(parentActivity, this)
             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
@@ -271,7 +271,7 @@ class Icon(
                 true
             }
 
-            if(::parentLayout.isInitialized) {
+            if (::parentLayout.isInitialized) {
                 val menuItemCreateDL = menu.menu.add(1, 5, 1, "Create dual launch")
                 menuItemCreateDL.setIcon(R.drawable.ic_dual_launch)
                 menuItemCreateDL.setOnMenuItemClickListener {
@@ -281,13 +281,13 @@ class Icon(
             }
 
             var itemText = "Set as work app"
-            if(appList.isManualWorkApp(launchInfo)) {
+            if (appList.isManualWorkApp(launchInfo)) {
                 itemText = "Set as non-work app"
             }
             val menuItemManualWorkApp = menu.menu.add(1, 6, 1, itemText)
             menuItemManualWorkApp.setIcon(R.drawable.ic_work)
             menuItemManualWorkApp.setOnMenuItemClickListener {
-                if(appList.isManualWorkApp(launchInfo)) {
+                if (appList.isManualWorkApp(launchInfo)) {
                     appList.desetAsManualWorkApp(launchInfo)
                 } else {
                     appList.setAsManualWorkApp(launchInfo)
@@ -341,13 +341,17 @@ class Icon(
     }
 
     private fun launch() {
-        if(launchInfo.getActivityName() != "") {
-            listener.onLaunch(launchInfo, parentActivity.displayId)
+        if (launchInfo.getActivityName() != "") {
+            if (launchInfo.getActivityName() == "allapps") {
+                parentActivity.showDrawerFragment()
+            } else {
+                listener.onLaunch(launchInfo, parentActivity.displayId)
+            }
         }
     }
 
     private fun startDragging() {
-        if(launchInfo.getActivityName() != "") {
+        if (launchInfo.getActivityName() != "") {
             val id = System.currentTimeMillis().toString()
             val passedLaunchInfo = launchInfo.copy()
             dragAndDropData.addLaunchInfo(passedLaunchInfo, id)
@@ -412,7 +416,7 @@ class Icon(
                 params.column
             )
         }
-        if(this.parent is LinearLayout) {
+        if (this.parent is LinearLayout) {
             listener.onRemoveFromFolder(launchInfo)
         }
 

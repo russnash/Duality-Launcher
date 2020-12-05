@@ -21,12 +21,21 @@
 
         </androidx.viewpager2.widget.ViewPager2>
 
+        <ImageView
+            android:id="@+id/homeDrawerButton"
+            android:layout_width="match_parent"
+            android:layout_height="16dp"
+            app:srcCompat="@drawable/ic_drawer_open" />
+
         <TableLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="bottom|center">
+            android:layout_gravity="center"
+            android:gravity="bottom|center">
 
-            <TableRow android:id="@+id/homePageIndicator" />
+            <TableRow android:id="@+id/homePageIndicator">
+
+            </TableRow>
         </TableLayout>
 
         <FrameLayout

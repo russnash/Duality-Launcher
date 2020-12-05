@@ -19,10 +19,7 @@ import android.net.Uri
 import android.os.Bundle
 import android.text.Editable
 import android.util.Log
-import android.view.DragEvent
-import android.view.View
-import android.view.ViewGroup
-import android.view.WindowManager
+import android.view.*
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
 import android.widget.ArrayAdapter
@@ -241,6 +238,7 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
         }
 
         setupHomePageIndicator()
+        setupDrawerButton()
 
         homeDelete.setColorFilter(
             settingsPreferences.getInt(
@@ -312,6 +310,7 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
             TableRow.LayoutParams.WRAP_CONTENT,
             TableRow.LayoutParams.WRAP_CONTENT
         )
+        params.gravity = Gravity.BOTTOM
         val filterColor = settingsPreferences.getInt(
             "home_widget_color",
             -1
@@ -320,6 +319,7 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
         for (n in 1..homePagerAdapter.itemCount) {
             var pageIndicator = ImageView(this)
             pageIndicator.layoutParams = params
+            pageIndicator.setPadding(10, 5, 10, 5)
             if (homePager.currentItem == n - 1) {
                 pageIndicator.setImageResource(R.drawable.pager_active)
             } else {
@@ -327,6 +327,32 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
             }
             pageIndicator.setColorFilter(filterColor)
             homePageIndicator.addView(pageIndicator)
+        }
+    }
+
+    fun setupDrawerButton() {
+        val filterColor = settingsPreferences.getInt(
+            "home_widget_color",
+            -1
+        )
+
+        homeDrawerButton.setColorFilter(filterColor)
+
+        if(settingsPreferences.getBoolean("drawer_button", false)) {
+            val params = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 48)
+            homeDrawerButton.layoutParams = params
+            homeDrawerButton.visibility = View.VISIBLE
+        } else {
+            val params = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 0)
+            homeDrawerButton.layoutParams = params
+            homeDrawerButton.visibility = View.INVISIBLE
+        }
+
+        homeDrawerButton.setOnClickListener {
+            if (!drawerFragment.isVisible) {
+                showDrawerFragment()
+                gestureLayout.setDrawerOpen(true)
+            }
         }
     }
 
@@ -695,12 +721,16 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
             }
             if (key == "home_widget_color") {
                 setupHomePageIndicator()
+                setupDrawerButton()
                 homeDelete.setColorFilter(
                     settingsPreferences.getInt(
                         "home_widget_color",
                         -1
                     )
                 )
+            }
+            if(key == "drawer_button") {
+                setupDrawerButton()
             }
             if (key == "home_text_color") {
                 homePagerAdapter.lock.lock()

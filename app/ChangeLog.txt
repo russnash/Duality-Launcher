@@ -1,3 +1,9 @@
+Version 2020.12.5.1-internal
+Changes:
+- Added option to add an arrow button above the dock to open the app drawer.
+- Added a legacy style 'All Apps' icon to the drawer for custom placement.
+- Updated the graphics of the home page indicator.
+
 Version 2020.12.4.1-internal
 Changes:
 - Added EXPERIMENTAL option to remove the background from adaptive icons, note that the results can be far from desirable.

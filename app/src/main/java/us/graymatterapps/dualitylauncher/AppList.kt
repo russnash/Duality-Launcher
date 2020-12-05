@@ -86,9 +86,6 @@ class AppList(val context: Context) : LauncherApps.Callback() {
                     val name = apps.label.toString()
                     val icon = apps.getBadgedIcon(0)
                     val packageName = apps.applicationInfo.packageName
-                    if (packageName == "us.graymatterapps.dualitylauncher") {
-                        Log.d(TAG, "DL")
-                    }
                     val activityName = apps.componentName.className
                     var iconForeground: Drawable
                     var iconBackground: Drawable
@@ -128,6 +125,17 @@ class AppList(val context: Context) : LauncherApps.Callback() {
             } catch (e: Exception) {
                 // Do nothing
             }
+            val drawerIcon = AppListDataType(
+                "All Apps",
+                ContextCompat.getDrawable(mainContext, R.mipmap.ic_app_drawer_button)!!,
+                ContextCompat.getDrawable(mainContext, R.mipmap.ic_app_drawer_button)!!,
+                ContextCompat.getDrawable(mainContext, R.mipmap.ic_app_drawer_button)!!,
+                "allapps",
+                "allapps",
+                android.os.Process.myUserHandle(),
+                0L
+            )
+            apps.add(0, drawerIcon)
             val editor = prefs.edit()
             editor.putString("apps", System.currentTimeMillis().toString())
             editor.apply()

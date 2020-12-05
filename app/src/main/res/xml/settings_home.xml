@@ -108,6 +108,12 @@
             android:summary="Links the home page carousels on the main and dual screens so that they page in sequence with one another"
             android:title="Linked carousels"
             app:icon="@drawable/ic_link"/>
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="drawer_button"
+            android:summary="Adds an arrow button above the dock for opening the app drawer"
+            android:title="Drawer arrow button"
+            app:icon="@drawable/ic_drawer_open"/>
         <us.graymatterapps.dualitylauncher.ColorPreference
             android:key="home_widget_color"
             android:title="Widget color"
