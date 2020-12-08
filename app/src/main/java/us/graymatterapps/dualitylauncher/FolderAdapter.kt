@@ -148,6 +148,10 @@ class FolderAdapter(
         // Do nothing
     }
 
+    override fun onOpenDrawer() {
+        listener.onOpenDrawer()
+    }
+
     fun setListener(ear: FolderAdapterInterface) {
         listener = ear
     }
@@ -156,6 +160,7 @@ class FolderAdapter(
         fun onDragStarted(view: View, clipData: ClipData)
         fun onLaunch(launchInfo: LaunchInfo, displayId: Int)
         fun onUninstall(launchInfo: LaunchInfo)
+        fun onOpenDrawer()
     }
 
     override fun onSharedPreferenceChanged(sharedPref: SharedPreferences?, key: String?) {

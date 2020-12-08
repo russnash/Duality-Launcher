@@ -210,6 +210,7 @@ class Dock(val parentActivity: MainActivity, attrs: AttributeSet?) :
     interface DockInterface {
         fun onDragStarted(view: View, clipData: ClipData)
         fun onUninstall(launchInfo: LaunchInfo)
+        fun onOpenDrawer()
     }
 
     override fun onDragStarted(view: View, clipData: ClipData) {
@@ -238,6 +239,10 @@ class Dock(val parentActivity: MainActivity, attrs: AttributeSet?) :
 
     override fun onReloadAppDrawer() {
         // Do nothing
+    }
+
+    override fun onOpenDrawer() {
+        listener.onOpenDrawer()
     }
 
     fun startDrag(view: View, clipData: ClipData) {

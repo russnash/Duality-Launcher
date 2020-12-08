@@ -11,7 +11,9 @@ data class LaunchInfo(
     private var folderName: String = "",
     private var dualLaunchName: String = "",
     private var folderUniqueId: Long = 0L,
-    private var dualLaunchUniqueId: Long = 0L
+    private var dualLaunchUniqueId: Long = 0L,
+    private var lastX: Int = 9999,
+    private var lastY: Int = 9999
 ) {
     val TAG = javaClass.simpleName
 
@@ -77,6 +79,19 @@ data class LaunchInfo(
 
     fun getDualLaunchUniqueId() : Long {
         return dualLaunchUniqueId
+    }
+
+    fun setLastXY(X: Int, Y: Int) {
+        lastX = X
+        lastY = Y
+    }
+
+    fun getLastX(): Int {
+        return lastX
+    }
+
+    fun getLastY(): Int {
+        return lastY
     }
 
     companion object {

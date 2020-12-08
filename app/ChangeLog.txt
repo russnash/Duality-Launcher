@@ -1,3 +1,16 @@
+Version 2020.12.8.1-internal
+Changes:
+- Home page indicator can now be enabled / disabled.
+- Added drag and drop safety net system, failed drops will now return to their previous position instead of the icon / folder / etc disappearing.
+
+Bugs:
+- Fixed missing remove option from inside folders.
+- Fixed a crash that could occur on startup due to an incorrect choice of context.
+
+Version 2020.12.6.1-internal
+Bugs:
+- Fixed a bug where the app drawer would stop scrolling when opened with the All Apps icon.
+
 Version 2020.12.5.1-internal
 Changes:
 - Added option to add an arrow button above the dock to open the app drawer.

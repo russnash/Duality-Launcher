@@ -113,7 +113,13 @@
             android:key="drawer_button"
             android:summary="Adds an arrow button above the dock for opening the app drawer"
             android:title="Drawer arrow button"
-            app:icon="@drawable/ic_drawer_open"/>
+            app:icon="@drawable/ic_arrow_up"/>
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:key="home_pager_indicator"
+            android:summary="Shows an indicator of the current home screen page above the dock"
+            android:title="Home page indicator"
+            app:icon="@drawable/ic_home_page_indicator"/>
         <us.graymatterapps.dualitylauncher.ColorPreference
             android:key="home_widget_color"
             android:title="Widget color"

@@ -130,4 +130,8 @@ class AppDrawerAdapter(
         filterWork(filteredWork)
         this.notifyDataSetChanged()
     }
+
+    override fun onOpenDrawer() {
+        // Do nothing
+    }
 }

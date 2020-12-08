@@ -171,6 +171,12 @@ class DualLaunch(
 
     private fun startDragging() {
         val id = System.currentTimeMillis().toString()
+        if(::parentLayout.isInitialized) {
+            if (parentLayout is HomeLayout) {
+                val params = this.layoutParams as HomeLayout.LayoutParams
+                launchInfo.setLastXY(params.column, params.row)
+            }
+        }
         val passedLaunchInfo = launchInfo.copy()
         dragAndDropData.addLaunchInfo(passedLaunchInfo, id)
         var clipData = ClipData.newPlainText("launchInfo", id)

@@ -24,7 +24,7 @@ class DockSearchWidget(val con: Context, attributeSet: AttributeSet? = null) :
     SharedPreferences.OnSharedPreferenceChangeListener {
     private val dockSearchLayout: ConstraintLayout
     private val dockSearchIcon: ImageView
-    private val dockSearchText: EditText
+    private val dockSearchText: EditTextNoDrop
     private val dockSpeakIcon: ImageView
     private val displayId: Int
 
@@ -47,7 +47,7 @@ class DockSearchWidget(val con: Context, attributeSet: AttributeSet? = null) :
                 } else {
                     GrayMatterUtils.hideKeyboardFrom(con, dockSearchText)
                 }
-                dockSearchText.text.clear()
+                dockSearchText.text?.clear()
                 dockSearchText.clearFocus()
             }
             true

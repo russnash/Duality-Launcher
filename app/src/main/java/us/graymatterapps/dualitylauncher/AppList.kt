@@ -127,9 +127,9 @@ class AppList(val context: Context) : LauncherApps.Callback() {
             }
             val drawerIcon = AppListDataType(
                 "All Apps",
-                ContextCompat.getDrawable(mainContext, R.mipmap.ic_app_drawer_button)!!,
-                ContextCompat.getDrawable(mainContext, R.mipmap.ic_app_drawer_button)!!,
-                ContextCompat.getDrawable(mainContext, R.mipmap.ic_app_drawer_button)!!,
+                ContextCompat.getDrawable(appContext, R.mipmap.ic_app_drawer_button)!!,
+                ContextCompat.getDrawable(appContext, R.mipmap.ic_app_drawer_button)!!,
+                ContextCompat.getDrawable(appContext, R.mipmap.ic_app_drawer_button)!!,
                 "allapps",
                 "allapps",
                 android.os.Process.myUserHandle(),

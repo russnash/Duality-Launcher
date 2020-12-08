@@ -258,6 +258,10 @@ class HomePagerAdapter(private val parent: MainActivity, private val container: 
         // Do nothing
     }
 
+    override fun onOpenDrawer() {
+        listener.onOpenDrawer()
+    }
+
     fun setListener(homeIconsInterface: HomeIconsInterface) {
         listener = homeIconsInterface
     }
@@ -274,6 +278,7 @@ class HomePagerAdapter(private val parent: MainActivity, private val container: 
         fun onFolderChanged()
         fun resetResize()
         fun onUninstall(launchInfo: LaunchInfo)
+        fun onOpenDrawer()
     }
 
     override fun onShowFolder(state: Boolean) {

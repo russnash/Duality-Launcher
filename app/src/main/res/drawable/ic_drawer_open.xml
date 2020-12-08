@@ -6,6 +6,6 @@
     <path
         android:name="button"
         android:strokeWidth="20"
-        android:strokeColor="#000000"
+        android:strokeColor="#FFFFFF"
         android:pathData="M5,120 L128,5 L251,120" />
 </vector>

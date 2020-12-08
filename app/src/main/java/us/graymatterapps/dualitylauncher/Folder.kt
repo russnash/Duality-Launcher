@@ -21,6 +21,7 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import us.graymatterapps.graymatterutils.GrayMatterUtils
 
 class Folder(
     private val parentActivity: MainActivity,
@@ -73,7 +74,14 @@ class Folder(
         }
 
         folderIcon.setOnLongClickListener {
+            GrayMatterUtils.vibrate(parentActivity, 50)
             val id = System.currentTimeMillis().toString()
+            if(::parentLayout.isInitialized) {
+                if (parentLayout is HomeLayout) {
+                    val params = this.layoutParams as HomeLayout.LayoutParams
+                    launchInfo.setLastXY(params.column, params.row)
+                }
+            }
             val passedLaunchInfo = launchInfo.copy()
             dragAndDropData.addLaunchInfo(passedLaunchInfo, id)
             var clipData = ClipData.newPlainText("launchInfo", id)

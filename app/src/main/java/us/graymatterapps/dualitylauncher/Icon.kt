@@ -8,6 +8,7 @@ import android.util.Log
 import android.view.DragEvent
 import android.view.MotionEvent
 import android.view.View
+import android.view.ViewGroup
 import android.view.animation.AnimationUtils
 import android.widget.*
 import androidx.core.graphics.ColorUtils
@@ -50,7 +51,7 @@ class Icon(
     ) : this(con, attrs, activityInfo, packageInfo, userSerial, true, false, false, 0)
 
     private lateinit var listener: IconInterface
-    lateinit var parentLayout: HomeLayout
+    lateinit var parentLayout: ViewGroup
     var iconLayout: LinearLayout
     var icon: ImageView
     var label: TextView
@@ -173,8 +174,10 @@ class Icon(
         if (event != null) {
             Log.d(TAG, "onTouchEvent() ${MotionEvent.actionToString(event.action)}")
             if (downTime > 0 && System.currentTimeMillis() - downTime > longClickTime) {
+                Log.d(TAG, "Downtime > longClickTime")
                 downTime = 0
                 if (!isDualLaunch) {
+                    Log.d(TAG, "historySize = ${event.historySize}")
                     if (event.historySize != 0) {
                         val distance = GrayMatterUtils.getDistance(
                             event.getHistoricalX(0),
@@ -182,9 +185,14 @@ class Icon(
                             event.getX(),
                             event.getY()
                         )
+                        Log.d(TAG, "Distance: $distance")
                         if (distance < touchSlop) {
                             showPopupMenu()
+                            return true
                         }
+                    } else {
+                        showPopupMenu()
+                        return true
                     }
                 }
             }
@@ -217,9 +225,6 @@ class Icon(
                                 menu.dismiss()
                                 startDragging()
                             }
-                            if (distance > 2) {
-                                downTime = 0
-                            }
                         }
                     }
                     return true
@@ -244,7 +249,7 @@ class Icon(
                 true
             }
 
-            if (this.parent is HomeLayout || this.parent is TableRow || this.parent is GridView) {
+            if (this.parent is HomeLayout || this.parent is TableRow || this.parent is LinearLayout) {
                 val menuItemRemove = menu.menu.add(1, 2, 1, "Remove")
                 menuItemRemove.setIcon(R.drawable.ic_remove)
                 menuItemRemove.setOnMenuItemClickListener {
@@ -338,12 +343,15 @@ class Icon(
                 )
             }
         }
+        if(this.parent is LinearLayout) {
+            parentLayout = this.parent as LinearLayout
+        }
     }
 
     private fun launch() {
         if (launchInfo.getActivityName() != "") {
             if (launchInfo.getActivityName() == "allapps") {
-                parentActivity.showDrawerFragment()
+                listener.onOpenDrawer()
             } else {
                 listener.onLaunch(launchInfo, parentActivity.displayId)
             }
@@ -353,6 +361,12 @@ class Icon(
     private fun startDragging() {
         if (launchInfo.getActivityName() != "") {
             val id = System.currentTimeMillis().toString()
+            if(::parentLayout.isInitialized) {
+                if (parentLayout is HomeLayout) {
+                    val params = this.layoutParams as HomeLayout.LayoutParams
+                    launchInfo.setLastXY(params.column, params.row)
+                }
+            }
             val passedLaunchInfo = launchInfo.copy()
             dragAndDropData.addLaunchInfo(passedLaunchInfo, id)
             var clipData = ClipData.newPlainText("launchInfo", id)
@@ -542,5 +556,6 @@ class Icon(
         fun onUninstall(launchInfo: LaunchInfo)
         fun onRemoveFromFolder(launchInfo: LaunchInfo)
         fun onReloadAppDrawer()
+        fun onOpenDrawer()
     }
 }

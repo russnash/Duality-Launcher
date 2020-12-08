@@ -4,12 +4,14 @@ class DragAndDropData() {
     var ids: MutableList<String> = ArrayList()
     var launchInfos: MutableList<LaunchInfo> = ArrayList()
     var widgets: MutableList<WidgetInfo> = ArrayList()
+    var lastId: String = ""
     val TAG = javaClass.simpleName
 
     fun addLaunchInfo(launchInfo: LaunchInfo, id: String){
         reset()
         ids.add(id)
         launchInfos.add(launchInfo)
+        lastId = id
     }
 
     fun retrieveLaunchInfo(id: String) : LaunchInfo {
