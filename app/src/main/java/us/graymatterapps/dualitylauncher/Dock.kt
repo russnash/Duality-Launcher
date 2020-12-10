@@ -1,22 +1,20 @@
 package us.graymatterapps.dualitylauncher
 
 import android.content.ClipData
-import android.content.Context
 import android.content.SharedPreferences
 import android.graphics.Color
 import android.util.AttributeSet
+import android.util.Log
+import android.view.OrientationEventListener
 import android.view.View
-import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.TableLayout
 import android.widget.TableRow
-import androidx.core.graphics.ColorUtils
-import androidx.core.view.setPadding
 import androidx.preference.PreferenceManager
-import us.graymatterapps.graymatterutils.GrayMatterUtils.colorPrefToColor
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+
 
 class Dock(val parentActivity: MainActivity, attrs: AttributeSet?) :
     LinearLayout(parentActivity, attrs),
@@ -31,6 +29,7 @@ class Dock(val parentActivity: MainActivity, attrs: AttributeSet?) :
     var searchRowBottom: LinearLayout
     var dockSearchWidget: DockSearchWidget = DockSearchWidget(context)
     val TAG = javaClass.simpleName
+    lateinit var orientationEventListener: OrientationEventListener
 
     init {
         inflate(context, R.layout.dock, this)

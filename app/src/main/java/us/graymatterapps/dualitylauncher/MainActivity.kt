@@ -11,6 +11,7 @@ import android.appwidget.AppWidgetProviderInfo
 import android.content.*
 import android.content.pm.PackageManager
 import android.content.res.ColorStateList
+import android.content.res.Configuration
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Color
@@ -265,7 +266,6 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
                         }
                         DragEvent.ACTION_DRAG_ENDED -> {
                             homeDelete.alpha = 0f
-                            dockSearchText.isEnabled = true
                             if(dragEvent.result == false) {
                                 val id = dragAndDropData.lastId
                                 val launchInfo = dragAndDropData.retrieveLaunchInfo(id)
@@ -904,7 +904,7 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
             .commitNowAllowingStateLoss()
         val animation = AnimationUtils.loadAnimation(this@MainActivity, R.anim.drawer_slide_up)
         fragmentFrame.startAnimation(animation)
-        var color = settingsPreferences.getInt(
+        val color = settingsPreferences.getInt(
             "app_drawer_background",
             Color.BLACK
         )
@@ -1594,5 +1594,17 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
         }
         homePagerAdapter.lock.unlock()
         persistGrid(page)
+    }
+
+    override fun onPause() {
+        super.onPause()
+        Log.d(TAG, "onPause()")
+        dock.adjustPadding()
+    }
+
+    override fun onPostResume() {
+        super.onPostResume()
+        Log.d(TAG, "onPostResume()")
+        dock.adjustPadding()
     }
 }

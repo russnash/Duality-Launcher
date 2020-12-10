@@ -1,3 +1,9 @@
+Version 2020.12.10.1-internal
+Bugs:
+- Fixed a bug where drag and drop would cause a crash if the dock search wasn't being used.
+- (Hopefully) fixed an issue where padding for the dock icons was not being applied after orientation changes.
+
+
 Version 2020.12.8.1-internal
 Changes:
 - Home page indicator can now be enabled / disabled.
