@@ -5,15 +5,12 @@ import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.util.AttributeSet
 import android.util.Log
-import android.view.DragEvent
-import android.view.MotionEvent
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.view.animation.AnimationUtils
 import android.widget.*
 import androidx.core.graphics.ColorUtils
+import androidx.core.view.GestureDetectorCompat
 import androidx.core.view.setPadding
-import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.dual_launch.view.*
 import kotlinx.android.synthetic.main.folder.view.*
 import us.graymatterapps.graymatterutils.GrayMatterUtils
@@ -59,8 +56,8 @@ class Icon(
     private var dragTarget = true
     private var blankOnDrag = false
     private var isDockIcon = false
-    private var isDualLaunch = false
-    private val touchSlop = 7
+    private var isDualLaunchEditWindow = false
+    private val touchSlop = 10
     private val longClickTime = android.view.ViewConfiguration.getLongPressTimeout()
     private val enteredColor = ColorUtils.setAlphaComponent(Color.GREEN, 20)
     private val pulseAnim = AnimationUtils.loadAnimation(context, R.anim.pulse_alpha)
@@ -171,67 +168,56 @@ class Icon(
     }
 
     override fun onTouchEvent(event: MotionEvent?): Boolean {
-        if (event != null) {
-            Log.d(TAG, "onTouchEvent() ${MotionEvent.actionToString(event.action)}")
-            if (downTime > 0 && System.currentTimeMillis() - downTime > longClickTime) {
-                Log.d(TAG, "Downtime > longClickTime")
-                downTime = 0
-                if (!isDualLaunch) {
-                    Log.d(TAG, "historySize = ${event.historySize}")
-                    if (event.historySize != 0) {
-                        val distance = GrayMatterUtils.getDistance(
-                            event.getHistoricalX(0),
-                            event.getHistoricalY(0),
-                            event.getX(),
-                            event.getY()
-                        )
-                        Log.d(TAG, "Distance: $distance")
-                        if (distance < touchSlop) {
-                            showPopupMenu()
-                            return true
-                        }
-                    } else {
+        if(!isScrolling) {
+            if (event != null) {
+                Log.d(TAG, "onTouchEvent() ${MotionEvent.actionToString(event.action)}")
+                if (downTime > 0 && System.currentTimeMillis() - downTime > longClickTime) {
+                    Log.d(TAG, "Downtime > longClickTime")
+                    downTime = 0
+                    if (!isDualLaunchEditWindow) {
                         showPopupMenu()
+                    }
+                }
+                when (event.action) {
+                    MotionEvent.ACTION_DOWN -> {
+                        downTime = System.currentTimeMillis()
+                        return true
+                    }
+                    MotionEvent.ACTION_UP -> {
+                        if (System.currentTimeMillis() - downTime < longClickTime) {
+                            if (!isDualLaunchEditWindow) {
+                                launch()
+                            }
+                        }
+                        downTime = 0
+                        return true
+                    }
+                    MotionEvent.ACTION_MOVE -> {
+                        if (isPopupMenuVisible) {
+                            if (event.historySize != 0) {
+                                val distance = GrayMatterUtils.getDistance(
+                                    event.getHistoricalX(0),
+                                    event.getHistoricalY(0),
+                                    event.getX(),
+                                    event.getY()
+                                )
+                                Log.d(TAG, "distance = $distance, touchSlop = $touchSlop")
+                                if (distance > touchSlop) {
+                                    downTime = 0
+                                    menu.dismiss()
+                                    startDragging()
+                                }
+                            }
+                        }
                         return true
                     }
                 }
             }
-            when (event.action) {
-                MotionEvent.ACTION_DOWN -> {
-                    downTime = System.currentTimeMillis()
-                    return true
-                }
-                MotionEvent.ACTION_UP -> {
-                    if (System.currentTimeMillis() - downTime < longClickTime) {
-                        if (!isDualLaunch) {
-                            launch()
-                        }
-                    }
-                    downTime = 0
-                    return true
-                }
-                MotionEvent.ACTION_MOVE -> {
-                    if (isPopupMenuVisible) {
-                        if (event.historySize != 0) {
-                            val distance = GrayMatterUtils.getDistance(
-                                event.getHistoricalX(0),
-                                event.getHistoricalY(0),
-                                event.getX(),
-                                event.getY()
-                            )
-                            Log.d(TAG, "distance = $distance, touchSlop = $touchSlop")
-                            if (distance > touchSlop) {
-                                downTime = 0
-                                menu.dismiss()
-                                startDragging()
-                            }
-                        }
-                    }
-                    return true
-                }
-            }
+            return true
+        } else {
+            downTime = 0
         }
-        return true
+        return false
     }
 
     private fun showPopupMenu() {
@@ -343,7 +329,7 @@ class Icon(
                 )
             }
         }
-        if(this.parent is LinearLayout) {
+        if (this.parent is LinearLayout) {
             parentLayout = this.parent as LinearLayout
         }
     }
@@ -361,7 +347,7 @@ class Icon(
     private fun startDragging() {
         if (launchInfo.getActivityName() != "") {
             val id = System.currentTimeMillis().toString()
-            if(::parentLayout.isInitialized) {
+            if (::parentLayout.isInitialized) {
                 if (parentLayout is HomeLayout) {
                     val params = this.layoutParams as HomeLayout.LayoutParams
                     launchInfo.setLastXY(params.column, params.row)
@@ -481,7 +467,7 @@ class Icon(
     }
 
     fun setDualLaunch(state: Boolean) {
-        isDualLaunch = state
+        isDualLaunchEditWindow = state
     }
 
     fun convertToFolder(info: LaunchInfo) {
@@ -529,6 +515,13 @@ class Icon(
         parentLayout.addView(dualLaunch)
         parentLayout.removeView(this)
         parentActivity.persistGrid(page)
+    }
+
+    fun setIconSize(pref: String) {
+        val percentage = settingsPreferences.getInt(pref, 100)
+        val scale = percentage.toFloat() / 100
+        this.icon.scaleX = scale
+        this.icon.scaleY = scale
     }
 
     /*

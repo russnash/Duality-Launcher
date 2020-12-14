@@ -11,7 +11,6 @@ import android.appwidget.AppWidgetProviderInfo
 import android.content.*
 import android.content.pm.PackageManager
 import android.content.res.ColorStateList
-import android.content.res.Configuration
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Color
@@ -194,6 +193,17 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
             override fun onPageScrollStateChanged(state: Int) {
                 Log.d(TAG, "onPageScrollStateChanged() state:$state")
                 super.onPageScrollStateChanged(state)
+                when (state) {
+                    ViewPager2.SCROLL_STATE_IDLE -> {
+                        isScrolling = false
+                    }
+                    ViewPager2.SCROLL_STATE_DRAGGING -> {
+                        isScrolling = true
+                    }
+                    ViewPager2.SCROLL_STATE_SETTLING -> {
+                        isScrolling = true
+                    }
+                }
                 setupHomePageIndicator()
 
                 if (dualityLauncherApplication.arePagersInitialized()) {
@@ -851,7 +861,7 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
                 homePagerAdapter.notifyDataSetChanged()
                 homePagerAdapter.lock.unlock()
             }
-            if (key == "home_icon_padding") {
+            if (key == "home_icon_size") {
                 homePagerAdapter.lock.lock()
                 homePagerAdapter.notifyDataSetChanged()
                 homePagerAdapter.lock.unlock()
@@ -1599,12 +1609,12 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
     override fun onPause() {
         super.onPause()
         Log.d(TAG, "onPause()")
-        dock.adjustPadding()
+        dock.adjustIconSize()
     }
 
     override fun onPostResume() {
         super.onPostResume()
         Log.d(TAG, "onPostResume()")
-        dock.adjustPadding()
+        dock.adjustIconSize()
     }
 }

@@ -66,7 +66,6 @@ class HomePagerAdapter(private val parent: MainActivity, private val container: 
         numRows = Integer.parseInt(numRowsString.toString())
         val textColor = settingsPreferences.getInt("home_text_color", Color.WHITE)
         val textShadowColor = settingsPreferences.getInt("home_text_shadow_color", Color.BLACK)
-        val iconPadding = settingsPreferences.getInt("home_icon_padding", 5)
         val textSize = settingsPreferences.getInt("home_text_size", 14)
 
         homeIconsTable.removeAllViews()
@@ -119,7 +118,7 @@ class HomePagerAdapter(private val parent: MainActivity, private val container: 
                                 launchInfo.getPackageName(),
                                 launchInfo.getUserSerial()
                             )
-                            icon.setPadding(iconPadding, iconPadding, iconPadding, iconPadding)
+                            icon.setIconSize("home_icon_size")
                             homeIconsTable.addView(icon, iconParams)
                         }
                     }
@@ -145,7 +144,7 @@ class HomePagerAdapter(private val parent: MainActivity, private val container: 
                         folder.folderLabel.setTextColor(textColor)
                         folder.folderLabel.setShadowLayer(6F, 0F, 0F, textShadowColor)
                         folder.folderLabel.textSize = textSize.toFloat()
-                        folder.setPadding(iconPadding, iconPadding, iconPadding, iconPadding)
+                        folder.setIconSize("home_icon_size")
                         homeIconsTable.addView(folder, folderParams)
                     }
                     if (launchInfo.getType() == LaunchInfo.DUALLAUNCH) {
@@ -170,7 +169,7 @@ class HomePagerAdapter(private val parent: MainActivity, private val container: 
                         dualLaunch.dualLaunchLabel.setTextColor(textColor)
                         dualLaunch.dualLaunchLabel.setShadowLayer(6F, 0F, 0F, textShadowColor)
                         dualLaunch.dualLaunchLabel.textSize = textSize.toFloat()
-                        dualLaunch.setPadding(iconPadding, iconPadding, iconPadding, iconPadding)
+                        dualLaunch.setIconSize("home_icon_size")
                         homeIconsTable.addView(dualLaunch, dualLaunchParams)
                     }
                 }

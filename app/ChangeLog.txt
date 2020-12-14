@@ -1,3 +1,10 @@
+Version 2020.12.14.1-internal
+Changes:
+- Switched icon padding settings to icon percentage size, icons are now scaled instead of squashed!
+
+Bugs:
+- Further tweaked touch handling code to help prevent accidental drag / long presses.
+
 Version 2020.12.10.1-internal
 Bugs:
 - Fixed a bug where drag and drop would cause a crash if the dock search wasn't being used.

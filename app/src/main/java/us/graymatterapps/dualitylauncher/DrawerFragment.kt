@@ -68,6 +68,8 @@ class DrawerFragment() : Fragment(), SharedPreferences.OnSharedPreferenceChangeL
             notifyDataSetChanged()
         }
 
+        drawer.addOnScrollListener(RecyclerViewScrollListener())
+
         setDrawerBackground()
         notifyDataSetChanged()
 
@@ -100,6 +102,10 @@ class DrawerFragment() : Fragment(), SharedPreferences.OnSharedPreferenceChangeL
 
         if (key == "app_drawer_text") {
             changeTextColors()
+        }
+
+        if (key == "drawer_icon_size") {
+            notifyDataSetChanged()
         }
     }
 

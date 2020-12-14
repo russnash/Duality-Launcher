@@ -476,6 +476,13 @@ class Folder(
         parentActivity.persistGrid(page)
     }
 
+    fun setIconSize(pref: String) {
+        val percentage = settingsPreferences.getInt(pref, 100)
+        val scale = percentage.toFloat() / 100
+        this.folderIcon.scaleX = scale
+        this.folderIcon.scaleY = scale
+    }
+
     interface FolderInterface {
         fun onShowFolder(state: Boolean)
         fun onSetupFolder(apps: ArrayList<LaunchInfo>, name: Editable, folder: Folder)

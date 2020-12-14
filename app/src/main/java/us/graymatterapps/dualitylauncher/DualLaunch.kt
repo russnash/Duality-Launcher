@@ -325,6 +325,13 @@ class DualLaunch(
         }
     }
 
+    fun setIconSize(pref: String) {
+        val percentage = settingsPreferences.getInt(pref, 100)
+        val scale = percentage.toFloat() / 100
+        this.dualLaunchIcon.scaleX = scale
+        this.dualLaunchIcon.scaleY = scale
+    }
+
     interface DualLaunchInterface {
         fun onShowDualLaunch(state: Boolean)
         fun onSetupDualLaunch(apps: ArrayList<LaunchInfo>, name: Editable, dualLaunch: DualLaunch)

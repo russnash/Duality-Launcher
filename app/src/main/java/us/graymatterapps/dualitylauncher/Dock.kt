@@ -4,7 +4,6 @@ import android.content.ClipData
 import android.content.SharedPreferences
 import android.graphics.Color
 import android.util.AttributeSet
-import android.util.Log
 import android.view.OrientationEventListener
 import android.view.View
 import android.widget.LinearLayout
@@ -72,7 +71,6 @@ class Dock(val parentActivity: MainActivity, attrs: AttributeSet?) :
     fun populateDock() {
         val totalItemsString = settingsPreferences.getString("dock_icons", "6")
         val totalItems = Integer.parseInt(totalItemsString.toString())
-        val dockIconPadding = settingsPreferences.getInt("dock_icon_padding", 5)
         dockRow.removeAllViews()
 
         if (totalItems != null) {
@@ -84,22 +82,11 @@ class Dock(val parentActivity: MainActivity, attrs: AttributeSet?) :
                     dockItems.packageNames[n],
                     dockItems.userSerials[n]
                 )
-                var params = TableRow.LayoutParams(
-                    TableRow.LayoutParams.WRAP_CONTENT,
-                    TableRow.LayoutParams.WRAP_CONTENT
-                )
-                params.width = 0
-                dockIcon.layoutParams = params
+                dockIcon.setIconSize("dock_icon_size")
                 dockIcon.label.height = 0
                 dockIcon.setListener(this)
                 dockIcon.setBlankOnDrag(true)
                 dockIcon.setDockIcon(true)
-                dockIcon.icon.setPadding(
-                    dockIconPadding,
-                    dockIconPadding,
-                    dockIconPadding,
-                    dockIconPadding
-                )
                 dockRow.addView(dockIcon)
             }
         }
@@ -146,11 +133,10 @@ class Dock(val parentActivity: MainActivity, attrs: AttributeSet?) :
         }
     }
 
-    fun adjustPadding() {
-        val dockIconPadding = settingsPreferences.getInt("dock_icon_padding", 5)
+    fun adjustIconSize() {
         for (n in 0 until dockRow.childCount) {
             val dockIcon = dockRow.getChildAt(n) as Icon
-            dockIcon.setPadding(dockIconPadding, dockIconPadding, dockIconPadding, dockIconPadding)
+            dockIcon.setIconSize("dock_icon_size")
         }
     }
 
@@ -197,8 +183,8 @@ class Dock(val parentActivity: MainActivity, attrs: AttributeSet?) :
             setupDockSearch()
         }
 
-        if (key == "dock_icon_padding") {
-            adjustPadding()
+        if (key == "dock_icon_size") {
+            adjustIconSize()
         }
     }
 

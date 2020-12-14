@@ -10,15 +10,15 @@
         android:id="@+id/iconImage"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_centerVertical="true"
-        android:adjustViewBounds="true"
+        android:layout_gravity="center"
         android:padding="5dp"
-        android:scaleType="fitStart" />
+        android:scaleType="centerInside" />
 
     <TextView
         android:id="@+id/label"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_gravity="center"
         android:elegantTextHeight="false"
         android:ellipsize="end"
         android:maxLines="2"

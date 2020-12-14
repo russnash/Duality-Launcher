@@ -40,12 +40,12 @@
             android:defaultValue="6"
             app:icon="@drawable/ic_rows"/>
         <SeekBarPreference
-            android:defaultValue="5"
-            android:key="dock_icon_padding"
-            android:max="30"
-            app:min="0"
-            android:title="Icon padding"
-            android:summary="Adjusts icon padding to change the size of the icons"
+            android:defaultValue="100"
+            android:key="dock_icon_size"
+            android:max="200"
+            app:min="5"
+            android:title="Icon size %"
+            android:summary="Adjusts the size of the icons"
             app:showSeekBarValue="true"
             app:icon="@drawable/ic_padding"/>
         <CheckBoxPreference
@@ -94,12 +94,12 @@
             android:defaultValue="7"
             app:icon="@drawable/ic_rows"/>
         <SeekBarPreference
-            android:defaultValue="5"
-            android:key="home_icon_padding"
-            android:max="30"
-            app:min="0"
-            android:title="Icon padding"
-            android:summary="Adjusts icon padding to change the size of the icons"
+            android:defaultValue="100"
+            android:key="home_icon_size"
+            android:max="200"
+            app:min="5"
+            android:title="Icon size %"
+            android:summary="Adjusts the size of the icons"
             app:showSeekBarValue="true"
             app:icon="@drawable/ic_padding"/>
         <CheckBoxPreference

@@ -46,6 +46,8 @@ lateinit var mainContext: Context
 lateinit var dualScreen: View
 lateinit var homePagerDual: ViewPager2
 lateinit var homePagerMain: ViewPager2
+var isScrolling = false
+val STANDARD_ICON_SIZE = 100
 
 @AcraCore(buildConfigClass = org.acra.BuildConfig::class, reportFormat = StringFormat.JSON)
 @AcraMailSender(mailTo = "russnash37@gmail.com", reportAsFile = true)
