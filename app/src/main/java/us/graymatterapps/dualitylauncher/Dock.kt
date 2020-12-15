@@ -72,6 +72,8 @@ class Dock(val parentActivity: MainActivity, attrs: AttributeSet?) :
         val totalItemsString = settingsPreferences.getString("dock_icons", "6")
         val totalItems = Integer.parseInt(totalItemsString.toString())
         dockRow.removeAllViews()
+        val itemWidth = dockRow.width / totalItems
+        val params = TableRow.LayoutParams(itemWidth, TableRow.LayoutParams.WRAP_CONTENT)
 
         if (totalItems != null) {
             for (n in 0 until totalItems) {
@@ -87,7 +89,7 @@ class Dock(val parentActivity: MainActivity, attrs: AttributeSet?) :
                 dockIcon.setListener(this)
                 dockIcon.setBlankOnDrag(true)
                 dockIcon.setDockIcon(true)
-                dockRow.addView(dockIcon)
+                dockRow.addView(dockIcon, params)
             }
         }
     }

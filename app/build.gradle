@@ -11,8 +11,8 @@ android {
         applicationId "us.graymatterapps.dualitylauncher"
         minSdkVersion 29
         targetSdkVersion 29
-        versionCode 47
-        versionName "2020.12.14.1-internal"
+        versionCode 51
+        versionName "2020.12.15.1-internal"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -59,7 +59,7 @@ dependencies {
     implementation "androidx.dynamicanimation:dynamicanimation:1.0.0"
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
     implementation 'com.github.MikeOrtiz:TouchImageView:3.0.1'
-    implementation "androidx.preference:preference:1.1.1"
+    implementation "androidx.preference:preference-ktx:1.1.1"
     implementation 'androidx.gridlayout:gridlayout:1.0.0'
     implementation 'androidx.viewpager2:viewpager2:1.0.0'
     implementation 'com.google.android.material:material:1.2.1'

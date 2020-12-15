@@ -1,3 +1,7 @@
+Version 2020.12.15.1-internal
+Bugs:
+- Fixed layout bugs causing misalignment of icons.
+
 Version 2020.12.14.1-internal
 Changes:
 - Switched icon padding settings to icon percentage size, icons are now scaled instead of squashed!
