@@ -30,6 +30,10 @@
         android:title="Recents to logcat"
         app:icon="@android:drawable/ic_menu_view" />
     <Preference
+        android:key="icon_pack_debug"
+        android:title="Icon pack info"
+        app:icon="@android:drawable/ic_menu_view" />
+    <Preference
         android:key="update_app_list"
         android:title="Force appList update"
         app:icon="@android:drawable/ic_menu_upload" />

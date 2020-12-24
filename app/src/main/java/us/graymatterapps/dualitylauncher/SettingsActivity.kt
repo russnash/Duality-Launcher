@@ -18,6 +18,7 @@ class SettingsActivity : AppCompatActivity(), PreferenceFragmentCompat.OnPrefere
     var settingsFragment = SettingsFragment()
     lateinit var versionName: TextView
     lateinit var versionCode: TextView
+    var settingsContext = this
     val TAG = javaClass.simpleName
 
     override fun onCreate(savedInstanceState: Bundle?) {

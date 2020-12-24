@@ -2,8 +2,14 @@ package us.graymatterapps.dualitylauncher
 
 import android.appwidget.AppWidgetHost
 import android.os.Bundle
+import android.view.LayoutInflater
+import android.widget.ImageView
+import android.widget.TextView
+import androidx.appcompat.app.AlertDialog
+import androidx.core.content.ContextCompat
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
+import kotlinx.android.synthetic.main.icon_pack_debug.view.*
 import us.graymatterapps.graymatterutils.GrayMatterUtils.shortToast
 import us.graymatterapps.graymatterutils.GrayMatterUtils.showOkDialog
 
@@ -78,6 +84,33 @@ class SettingsDeveloper : PreferenceFragmentCompat() {
 
         preferenceManager.findPreference<Preference>("log_recents")?.setOnPreferenceClickListener {
             listener.logRecents()
+            true
+        }
+
+        preferenceManager.findPreference<Preference>("icon_pack_debug")?.setOnPreferenceClickListener {
+            val dialogView = LayoutInflater.from(requireContext()).inflate(R.layout.icon_pack_debug, null)
+            val iconBackView = dialogView.findViewById<ImageView>(R.id.iconBackView)
+            val iconMaskView = dialogView.findViewById<ImageView>(R.id.iconMaskView)
+            val infoText = dialogView.findViewById<TextView>(R.id.infoText)
+
+            if(iconPackManager.iconBack == null) {
+                iconBackView.setImageDrawable(ContextCompat.getDrawable(appContext, R.drawable.ic_error))
+            } else {
+                iconBackView.setImageDrawable(iconPackManager.iconBack)
+            }
+            if(iconPackManager.iconMask == null) {
+                iconMaskView.setImageDrawable(ContextCompat.getDrawable(appContext, R.drawable.ic_error))
+            } else {
+                iconMaskView.setImageDrawable(iconPackManager.iconMask)
+            }
+            infoText.text = "Scale: ${iconPackManager.scale}\nSize: ${iconPackManager.iconSize}"
+            val builder = AlertDialog.Builder(requireContext())
+            builder.setTitle(settingsPreferences.getString("choose_icon_pack", "Default"))
+            builder.setView(dialogView)
+            builder.setPositiveButton("Ok") { dialog, which ->
+                dialog.dismiss()
+            }
+            builder.show()
             true
         }
     }

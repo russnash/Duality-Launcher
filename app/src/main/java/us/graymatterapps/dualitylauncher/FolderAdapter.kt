@@ -33,7 +33,6 @@ class FolderAdapter(
     }
 
     override fun onBindViewHolder(holder: FolderHolder, position: Int) {
-        val iconPadding = settingsPreferences.getInt("folder_icon_padding", 5)
         val textSize = settingsPreferences.getInt("folder_text_size", 14)
         val textColor = settingsPreferences.getInt("folder_text", Color.WHITE)
         val textShadowColor = settingsPreferences.getInt("folder_text_shadow", Color.BLACK)
@@ -51,7 +50,7 @@ class FolderAdapter(
             icon.label.setTextColor(textColor)
             icon.label.setShadowLayer(6F, 0F, 0F, textShadowColor)
             icon.label.textSize = textSize.toFloat()
-            icon.setPadding(iconPadding, iconPadding, iconPadding, 25)
+            icon.setIconSize("folder_icon_size")
             icon.setOnDragListener { view, dragEvent ->
                 if (dragEvent != null) {
                     when (dragEvent.action) {
@@ -72,7 +71,7 @@ class FolderAdapter(
             dualLaunch.dualLaunchLabel.setTextColor(textColor)
             dualLaunch.dualLaunchLabel.setShadowLayer(6F, 0F, 0F, textShadowColor)
             dualLaunch.dualLaunchLabel.textSize = textSize.toFloat()
-            dualLaunch.setPadding(iconPadding, iconPadding, iconPadding, 25)
+            dualLaunch.setIconSize("folder_icon_size")
             dualLaunch.setListener(this)
             dualLaunch.setOnDragListener { view, dragEvent ->
                 if (dragEvent != null) {
@@ -170,6 +169,9 @@ class FolderAdapter(
             }
             if (key == "icon_background") {
                 folder.updateIcon()
+                this.notifyDataSetChanged()
+            }
+            if (key == "folder_icon_size") {
                 this.notifyDataSetChanged()
             }
         }

@@ -46,6 +46,7 @@ lateinit var mainContext: Context
 lateinit var dualScreen: View
 lateinit var homePagerDual: ViewPager2
 lateinit var homePagerMain: ViewPager2
+lateinit var iconPackManager: IconPackManager
 var isScrolling = false
 val STANDARD_ICON_SIZE = 100
 
@@ -75,6 +76,7 @@ class DualityLauncherApplication: Application() {
         } catch (e: Exception) {
             // Do nothing
         } */
+        iconPackManager = IconPackManager(applicationContext)
         appList = AppList(applicationContext)
         appWidgetManager = AppWidgetManager.getInstance(applicationContext)
         appWidgetHost = AppWidgetHost(applicationContext, 1)

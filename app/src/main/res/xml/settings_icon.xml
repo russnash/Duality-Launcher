@@ -1,8 +1,10 @@
 <PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:android="http://schemas.android.com/apk/res/android">
-    <CheckBoxPreference
-        android:key="icon_background"
-        android:title="Remove adaptive icon backgrounds"
-        android:defaultValue="false"
-        app:icon="@drawable/ic_icons"/>
+    <ListPreference
+        android:key = "choose_icon_pack"
+        android:title = "Choose icon pack"
+        android:summary = "Select an icon pack to use"
+        app:useSimpleSummaryProvider="true"
+        android:icon = "@drawable/ic_app_drawer">
+    </ListPreference>
 </PreferenceScreen>

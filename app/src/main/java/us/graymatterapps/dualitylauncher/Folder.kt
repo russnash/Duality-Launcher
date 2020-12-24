@@ -507,6 +507,9 @@ class Folder(
                 sortFolder()
                 persistFolderApps()
             }
+            if (key == "apps") {
+                updateIcon()
+            }
         }
     }
 }

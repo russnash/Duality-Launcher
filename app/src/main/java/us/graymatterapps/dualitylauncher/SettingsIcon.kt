@@ -5,6 +5,7 @@ import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import androidx.fragment.app.DialogFragment
+import androidx.preference.ListPreference
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import us.graymatterapps.graymatterutils.GrayMatterUtils
@@ -15,6 +16,21 @@ class SettingsIcon : PreferenceFragmentCompat(), SharedPreferences.OnSharedPrefe
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         setPreferencesFromResource(R.xml.settings_icon, rootKey)
         settingsPreferences.registerOnSharedPreferenceChangeListener(this)
+
+        var chooseIconPack = preferenceManager.findPreference<ListPreference>("choose_icon_pack")
+        var entries = ArrayList<String>()
+        var entriesValues = ArrayList<String>()
+        entries.add("Default")
+        entriesValues.add("Default")
+        iconPackManager.iconPacks.forEach{
+            entries.add(it.name)
+            entriesValues.add(it.name)
+        }
+        if (chooseIconPack != null) {
+            chooseIconPack.entries = entries.toArray(arrayOfNulls<CharSequence>(entries.size))
+            chooseIconPack.entryValues = entriesValues.toArray(arrayOfNulls<CharSequence>(entriesValues.size))
+            chooseIconPack.setDefaultValue("Default")
+        }
     }
 
     override fun onDisplayPreferenceDialog(preference: Preference?) {

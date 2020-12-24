@@ -5,12 +5,10 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.pm.LauncherApps
 import android.content.pm.ShortcutInfo
-import android.graphics.drawable.AdaptiveIconDrawable
 import android.graphics.drawable.Drawable
 import android.os.Process
 import android.os.UserHandle
 import android.os.UserManager
-import android.util.Log
 import androidx.core.content.ContextCompat
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
@@ -74,43 +72,55 @@ class AppList(val context: Context) : LauncherApps.Callback() {
     }
 
     fun updateApps() {
+        iconPackManager.updateIconPacks()
+
+        var activeIconPack = settingsPreferences.getString("choose_icon_pack", "Default")
+        if(activeIconPack != "Default") {
+            try {
+                val pkgInfo = packageManager.getPackageInfo(iconPackManager.getPackageNameForIconPack(activeIconPack!!), 0)
+                iconPackManager.initializeIconPack(activeIconPack!!)
+            } catch (e: Exception) {
+                activeIconPack = "Default"
+                val editor = settingsPreferences.edit()
+                editor.putString("choose_icon_pack", activeIconPack)
+                editor.apply()
+            }
+        }
+
+        if(activeIconPack == "Default") {
+            iconPackManager.appFilter.clear()
+            iconPackManager.scale = 0f
+            iconPackManager.iconMask = null
+            iconPackManager.iconBack = null
+            iconPackManager.iconSize = 0
+        }
+
         Thread(Runnable {
             lock.lock()
             apps.clear()
 
             val handles = launcherApps.profiles
-
             handles.forEach { handle ->
                 val appList = launcherApps.getActivityList(null, handle)
                 appList.forEach { apps ->
-                    val name = apps.label.toString()
-                    val icon = apps.getBadgedIcon(0)
                     val packageName = apps.applicationInfo.packageName
+                    val name = apps.label.toString()
                     val activityName = apps.componentName.className
-                    var iconForeground: Drawable
-                    var iconBackground: Drawable
-                    try {
-                        val launchIntentForPackage = packageManager.getLaunchIntentForPackage(packageName)
-                        val fullPathToActivity = launchIntentForPackage!!.component!!.className
-                        val activityInfo =
-                            packageManager.getActivityInfo(ComponentName(packageName, fullPathToActivity), 0)
-                        val iconRes = activityInfo.iconResource
-                        val drawable =
-                            packageManager.getDrawable(packageName, iconRes, activityInfo.applicationInfo)
-                        iconForeground = (drawable as AdaptiveIconDrawable).foreground
-                        iconBackground = (drawable as AdaptiveIconDrawable).background
-                    } catch (e: Exception) {
-                        iconForeground = icon
-                        iconBackground = icon
+                    var icon = apps.getBadgedIcon(0)
+
+                    if(activeIconPack != "Default") {
+                        icon = iconPackManager.getIconPackDrawable(activeIconPack!!, packageName, activityName, icon)
+                        if(icon == null) {
+                            icon = apps.getBadgedIcon(0)
+                        }
                     }
+
                     val handle = apps.user
                     val userSerial = userManager.getSerialNumberForUser(handle)
                     this.apps.add(
                         AppListDataType(
                             name,
                             icon,
-                            iconForeground,
-                            iconBackground,
                             activityName,
                             packageName,
                             handle,
@@ -127,8 +137,6 @@ class AppList(val context: Context) : LauncherApps.Callback() {
             }
             val drawerIcon = AppListDataType(
                 "All Apps",
-                ContextCompat.getDrawable(appContext, R.mipmap.ic_app_drawer_button)!!,
-                ContextCompat.getDrawable(appContext, R.mipmap.ic_app_drawer_button)!!,
                 ContextCompat.getDrawable(appContext, R.mipmap.ic_app_drawer_button)!!,
                 "allapps",
                 "allapps",
@@ -160,11 +168,7 @@ class AppList(val context: Context) : LauncherApps.Callback() {
         }
         lock.unlock()
         if (app != null) {
-            if (settingsPreferences.getBoolean("icon_background", false)) {
-                return app.iconForeground
-            } else {
-                return app.icon
-            }
+            return app.icon
         } else {
             return ContextCompat.getDrawable(context, R.drawable.ic_launcher_foreground)!!
         }
@@ -313,8 +317,6 @@ class AppList(val context: Context) : LauncherApps.Callback() {
     data class AppListDataType(
         var name: String,
         var icon: Drawable,
-        var iconForeground: Drawable,
-        var iconBackground: Drawable,
         var activityName: String,
         var packageName: String,
         var handle: UserHandle,

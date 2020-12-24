@@ -1,3 +1,11 @@
+Version 2020.12.23.1-internal
+Changes:
+- Implemented icon % sizing for folders.
+- Added support for icon packs.
+
+Bugs:
+- Fixed a bug where an icon could be dropped into the same position as an existing item and replace it instead of interacting with it.
+
 Version 2020.12.15.1-internal
 Bugs:
 - Fixed layout bugs causing misalignment of icons.

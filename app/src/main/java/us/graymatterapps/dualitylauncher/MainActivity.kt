@@ -830,6 +830,10 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
 
             if (key == "apps") {
                 dock.populateDock()
+                homePagerAdapter.lock.lock()
+                homePagerAdapter.notifyDataSetChanged()
+                homePagerAdapter.lock.unlock()
+                setupHomePageIndicator()
             }
 
             if (key == "home_grid_pages" || key == "home_grid_columns" || key == "home_grid_rows" || key == "home_pager_indicator") {
@@ -885,6 +889,9 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
                 homePagerAdapter.lock.unlock()
                 dock.depersistDock()
                 dock.populateDock()
+            }
+            if(key == "choose_icon_pack") {
+                appList.updateApps()
             }
         }
     }

@@ -39,7 +39,7 @@ class HomeLayout(context: Context, attributeSet: AttributeSet?) : ViewGroup(
         this.setOnDragListener { view, dragEvent ->
             if (dragEvent != null) {
                 var dragType: String? = null
-                if(dragEvent.clipDescription != null) {
+                if (dragEvent.clipDescription != null) {
                     dragType = dragEvent.clipDescription.label.toString()
                 }
 
@@ -67,99 +67,151 @@ class HomeLayout(context: Context, attributeSet: AttributeSet?) : ViewGroup(
                     }
                     DragEvent.ACTION_DRAG_LOCATION -> {
                         val params = findClosestCell(dragEvent.x, dragEvent.y)
-                        if(dragType == "widget") {
+                        if (dragType == "widget") {
                             params.columnSpan = widthToCells(dragWidgetBitmap!!.width)
                             params.rowSpan = heightToCells(dragWidgetBitmap!!.height)
                         }
                         dragImage.layoutParams = params
                     }
                     DragEvent.ACTION_DROP -> {
-                        if (dragType == "launchInfo") {
-                            val id = dragEvent.clipData.getItemAt(0).text.toString()
-                            val info = dragAndDropData.retrieveLaunchInfo(id)
-                            if (info.getType() == LaunchInfo.ICON) {
-                                val textColor = settingsPreferences.getInt("home_text_color", Color.WHITE)
-                                val textShadowColor = settingsPreferences.getInt("home_text_shadow_color", Color.BLACK)
-                                val iconPadding = settingsPreferences.getInt("home_icon_padding", 5)
-                                val textSize = settingsPreferences.getInt("home_text_size", 14)
-                                val icon = Icon(parentActivity, null, true, page)
-                                val params = dragImage.layoutParams as HomeLayout.LayoutParams
-                                params.columnSpan = 1
-                                params.rowSpan = 1
-                                params.freeForm = false
-                                icon.layoutParams = params
-                                icon.label.setTextColor(textColor)
-                                icon.label.setShadowLayer(6F, 0F, 0F, textShadowColor)
-                                icon.label.textSize = textSize.toFloat()
-                                icon.setListener(parentActivity.homePagerAdapter as Icon.IconInterface)
-                                icon.setLaunchInfo(info)
-                                icon.setPadding(iconPadding, iconPadding, iconPadding, iconPadding)
-                                this.addView(icon, params)
+                        val params = dragImage.layoutParams as HomeLayout.LayoutParams
+                        this.removeView(dragImage)
+                        if (!isCellOccupied(params.row, params.column)) {
+                            if (dragType == "launchInfo") {
+                                val id = dragEvent.clipData.getItemAt(0).text.toString()
+                                val info = dragAndDropData.retrieveLaunchInfo(id)
+                                if (info.getType() == LaunchInfo.ICON) {
+                                    val textColor =
+                                        settingsPreferences.getInt("home_text_color", Color.WHITE)
+                                    val textShadowColor = settingsPreferences.getInt(
+                                        "home_text_shadow_color",
+                                        Color.BLACK
+                                    )
+                                    val iconPadding =
+                                        settingsPreferences.getInt("home_icon_padding", 5)
+                                    val textSize = settingsPreferences.getInt("home_text_size", 14)
+                                    val icon = Icon(parentActivity, null, true, page)
+                                    params.columnSpan = 1
+                                    params.rowSpan = 1
+                                    params.freeForm = false
+                                    icon.layoutParams = params
+                                    icon.label.setTextColor(textColor)
+                                    icon.label.setShadowLayer(6F, 0F, 0F, textShadowColor)
+                                    icon.label.textSize = textSize.toFloat()
+                                    icon.setListener(parentActivity.homePagerAdapter as Icon.IconInterface)
+                                    icon.setLaunchInfo(info)
+                                    icon.setPadding(
+                                        iconPadding,
+                                        iconPadding,
+                                        iconPadding,
+                                        iconPadding
+                                    )
+                                    this.addView(icon, params)
+                                }
+                                if (info.getType() == LaunchInfo.DUALLAUNCH) {
+                                    val textColor =
+                                        settingsPreferences.getInt("home_text_color", Color.WHITE)
+                                    val textShadowColor = settingsPreferences.getInt(
+                                        "home_text_shadow_color",
+                                        Color.BLACK
+                                    )
+                                    val iconPadding =
+                                        settingsPreferences.getInt("home_icon_padding", 5)
+                                    val textSize = settingsPreferences.getInt("home_text_size", 14)
+                                    val dualLaunch = DualLaunch(
+                                        parentActivity,
+                                        null,
+                                        info.getDualLaunchName(),
+                                        info,
+                                        true,
+                                        page
+                                    )
+                                    params.columnSpan = 1
+                                    params.rowSpan = 1
+                                    params.freeForm = false
+                                    dualLaunch.layoutParams = params
+                                    dualLaunch.dualLaunchLabel.maxLines = 1
+                                    dualLaunch.dualLaunchLabel.setTextColor(textColor)
+                                    dualLaunch.dualLaunchLabel.setShadowLayer(
+                                        6F,
+                                        0F,
+                                        0F,
+                                        textShadowColor
+                                    )
+                                    dualLaunch.dualLaunchLabel.textSize = textSize.toFloat()
+                                    dualLaunch.setPadding(
+                                        iconPadding,
+                                        iconPadding,
+                                        iconPadding,
+                                        iconPadding
+                                    )
+                                    dualLaunch.setListener(parentActivity.homePagerAdapter as DualLaunch.DualLaunchInterface)
+                                    this.addView(dualLaunch, params)
+                                }
+                                if (info.getType() == LaunchInfo.FOLDER) {
+                                    val textColor =
+                                        settingsPreferences.getInt("home_text_color", Color.WHITE)
+                                    val textShadowColor = settingsPreferences.getInt(
+                                        "home_text_shadow_color",
+                                        Color.BLACK
+                                    )
+                                    val textSize = settingsPreferences.getInt("home_text_size", 14)
+                                    val iconPadding =
+                                        settingsPreferences.getInt("home_icon_padding", 5)
+                                    val folder = Folder(
+                                        parentActivity,
+                                        null,
+                                        info.getFolderName(),
+                                        info,
+                                        true,
+                                        page
+                                    )
+                                    params.columnSpan = 1
+                                    params.rowSpan = 1
+                                    params.freeForm = false
+                                    folder.layoutParams = params
+                                    folder.folderLabel.setTextColor(textColor)
+                                    folder.folderLabel.setShadowLayer(6F, 0F, 0F, textShadowColor)
+                                    folder.folderLabel.textSize = textSize.toFloat()
+                                    folder.setListener(parentActivity.homePagerAdapter as Folder.FolderInterface)
+                                    folder.setPadding(
+                                        iconPadding,
+                                        iconPadding,
+                                        iconPadding,
+                                        iconPadding
+                                    )
+                                    this.addView(folder, params)
+                                }
+                                parentActivity.persistGrid(page)
                             }
-                            if(info.getType() == LaunchInfo.DUALLAUNCH){
-                                val textColor = settingsPreferences.getInt("home_text_color", Color.WHITE)
-                                val textShadowColor = settingsPreferences.getInt("home_text_shadow_color", Color.BLACK)
-                                val iconPadding = settingsPreferences.getInt("home_icon_padding", 5)
-                                val textSize = settingsPreferences.getInt("home_text_size", 14)
-                                val dualLaunch = DualLaunch(parentActivity, null, info.getDualLaunchName(), info, true, page)
-                                val params = dragImage.layoutParams as HomeLayout.LayoutParams
-                                params.columnSpan = 1
-                                params.rowSpan = 1
-                                params.freeForm = false
-                                dualLaunch.layoutParams = params
-                                dualLaunch.dualLaunchLabel.maxLines = 1
-                                dualLaunch.dualLaunchLabel.setTextColor(textColor)
-                                dualLaunch.dualLaunchLabel.setShadowLayer(6F, 0F, 0F, textShadowColor)
-                                dualLaunch.dualLaunchLabel.textSize = textSize.toFloat()
-                                dualLaunch.setPadding(iconPadding, iconPadding, iconPadding, iconPadding)
-                                dualLaunch.setListener(parentActivity.homePagerAdapter as DualLaunch.DualLaunchInterface)
-                                this.addView(dualLaunch, params)
-                            }
-                            if (info.getType() == LaunchInfo.FOLDER) {
-                                val textColor = settingsPreferences.getInt("home_text_color", Color.WHITE)
-                                val textShadowColor = settingsPreferences.getInt("home_text_shadow_color", Color.BLACK)
-                                val textSize = settingsPreferences.getInt("home_text_size", 14)
-                                val iconPadding = settingsPreferences.getInt("home_icon_padding", 5)
-                                val folder = Folder(
+                            if (dragType == "widget") {
+                                val id = dragEvent.clipData.getItemAt(0).text.toString()
+                                val widgetInfo = dragAndDropData.retrieveWidgetId(id)
+                                val widgetContainer = WidgetContainer(
                                     parentActivity,
-                                    null,
-                                    info.getFolderName(),
-                                    info,
-                                    true,
-                                    page
+                                    widgetInfo.getAppWidgetId(),
+                                    widgetInfo.getAppWidgetProviderInfo()
                                 )
-                                val params = dragImage.layoutParams as HomeLayout.LayoutParams
-                                params.columnSpan = 1
-                                params.rowSpan = 1
-                                params.freeForm = false
-                                folder.layoutParams = params
-                                folder.folderLabel.setTextColor(textColor)
-                                folder.folderLabel.setShadowLayer(6F, 0F, 0F, textShadowColor)
-                                folder.folderLabel.textSize = textSize.toFloat()
-                                folder.setListener(parentActivity.homePagerAdapter as Folder.FolderInterface)
-                                folder.setPadding(iconPadding, iconPadding, iconPadding, iconPadding)
-                                this.addView(folder, params)
+                                widgetContainer.layoutParams = params
+                                widgetContainer.setListener(parentActivity as WidgetContainer.WidgetInterface)
+                                this.addView(widgetContainer, params)
                             }
-                            parentActivity.persistGrid(page)
-                        }
-                        if (dragType == "widget") {
-                            val id = dragEvent.clipData.getItemAt(0).text.toString()
-                            val widgetInfo = dragAndDropData.retrieveWidgetId(id)
-                            val widgetContainer = WidgetContainer(
-                                parentActivity,
-                                widgetInfo.getAppWidgetId(),
-                                widgetInfo.getAppWidgetProviderInfo()
-                            )
-                            val params = dragImage.layoutParams as HomeLayout.LayoutParams
-                            widgetContainer.layoutParams = params
-                            widgetContainer.setListener(parentActivity as WidgetContainer.WidgetInterface)
-                            this.addView(widgetContainer, params)
                         }
                     }
                 }
             }
             true
         }
+    }
+
+    private fun isCellOccupied(row: Int, column: Int): Boolean {
+        for (n in 0 until this.childCount) {
+            val params = this.getChildAt(n).layoutParams as HomeLayout.LayoutParams
+            if (params.row == row && params.column == column) {
+                return true
+            }
+        }
+        return false
     }
 
     private fun findClosestCell(xpos: Float, ypos: Float): HomeLayout.LayoutParams {
@@ -210,7 +262,7 @@ class HomeLayout(context: Context, attributeSet: AttributeSet?) : ViewGroup(
         Log.d(TAG, "onLayout(), ${this.childCount} children")
         for (n in 0 until this.childCount) {
             val child = this.getChildAt(n)
-            if(child is WidgetContainer) {
+            if (child is WidgetContainer) {
                 Log.d(TAG, "WidgetContainer")
             }
             val params = child.layoutParams as HomeLayout.LayoutParams
@@ -234,7 +286,10 @@ class HomeLayout(context: Context, attributeSet: AttributeSet?) : ViewGroup(
                     type = "Unknown"
                 }
             }
-            Log.d(TAG, "onLayout() $type row:${params.row} column:${params.column} rowSpan:${params.rowSpan} columnSpan:${params.columnSpan}")
+            Log.d(
+                TAG,
+                "onLayout() $type row:${params.row} column:${params.column} rowSpan:${params.rowSpan} columnSpan:${params.columnSpan}"
+            )
             layoutChild(
                 child,
                 params.row,
