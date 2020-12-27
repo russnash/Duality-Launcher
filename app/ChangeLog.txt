@@ -1,3 +1,11 @@
+Version 2020.12.27.1-internal
+Changes:
+- Added confirmation prompts to destructive developer tools (yes, I hit one by mistake!).
+- Added further improvements to icon pack code to support more packs with differing standards.
+
+Bugs:
+- Fixed some bugs where certain conditions caused icon pack loading to crash.
+
 Version 2020.12.23.1-internal
 Changes:
 - Implemented icon % sizing for folders.

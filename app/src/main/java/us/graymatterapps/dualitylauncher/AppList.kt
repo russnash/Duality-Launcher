@@ -5,10 +5,12 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.pm.LauncherApps
 import android.content.pm.ShortcutInfo
+import android.graphics.drawable.AdaptiveIconDrawable
 import android.graphics.drawable.Drawable
 import android.os.Process
 import android.os.UserHandle
 import android.os.UserManager
+import android.util.Log
 import androidx.core.content.ContextCompat
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
@@ -75,9 +77,11 @@ class AppList(val context: Context) : LauncherApps.Callback() {
         iconPackManager.updateIconPacks()
 
         var activeIconPack = settingsPreferences.getString("choose_icon_pack", "Default")
-        if(activeIconPack != "Default") {
+        if (activeIconPack != "Default") {
             try {
-                val pkgInfo = packageManager.getPackageInfo(iconPackManager.getPackageNameForIconPack(activeIconPack!!), 0)
+                val pkgInfo = packageManager.getPackageInfo(
+                    iconPackManager.getPackageNameForIconPack(activeIconPack!!), 0
+                )
                 iconPackManager.initializeIconPack(activeIconPack!!)
             } catch (e: Exception) {
                 activeIconPack = "Default"
@@ -87,11 +91,11 @@ class AppList(val context: Context) : LauncherApps.Callback() {
             }
         }
 
-        if(activeIconPack == "Default") {
+        if (activeIconPack == "Default") {
             iconPackManager.appFilter.clear()
             iconPackManager.scale = 0f
             iconPackManager.iconMask = null
-            iconPackManager.iconBack = null
+            iconPackManager.iconBack.clear()
             iconPackManager.iconSize = 0
         }
 
@@ -108,9 +112,54 @@ class AppList(val context: Context) : LauncherApps.Callback() {
                     val activityName = apps.componentName.className
                     var icon = apps.getBadgedIcon(0)
 
-                    if(activeIconPack != "Default") {
-                        icon = iconPackManager.getIconPackDrawable(activeIconPack!!, packageName, activityName, icon)
-                        if(icon == null) {
+                    if (activeIconPack != "Default") {
+                        try {
+                            val launchIntentForPackage =
+                                packageManager.getLaunchIntentForPackage(packageName)
+                            val fullPathToActivity = launchIntentForPackage!!.component!!.className
+                            val activityInfo = packageManager.getActivityInfo(
+                                ComponentName(
+                                    packageName,
+                                    fullPathToActivity
+                                ), 0
+                            )
+                            val iconRes = activityInfo.iconResource
+                            icon = packageManager.getDrawable(
+                                packageName,
+                                iconRes,
+                                activityInfo.applicationInfo
+                            )
+                        } catch (e: Exception) {
+                            Log.d(TAG, "Couldn't get PackageManager icon for $name")
+                            icon = apps.getBadgedIcon(0)
+                        }
+
+                        if (icon is AdaptiveIconDrawable) {
+                            if(icon.foreground != null) {
+                                icon = iconPackManager.getIconPackDrawable(
+                                    activeIconPack!!,
+                                    packageName,
+                                    activityName,
+                                    icon.foreground
+                                )
+                            } else {
+                                Log.d(TAG, "AdaptiveIcon for $name had null foreground.")
+                                icon = iconPackManager.getIconPackDrawable(
+                                    activeIconPack!!,
+                                    packageName,
+                                    activityName,
+                                    icon
+                                )
+                            }
+                        } else {
+                            icon = iconPackManager.getIconPackDrawable(
+                                activeIconPack!!,
+                                packageName,
+                                activityName,
+                                icon!!
+                            )
+                        }
+                        if (icon == null) {
                             icon = apps.getBadgedIcon(0)
                         }
                     }
@@ -120,7 +169,7 @@ class AppList(val context: Context) : LauncherApps.Callback() {
                     this.apps.add(
                         AppListDataType(
                             name,
-                            icon,
+                            icon!!,
                             activityName,
                             packageName,
                             handle,

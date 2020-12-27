@@ -53,5 +53,9 @@
         android:key="clear_folders"
         android:title="Clear folder data"
         app:icon="@android:drawable/ic_menu_delete" />
+    <Preference
+        android:key="restore_folder"
+        android:title="Restore folder"
+        app:icon="@android:drawable/ic_menu_delete" />
 
 </PreferenceScreen>

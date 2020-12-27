@@ -11,8 +11,8 @@ android {
         applicationId "us.graymatterapps.dualitylauncher"
         minSdkVersion 29
         targetSdkVersion 29
-        versionCode 52
-        versionName "2020.12.23.1-internal"
+        versionCode 53
+        versionName "2020.12.27.1-internal"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }

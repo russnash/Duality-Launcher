@@ -12,18 +12,20 @@ class Replicator {
 
     fun register(displayId: Int, listener: ReplicatorInterface) {
         deregister(displayId)
-        participants.add(Participants(
-            displayId,
-            listener
-        ))
+        participants.add(
+            Participants(
+                displayId,
+                listener
+            )
+        )
         Log.d(TAG, "register() display:$displayId")
     }
 
     fun deregister(displayId: Int) {
         val indexes = ArrayList<Int>()
 
-        for(i in 0 until participants.size) {
-            if(participants[i].displayId == displayId) {
+        for (i in 0 until participants.size) {
+            if (participants[i].displayId == displayId) {
                 indexes.add(i)
             }
         }
@@ -36,7 +38,7 @@ class Replicator {
 
     fun addIcon(displayId: Int, launchInfo: LaunchInfo, page: Int, row: Int, column: Int) {
         participants.forEach {
-            if(it.displayId != displayId) {
+            if (it.displayId != displayId) {
                 Log.d(TAG, "addIcon() to display:${it.displayId} page:$page")
                 it.listener.addIcon(launchInfo, page, row, column)
             }
@@ -45,7 +47,7 @@ class Replicator {
 
     fun changeIcon(displayId: Int, launchInfo: LaunchInfo, page: Int, row: Int, column: Int) {
         participants.forEach {
-            if(it.displayId != displayId) {
+            if (it.displayId != displayId) {
                 Log.d(TAG, "changeIcon() on display:${it.displayId} page:$page")
                 it.listener.changeIcon(launchInfo, page, row, column)
             }
@@ -54,16 +56,23 @@ class Replicator {
 
     fun addFolder(displayId: Int, launchInfo: LaunchInfo, page: Int, row: Int, column: Int) {
         participants.forEach {
-            if(it.displayId != displayId) {
+            if (it.displayId != displayId) {
                 Log.d(TAG, "addFolder() to display:${it.displayId} page:$page")
                 it.listener.addFolder(launchInfo, page, row, column)
             }
         }
     }
 
+    fun addFolderAll(launchInfo: LaunchInfo, page: Int, row: Int, column: Int) {
+        participants.forEach {
+            Log.d(TAG, "addFolder() to display:${it.displayId} page:$page")
+            it.listener.addFolder(launchInfo, page, row, column)
+        }
+    }
+
     fun changeFolder(displayId: Int, launchInfo: LaunchInfo, page: Int, row: Int, column: Int) {
         participants.forEach {
-            if(it.displayId != displayId) {
+            if (it.displayId != displayId) {
                 Log.d(TAG, "changeFolder() on display:${it.displayId} page:$page")
                 it.listener.changeFolder(launchInfo, page, row, column)
             }
@@ -71,8 +80,8 @@ class Replicator {
     }
 
     fun addDualLaunch(displayId: Int, launchInfo: LaunchInfo, page: Int, row: Int, column: Int) {
-        participants.forEach{
-            if(it.displayId != displayId) {
+        participants.forEach {
+            if (it.displayId != displayId) {
                 Log.d(TAG, "addDualLaunch() to display:${it.displayId} page:$page")
                 it.listener.addDualLaunch(launchInfo, page, row, column)
             }
@@ -81,16 +90,16 @@ class Replicator {
 
     fun changeDualLaunch(displayId: Int, launchInfo: LaunchInfo, page: Int, row: Int, column: Int) {
         participants.forEach {
-            if(it.displayId != displayId) {
+            if (it.displayId != displayId) {
                 Log.d(TAG, "changeDualLaunch() on display:${it.displayId} page:$page")
                 it.listener.changeDualLaunch(launchInfo, page, row, column)
             }
         }
     }
 
-    fun deleteViews(displayId: Int, page: Int, row: Int, column: Int){
+    fun deleteViews(displayId: Int, page: Int, row: Int, column: Int) {
         participants.forEach {
-            if(it.displayId != displayId) {
+            if (it.displayId != displayId) {
                 Log.d(TAG, "deleteViews() on display:${it.displayId} page:$page")
                 it.listener.deleteViews(page, row, column)
             }
