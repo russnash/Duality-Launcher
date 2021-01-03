@@ -11,7 +11,6 @@ import androidx.core.graphics.drawable.toBitmap
 import org.xmlpull.v1.XmlPullParser
 import org.xmlpull.v1.XmlPullParserFactory
 
-
 class IconPackManager(val context: Context) {
     val iconPacks: ArrayList<IconPack> = ArrayList()
     val appFilter: ArrayList<AppFilter> = ArrayList()
@@ -43,10 +42,6 @@ class IconPackManager(val context: Context) {
 
     fun checkIfIconPack(packageName: String): Int {
         try {
-            /*
-            val apkResources = packageManager.getResourcesForApplication(packageName)
-            val resId = apkResources.getIdentifier("appfilter", "xml", packageName)
-             */
             val pkgContext =
                 appContext.createPackageContext(packageName, Context.CONTEXT_IGNORE_SECURITY)
             val resources = pkgContext.resources
@@ -56,7 +51,6 @@ class IconPackManager(val context: Context) {
             }
             return resId
         } catch (e: Exception) {
-            //Log.d(TAG, "checkIfIconPack($packageName): ${e.printStackTrace()}")
             return 0
         }
     }
@@ -227,25 +221,42 @@ class IconPackManager(val context: Context) {
 
     fun makeAdaptedIcon(standardIcon: Drawable): Drawable {
         if (iconSize == 0) {
-            iconSize = 108
+            iconSize = 192
         }
-        var scaledForeground = Bitmap.createScaledBitmap(standardIcon.toBitmap(), (iconSize * scale).toInt(), (iconSize * scale).toInt(), true)
-        val foregroundBitmap = Bitmap.createBitmap(iconSize, iconSize, Bitmap.Config.ARGB_8888)
-        val foregroundCanvas = Canvas(foregroundBitmap)
 
-        if(scale <= 1.0) {
-            val offset = (iconSize - scaledForeground.width) / 2
-            var srcRect = Rect(0, 0, scaledForeground.width, scaledForeground.height)
-            var dstRect = Rect(offset, offset, iconSize - offset, iconSize - offset)
-            foregroundCanvas.drawBitmap(scaledForeground, srcRect, dstRect, null)
+        var foreground = Bitmap.createBitmap(iconSize, iconSize, Bitmap.Config.ARGB_8888)
+
+        if(scale > 0) {
+            var scaledForeground = Bitmap.createScaledBitmap(
+                standardIcon.toBitmap(),
+                (iconSize * scale).toInt(),
+                (iconSize * scale).toInt(),
+                true
+            )
+            val foregroundBitmap = Bitmap.createBitmap(iconSize, iconSize, Bitmap.Config.ARGB_8888)
+            val foregroundCanvas = Canvas(foregroundBitmap)
+
+            if (scale <= 1.0) {
+                val offset = (iconSize - scaledForeground.width) / 2
+                var srcRect = Rect(0, 0, scaledForeground.width, scaledForeground.height)
+                var dstRect = Rect(offset, offset, iconSize - offset, iconSize - offset)
+                foregroundCanvas.drawBitmap(scaledForeground, srcRect, dstRect, null)
+            } else {
+                val offset = (scaledForeground.width - iconSize) / 2
+                var srcRect = Rect(
+                    offset,
+                    offset,
+                    scaledForeground.width - offset,
+                    scaledForeground.height - offset
+                )
+                var dstRect = Rect(0, 0, iconSize, iconSize)
+                foregroundCanvas.drawBitmap(scaledForeground, srcRect, dstRect, null)
+            }
+
+            foreground = foregroundBitmap
         } else {
-            val offset = (scaledForeground.width - iconSize) / 2
-            var srcRect = Rect(offset, offset, scaledForeground.width - offset, scaledForeground.height - offset)
-            var dstRect = Rect(0, 0, iconSize, iconSize)
-            foregroundCanvas.drawBitmap(scaledForeground, srcRect, dstRect, null)
+            foreground = standardIcon.toBitmap()
         }
-
-        var foreground = foregroundBitmap
         var background = iconBack[(0..iconBack.size - 1).random()].toBitmap()
 
         val bitmap = Bitmap.createBitmap(iconSize, iconSize, Bitmap.Config.ARGB_8888)

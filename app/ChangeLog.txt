@@ -1,3 +1,10 @@
+Version 2021.1.3.1-internal
+Changes:
+- Optimized app / package management routines to speed up changes and converted to a service to reduce 'killing' by the Android lifecycle.
+
+Bugs:
+- Fixed a bug where making an adapted icon could cause a crash.
+
 Version 2020.12.27.1-internal
 Changes:
 - Added confirmation prompts to destructive developer tools (yes, I hit one by mistake!).

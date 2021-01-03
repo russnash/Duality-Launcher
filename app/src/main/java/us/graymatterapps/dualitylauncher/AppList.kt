@@ -1,12 +1,16 @@
 package us.graymatterapps.dualitylauncher
 
 import android.app.ActivityOptions
+import android.app.Service
 import android.content.ComponentName
 import android.content.Context
+import android.content.Intent
+import android.content.pm.LauncherActivityInfo
 import android.content.pm.LauncherApps
 import android.content.pm.ShortcutInfo
 import android.graphics.drawable.AdaptiveIconDrawable
 import android.graphics.drawable.Drawable
+import android.os.IBinder
 import android.os.Process
 import android.os.UserHandle
 import android.os.UserManager
@@ -21,9 +25,8 @@ import java.util.*
 import java.util.concurrent.locks.ReentrantLock
 import kotlin.collections.ArrayList
 
-
 class AppList(val context: Context) : LauncherApps.Callback() {
-    val apps: ArrayList<AppListDataType> = ArrayList()
+    var apps: ArrayList<AppListDataType> = ArrayList()
     var manualWorkApps: ArrayList<LaunchInfo> = ArrayList()
     var ready: Boolean = false
     val lock = ReentrantLock()
@@ -35,7 +38,7 @@ class AppList(val context: Context) : LauncherApps.Callback() {
 
     init {
         updateApps()
-        depersist()
+        depersistManualWorkApps()
         launcherApps.registerCallback(this)
     }
 
@@ -45,14 +48,14 @@ class AppList(val context: Context) : LauncherApps.Callback() {
         }
     }
 
-    fun depersist() {
+    fun depersistManualWorkApps() {
         var loadItJson = prefs.getString("manualWorkApps", "")
         if (loadItJson != "") {
             manualWorkApps = loadItJson?.let { Json.decodeFromString(it) }!!
         }
     }
 
-    fun persist() {
+    fun persistManualWorkApps() {
         var saveItJson = Json.encodeToString(manualWorkApps)
         val editor = prefs.edit()
         editor.putString("manualWorkApps", saveItJson)
@@ -65,12 +68,12 @@ class AppList(val context: Context) : LauncherApps.Callback() {
 
     fun setAsManualWorkApp(info: LaunchInfo) {
         manualWorkApps.add(info)
-        persist()
+        persistManualWorkApps()
     }
 
     fun desetAsManualWorkApp(info: LaunchInfo) {
         manualWorkApps.remove(info)
-        persist()
+        persistManualWorkApps()
     }
 
     fun updateApps() {
@@ -106,76 +109,8 @@ class AppList(val context: Context) : LauncherApps.Callback() {
             val handles = launcherApps.profiles
             handles.forEach { handle ->
                 val appList = launcherApps.getActivityList(null, handle)
-                appList.forEach { apps ->
-                    val packageName = apps.applicationInfo.packageName
-                    val name = apps.label.toString()
-                    val activityName = apps.componentName.className
-                    var icon = apps.getBadgedIcon(0)
-
-                    if (activeIconPack != "Default") {
-                        try {
-                            val launchIntentForPackage =
-                                packageManager.getLaunchIntentForPackage(packageName)
-                            val fullPathToActivity = launchIntentForPackage!!.component!!.className
-                            val activityInfo = packageManager.getActivityInfo(
-                                ComponentName(
-                                    packageName,
-                                    fullPathToActivity
-                                ), 0
-                            )
-                            val iconRes = activityInfo.iconResource
-                            icon = packageManager.getDrawable(
-                                packageName,
-                                iconRes,
-                                activityInfo.applicationInfo
-                            )
-                        } catch (e: Exception) {
-                            Log.d(TAG, "Couldn't get PackageManager icon for $name")
-                            icon = apps.getBadgedIcon(0)
-                        }
-
-                        if (icon is AdaptiveIconDrawable) {
-                            if(icon.foreground != null) {
-                                icon = iconPackManager.getIconPackDrawable(
-                                    activeIconPack!!,
-                                    packageName,
-                                    activityName,
-                                    icon.foreground
-                                )
-                            } else {
-                                Log.d(TAG, "AdaptiveIcon for $name had null foreground.")
-                                icon = iconPackManager.getIconPackDrawable(
-                                    activeIconPack!!,
-                                    packageName,
-                                    activityName,
-                                    icon
-                                )
-                            }
-                        } else {
-                            icon = iconPackManager.getIconPackDrawable(
-                                activeIconPack!!,
-                                packageName,
-                                activityName,
-                                icon!!
-                            )
-                        }
-                        if (icon == null) {
-                            icon = apps.getBadgedIcon(0)
-                        }
-                    }
-
-                    val handle = apps.user
-                    val userSerial = userManager.getSerialNumberForUser(handle)
-                    this.apps.add(
-                        AppListDataType(
-                            name,
-                            icon!!,
-                            activityName,
-                            packageName,
-                            handle,
-                            userSerial
-                        )
-                    )
+                appList.forEach { app ->
+                    updateApp(app, activeIconPack!!)
                 }
             }
 
@@ -199,6 +134,78 @@ class AppList(val context: Context) : LauncherApps.Callback() {
             lock.unlock()
             ready = true
         }).start()
+    }
+
+    fun updateApp(app: LauncherActivityInfo, activeIconPack: String) {
+        val packageName = app.applicationInfo.packageName
+        val name = app.label.toString()
+        val activityName = app.componentName.className
+        var icon = app.getBadgedIcon(0)
+
+        if (activeIconPack != "Default") {
+            try {
+                val launchIntentForPackage =
+                    packageManager.getLaunchIntentForPackage(packageName)
+                val fullPathToActivity = launchIntentForPackage!!.component!!.className
+                val activityInfo = packageManager.getActivityInfo(
+                    ComponentName(
+                        packageName,
+                        fullPathToActivity
+                    ), 0
+                )
+                val iconRes = activityInfo.iconResource
+                icon = packageManager.getDrawable(
+                    packageName,
+                    iconRes,
+                    activityInfo.applicationInfo
+                )
+            } catch (e: Exception) {
+                Log.d(TAG, "Couldn't get PackageManager icon for $name")
+                icon = app.getBadgedIcon(0)
+            }
+
+            if (icon is AdaptiveIconDrawable) {
+                if(icon.foreground != null) {
+                    icon = iconPackManager.getIconPackDrawable(
+                        activeIconPack!!,
+                        packageName,
+                        activityName,
+                        icon.foreground
+                    )
+                } else {
+                    Log.d(TAG, "AdaptiveIcon for $name had null foreground.")
+                    icon = iconPackManager.getIconPackDrawable(
+                        activeIconPack!!,
+                        packageName,
+                        activityName,
+                        icon
+                    )
+                }
+            } else {
+                icon = iconPackManager.getIconPackDrawable(
+                    activeIconPack!!,
+                    packageName,
+                    activityName,
+                    icon!!
+                )
+            }
+            if (icon == null) {
+                icon = app.getBadgedIcon(0)
+            }
+        }
+
+        val handle = app.user
+        val userSerial = userManager.getSerialNumberForUser(handle)
+        this.apps.add(
+            AppListDataType(
+                name,
+                icon!!,
+                activityName,
+                packageName,
+                handle,
+                userSerial
+            )
+        )
     }
 
     fun isAppInstalled(launchInfo: LaunchInfo): Boolean {
@@ -379,23 +386,93 @@ class AppList(val context: Context) : LauncherApps.Callback() {
         val shortcutInfo: ShortcutInfo
     )
 
-    override fun onPackageRemoved(p0: String?, p1: UserHandle?) {
-        updateApps()
+    override fun onPackageRemoved(packageName: String?, user: UserHandle?) {
+        removePackage(packageName!!, user!!)
+        iconPackManager.updateIconPacks()
+        val editor = prefs.edit()
+        editor.putString("apps", System.currentTimeMillis().toString())
+        editor.apply()
     }
 
-    override fun onPackageAdded(p0: String?, p1: UserHandle?) {
-        updateApps()
+    fun removePackage(packageName: String, user: UserHandle) {
+        Log.d(TAG, "removePackage $packageName")
+        this.lock.lock()
+        val removed = ArrayList<AppListDataType>()
+        apps.forEach {
+            if(it.packageName == packageName) {
+                removed.add(it)
+            }
+        }
+        apps.removeAll(removed)
+        this.lock.unlock()
+
+        val removed2 = ArrayList<IconPackManager.IconPack>()
+        iconPackManager.iconPacks.forEach {
+            if(it.packageName == packageName) {
+                removed2.add(it)
+                if(settingsPreferences.getString("choose_icon_pack", "Default") == it.name) {
+                    val editor = settingsPreferences.edit()
+                    editor.putString("choose_icon_pack", "Default")
+                    editor.apply()
+                    updateApps()
+                }
+            }
+        }
+        iconPackManager.iconPacks.removeAll(removed2)
     }
 
-    override fun onPackageChanged(p0: String?, p1: UserHandle?) {
-        updateApps()
+    override fun onPackageAdded(packageName: String?, user: UserHandle?) {
+        addPackage(packageName!!, user!!)
+        iconPackManager.updateIconPacks()
+        apps.sortBy { it.name.toLowerCase() }
+        val editor = prefs.edit()
+        editor.putString("apps", System.currentTimeMillis().toString())
+        editor.apply()
     }
 
-    override fun onPackagesAvailable(p0: Array<out String>?, p1: UserHandle?, p2: Boolean) {
-        updateApps()
+    fun addPackage(packageName: String, user: UserHandle) {
+        Log.d(TAG, "addPackage $packageName")
+        this.lock.lock()
+        val app = launcherApps.getActivityList(packageName, user)
+        val activeIconPack = settingsPreferences.getString("choose_icon_pack", "Default")
+        app.forEach {
+            updateApp(it, activeIconPack!!)
+        }
+        this.lock.unlock()
     }
 
-    override fun onPackagesUnavailable(p0: Array<out String>?, p1: UserHandle?, p2: Boolean) {
-        updateApps()
+    override fun onPackageChanged(packageName: String?, user: UserHandle?) {
+        removePackage(packageName!!, user!!)
+        addPackage(packageName!!, user!!)
+        iconPackManager.updateIconPacks()
+        apps.sortBy { it.name.toLowerCase() }
+        val editor = prefs.edit()
+        editor.putString("apps", System.currentTimeMillis().toString())
+        editor.apply()
+    }
+
+    override fun onPackagesAvailable(packageNames: Array<out String>?, user: UserHandle?, replacing: Boolean) {
+        if (packageNames != null) {
+            packageNames.forEach {
+                addPackage(it, user!!)
+            }
+        }
+        iconPackManager.updateIconPacks()
+        apps.sortBy { it.name.toLowerCase() }
+        val editor = prefs.edit()
+        editor.putString("apps", System.currentTimeMillis().toString())
+        editor.apply()
+    }
+
+    override fun onPackagesUnavailable(packageNames: Array<out String>?, user: UserHandle?, replacing: Boolean) {
+        if (packageNames != null) {
+            packageNames.forEach {
+                removePackage(it, user!!)
+            }
+        }
+        iconPackManager.updateIconPacks()
+        val editor = prefs.edit()
+        editor.putString("apps", System.currentTimeMillis().toString())
+        editor.apply()
     }
 }

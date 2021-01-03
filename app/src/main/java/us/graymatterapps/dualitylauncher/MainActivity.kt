@@ -178,8 +178,11 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
             }
         }, true)
 
-        appList.waitForReady()
+        startUI()
+    }
 
+    fun startUI() {
+        appList.waitForReady()
         dock = Dock(this, null)
         dockContainer.addView(dock)
         dock.depersistDock()

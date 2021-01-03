@@ -1,11 +1,13 @@
 package us.graymatterapps.dualitylauncher
 
+import android.app.ActivityManager
 import android.app.Application
 import android.app.WallpaperManager
 import android.appwidget.AppWidgetHost
 import android.appwidget.AppWidgetManager
 import android.content.ContentValues
 import android.content.Context
+import android.content.Intent
 import android.content.SharedPreferences
 import android.graphics.Bitmap
 import android.graphics.Canvas
@@ -15,26 +17,25 @@ import android.net.Uri
 import android.os.Environment
 import android.provider.MediaStore
 import android.text.format.DateFormat
-import android.util.Log
 import android.view.View
-import androidx.appcompat.app.AlertDialog
 import androidx.preference.PreferenceManager
 import androidx.viewpager2.widget.ViewPager2
-import us.graymatterapps.graymatterutils.GrayMatterUtils
 import org.acra.ACRA
 import org.acra.annotation.AcraCore
 import org.acra.annotation.AcraDialog
 import org.acra.annotation.AcraMailSender
 import org.acra.data.StringFormat
-import java.io.File
-import java.io.FileOutputStream
+import us.graymatterapps.graymatterutils.GrayMatterUtils
 import java.util.*
+
 
 lateinit var appWidgetManager: AppWidgetManager
 lateinit var appWidgetHost: AppWidgetHost
 lateinit var settingsPreferences: SharedPreferences
 lateinit var prefs: SharedPreferences
 lateinit var appList: AppList
+lateinit var appManager: AppManager
+lateinit var appManagerListener: AppManager.AppManagerInterface
 lateinit var appContext: Context
 lateinit var widgetDB: WidgetDB
 lateinit var replicator: Replicator
@@ -69,15 +70,10 @@ class DualityLauncherApplication: Application() {
         dualityLauncherApplication = this
         prefs = this.getSharedPreferences(PREFS_FILENAME, 0)
         settingsPreferences = PreferenceManager.getDefaultSharedPreferences(this)
-        /* try {
-            val editor = prefs.edit()
-            editor.remove("widgetSizes")
-            editor.apply()
-        } catch (e: Exception) {
-            // Do nothing
-        } */
         iconPackManager = IconPackManager(applicationContext)
-        appList = AppList(applicationContext)
+        if(!isServiceRunning(AppManager::class.java)) {
+            startService(Intent(this, AppManager::class.java))
+        }
         appWidgetManager = AppWidgetManager.getInstance(applicationContext)
         appWidgetHost = AppWidgetHost(applicationContext, 1)
         appWidgetHost.startListening()
@@ -98,6 +94,10 @@ class DualityLauncherApplication: Application() {
 
     fun areScreensInitialized(): Boolean {
         return ::mainScreen.isInitialized && ::dualScreen.isInitialized
+    }
+
+    fun isAppManagerInitialized(): Boolean {
+        return ::appManager.isInitialized
     }
 
     fun wideShot() {
@@ -162,5 +162,15 @@ class DualityLauncherApplication: Application() {
 
     fun displayOff() {
         GrayMatterUtils.longToast(this, "Dual screen not detected!")
+    }
+
+    private fun isServiceRunning(serviceClass: Class<*>): Boolean {
+        val manager = getSystemService(ACTIVITY_SERVICE) as ActivityManager
+        for (service in manager.getRunningServices(Int.MAX_VALUE)) {
+            if (serviceClass.name == service.service.className) {
+                return true
+            }
+        }
+        return false
     }
 }
