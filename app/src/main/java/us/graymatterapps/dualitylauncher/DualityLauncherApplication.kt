@@ -5,16 +5,14 @@ import android.app.Application
 import android.app.WallpaperManager
 import android.appwidget.AppWidgetHost
 import android.appwidget.AppWidgetManager
-import android.content.ContentValues
-import android.content.Context
-import android.content.Intent
-import android.content.SharedPreferences
+import android.content.*
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.drawable.BitmapDrawable
 import android.hardware.display.DisplayManager
 import android.net.Uri
 import android.os.Environment
+import android.os.IBinder
 import android.provider.MediaStore
 import android.text.format.DateFormat
 import android.view.View
@@ -71,9 +69,7 @@ class DualityLauncherApplication: Application() {
         prefs = this.getSharedPreferences(PREFS_FILENAME, 0)
         settingsPreferences = PreferenceManager.getDefaultSharedPreferences(this)
         iconPackManager = IconPackManager(applicationContext)
-        if(!isServiceRunning(AppManager::class.java)) {
-            startService(Intent(this, AppManager::class.java))
-        }
+        startAppManager()
         appWidgetManager = AppWidgetManager.getInstance(applicationContext)
         appWidgetHost = AppWidgetHost(applicationContext, 1)
         appWidgetHost.startListening()
@@ -81,6 +77,13 @@ class DualityLauncherApplication: Application() {
         replicator = Replicator()
         dragAndDropData = DragAndDropData()
         dualWallpaper = DualWallpaper(this)
+    }
+
+    fun startAppManager() {
+        if(!isServiceRunning(AppManager::class.java)) {
+            val intent = Intent(this, AppManager::class.java)
+            startService(intent)
+        }
     }
 
     override fun onTerminate() {
@@ -98,6 +101,10 @@ class DualityLauncherApplication: Application() {
 
     fun isAppManagerInitialized(): Boolean {
         return ::appManager.isInitialized
+    }
+
+    fun isAppManagerListenerInitialized(): Boolean {
+        return ::appManagerListener.isInitialized
     }
 
     fun wideShot() {

@@ -65,7 +65,7 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
     HomePagerAdapter.HomeIconsInterface, WidgetFragment.WidgetInterface,
     SettingsDeveloper.DeveloperInterface, WidgetContainer.WidgetInterface,
     FolderAdapter.FolderAdapterInterface, WidgetDB.WidgetDBInterface,
-    Replicator.ReplicatorInterface {
+    Replicator.ReplicatorInterface, AppManager.AppManagerInterface {
 
     lateinit var homeActivity: MainActivity
     var displayId: Int = 99999
@@ -178,7 +178,11 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
             }
         }, true)
 
-        startUI()
+        if(dualityLauncherApplication.isAppManagerInitialized()) {
+            startUI()
+        } else {
+            appManagerListener = this
+        }
     }
 
     fun startUI() {
@@ -731,7 +735,13 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
     }
 
     override fun onResume() {
-        onBackPressed()
+        if(!dualityLauncherApplication.isAppManagerInitialized()) {
+            appManagerListener = this
+            dualityLauncherApplication.startAppManager()
+        } else {
+            onBackPressed()
+            dock.adjustIconSize()
+        }
         super.onResume()
     }
 
@@ -1622,9 +1632,7 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
         dock.adjustIconSize()
     }
 
-    override fun onPostResume() {
-        super.onPostResume()
-        Log.d(TAG, "onPostResume()")
-        dock.adjustIconSize()
+    override fun onStarted() {
+        startUI()
     }
 }

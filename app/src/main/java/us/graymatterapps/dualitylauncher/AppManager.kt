@@ -2,6 +2,7 @@ package us.graymatterapps.dualitylauncher
 
 import android.app.Service
 import android.content.Intent
+import android.os.Binder
 import android.os.IBinder
 import android.util.Log
 
@@ -12,10 +13,12 @@ class AppManager : Service() {
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         Log.d(TAG, "AppManager Started")
         mainAppList = AppList(applicationContext)
-        appManager = this
         appList = mainAppList
-        appManagerListener.onStarted()
-        return super.onStartCommand(intent, flags, startId)
+        appManager = this
+        if(dualityLauncherApplication.isAppManagerListenerInitialized()) {
+            appManagerListener.onStarted()
+        }
+        return START_STICKY
     }
 
     override fun onDestroy() {
@@ -24,7 +27,7 @@ class AppManager : Service() {
     }
 
     override fun onBind(intent: Intent): IBinder {
-        TODO("Return the communication channel to the service.")
+        return Binder()
     }
 
     interface AppManagerInterface {

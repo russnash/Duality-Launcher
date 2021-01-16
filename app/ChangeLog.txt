@@ -1,3 +1,8 @@
+Version 2021.1.16.1-internal
+Bugs:
+- Fixed an issue where trying to set the wide wallpaper when the second display had not been initialized caused a crash.
+- Fixed an issue where the recents screen was getting stuck on a blank screen instead of returning to the launcher.
+
 Version 2021.1.3.1-internal
 Changes:
 - Optimized app / package management routines to speed up changes and converted to a service to reduce 'killing' by the Android lifecycle.

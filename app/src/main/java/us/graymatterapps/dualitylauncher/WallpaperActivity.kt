@@ -52,7 +52,7 @@ class WallpaperActivity : AppCompatActivity() {
             }
         }
 
-        if (type == "wide") {
+        if (type == "wide" && secondaryDisplayOK) {
             hingeGap.visibility = View.VISIBLE
             hingeValue.visibility = View.VISIBLE
             hingeGap.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
