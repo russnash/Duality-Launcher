@@ -1,3 +1,12 @@
+Version 2021.1.17.1-internal
+Changes:
+- Code optimizations in icon pack and appList management.
+- Improved support for more icon packs.
+
+Bugs:
+- Fixed a crash where preference changes could occur before the user interface was ready.
+- Worked around an Android OS issue where the appManager service was being started before the OS had fully resumed DL to the foreground.
+
 Version 2021.1.16.1-internal
 Bugs:
 - Fixed an issue where trying to set the wide wallpaper when the second display had not been initialized caused a crash.

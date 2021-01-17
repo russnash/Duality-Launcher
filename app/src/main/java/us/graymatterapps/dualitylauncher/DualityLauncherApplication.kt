@@ -80,9 +80,13 @@ class DualityLauncherApplication: Application() {
     }
 
     fun startAppManager() {
-        if(!isServiceRunning(AppManager::class.java)) {
-            val intent = Intent(this, AppManager::class.java)
-            startService(intent)
+        try {
+            if (!isServiceRunning(AppManager::class.java)) {
+                val intent = Intent(this, AppManager::class.java)
+                startService(intent)
+            }
+        } catch (e: Exception) {
+            System.exit(0)
         }
     }
 

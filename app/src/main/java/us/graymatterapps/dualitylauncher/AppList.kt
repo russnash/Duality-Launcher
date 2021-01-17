@@ -1,16 +1,14 @@
 package us.graymatterapps.dualitylauncher
 
 import android.app.ActivityOptions
-import android.app.Service
 import android.content.ComponentName
 import android.content.Context
-import android.content.Intent
 import android.content.pm.LauncherActivityInfo
 import android.content.pm.LauncherApps
+import android.content.pm.PackageManager
 import android.content.pm.ShortcutInfo
 import android.graphics.drawable.AdaptiveIconDrawable
 import android.graphics.drawable.Drawable
-import android.os.IBinder
 import android.os.Process
 import android.os.UserHandle
 import android.os.UserManager
@@ -27,14 +25,14 @@ import kotlin.collections.ArrayList
 
 class AppList(val context: Context) : LauncherApps.Callback() {
     var apps: ArrayList<AppListDataType> = ArrayList()
-    var manualWorkApps: ArrayList<LaunchInfo> = ArrayList()
-    var ready: Boolean = false
+    private var manualWorkApps: ArrayList<LaunchInfo> = ArrayList()
+    private var ready: Boolean = false
     val lock = ReentrantLock()
-    var launcherApps: LauncherApps =
+    private var launcherApps: LauncherApps =
         context.getSystemService(Context.LAUNCHER_APPS_SERVICE) as LauncherApps
-    val userManager = context.getSystemService(Context.USER_SERVICE) as UserManager
-    val packageManager = context.packageManager
-    val TAG = javaClass.simpleName
+    private val userManager = context.getSystemService(Context.USER_SERVICE) as UserManager
+    private val packageManager: PackageManager = context.packageManager
+    val TAG: String = javaClass.simpleName
 
     init {
         updateApps()
@@ -48,15 +46,15 @@ class AppList(val context: Context) : LauncherApps.Callback() {
         }
     }
 
-    fun depersistManualWorkApps() {
-        var loadItJson = prefs.getString("manualWorkApps", "")
+    private fun depersistManualWorkApps() {
+        val loadItJson = prefs.getString("manualWorkApps", "")
         if (loadItJson != "") {
             manualWorkApps = loadItJson?.let { Json.decodeFromString(it) }!!
         }
     }
 
-    fun persistManualWorkApps() {
-        var saveItJson = Json.encodeToString(manualWorkApps)
+    private fun persistManualWorkApps() {
+        val saveItJson = Json.encodeToString(manualWorkApps)
         val editor = prefs.edit()
         editor.putString("manualWorkApps", saveItJson)
         editor.apply()
@@ -77,20 +75,29 @@ class AppList(val context: Context) : LauncherApps.Callback() {
     }
 
     fun updateApps() {
+        Log.d(TAG, "updateApps()")
         iconPackManager.updateIconPacks()
 
         var activeIconPack = settingsPreferences.getString("choose_icon_pack", "Default")
         if (activeIconPack != "Default") {
-            try {
+            val debug: Boolean = false
+            if(debug) {
                 val pkgInfo = packageManager.getPackageInfo(
                     iconPackManager.getPackageNameForIconPack(activeIconPack!!), 0
                 )
-                iconPackManager.initializeIconPack(activeIconPack!!)
-            } catch (e: Exception) {
-                activeIconPack = "Default"
-                val editor = settingsPreferences.edit()
-                editor.putString("choose_icon_pack", activeIconPack)
-                editor.apply()
+                iconPackManager.initializeIconPack(activeIconPack)
+            } else {
+                try {
+                    val pkgInfo = packageManager.getPackageInfo(
+                        iconPackManager.getPackageNameForIconPack(activeIconPack!!), 0
+                    )
+                    iconPackManager.initializeIconPack(activeIconPack)
+                } catch (e: Exception) {
+                    activeIconPack = "Default"
+                    val editor = settingsPreferences.edit()
+                    editor.putString("choose_icon_pack", activeIconPack)
+                    editor.apply()
+                }
             }
         }
 
@@ -102,7 +109,7 @@ class AppList(val context: Context) : LauncherApps.Callback() {
             iconPackManager.iconSize = 0
         }
 
-        Thread(Runnable {
+        Thread {
             lock.lock()
             apps.clear()
 
@@ -115,7 +122,7 @@ class AppList(val context: Context) : LauncherApps.Callback() {
             }
 
             try {
-                apps.sortBy { it.name.toLowerCase() }
+                apps.sortBy { it.name.toLowerCase(Locale.ROOT) }
             } catch (e: Exception) {
                 // Do nothing
             }
@@ -133,10 +140,10 @@ class AppList(val context: Context) : LauncherApps.Callback() {
             editor.apply()
             lock.unlock()
             ready = true
-        }).start()
+        }.start()
     }
 
-    fun updateApp(app: LauncherActivityInfo, activeIconPack: String) {
+    private fun updateApp(app: LauncherActivityInfo, activeIconPack: String) {
         val packageName = app.applicationInfo.packageName
         val name = app.label.toString()
         val activityName = app.componentName.className
@@ -167,7 +174,7 @@ class AppList(val context: Context) : LauncherApps.Callback() {
             if (icon is AdaptiveIconDrawable) {
                 if(icon.foreground != null) {
                     icon = iconPackManager.getIconPackDrawable(
-                        activeIconPack!!,
+                        activeIconPack,
                         packageName,
                         activityName,
                         icon.foreground
@@ -175,7 +182,7 @@ class AppList(val context: Context) : LauncherApps.Callback() {
                 } else {
                     Log.d(TAG, "AdaptiveIcon for $name had null foreground.")
                     icon = iconPackManager.getIconPackDrawable(
-                        activeIconPack!!,
+                        activeIconPack,
                         packageName,
                         activityName,
                         icon
@@ -183,7 +190,7 @@ class AppList(val context: Context) : LauncherApps.Callback() {
                 }
             } else {
                 icon = iconPackManager.getIconPackDrawable(
-                    activeIconPack!!,
+                    activeIconPack,
                     packageName,
                     activityName,
                     icon!!
@@ -223,10 +230,10 @@ class AppList(val context: Context) : LauncherApps.Callback() {
             it.activityName == launchInfo.getActivityName() && it.packageName == launchInfo.getPackageName() && it.userSerial == launchInfo.getUserSerial()
         }
         lock.unlock()
-        if (app != null) {
-            return app.icon
+        return if (app != null) {
+            app.icon
         } else {
-            return ContextCompat.getDrawable(context, R.drawable.ic_launcher_foreground)!!
+            ContextCompat.getDrawable(context, R.drawable.ic_launcher_foreground)!!
         }
     }
 
@@ -236,10 +243,10 @@ class AppList(val context: Context) : LauncherApps.Callback() {
             it.activityName == launchInfo.getActivityName() && it.packageName == launchInfo.getPackageName() && it.userSerial == launchInfo.getUserSerial()
         }
         lock.unlock()
-        if (app != null) {
-            return app.name
+        return if (app != null) {
+            app.name
         } else {
-            return "?Unknown?"
+            "?Unknown?"
         }
     }
 
@@ -277,10 +284,10 @@ class AppList(val context: Context) : LauncherApps.Callback() {
         var targetDisplay: Int = 0
         var isDisplayAvailable: Boolean = true
 
-        if (display == 1) {
-            targetDisplay = 0
+        targetDisplay = if (display == 1) {
+            0
         } else {
-            targetDisplay = 1
+            1
         }
 
         val displays = parentActivity.displayManager.displays
@@ -312,7 +319,7 @@ class AppList(val context: Context) : LauncherApps.Callback() {
 
         val displays = parentActivity.displayManager.displays
         try {
-            displays.get(1)
+            displays[1]
         } catch (e: IndexOutOfBoundsException) {
             isDisplayAvailable = false
         }
@@ -349,13 +356,13 @@ class AppList(val context: Context) : LauncherApps.Callback() {
 
     fun loadShortcutIcon(shortcutInfo: ShortcutInfo): Drawable? {
         var drawable: Drawable? = null
-        try {
-            drawable = launcherApps.getShortcutIconDrawable(
+        drawable = try {
+            launcherApps.getShortcutIconDrawable(
                 shortcutInfo,
                 context.resources.displayMetrics.densityDpi
             )
         } catch (e: Exception) {
-            drawable = null
+            null
         }
         return drawable
     }
@@ -394,7 +401,7 @@ class AppList(val context: Context) : LauncherApps.Callback() {
         editor.apply()
     }
 
-    fun removePackage(packageName: String, user: UserHandle) {
+    private fun removePackage(packageName: String, user: UserHandle) {
         Log.d(TAG, "removePackage $packageName")
         this.lock.lock()
         val removed = ArrayList<AppListDataType>()
@@ -424,13 +431,13 @@ class AppList(val context: Context) : LauncherApps.Callback() {
     override fun onPackageAdded(packageName: String?, user: UserHandle?) {
         addPackage(packageName!!, user!!)
         iconPackManager.updateIconPacks()
-        apps.sortBy { it.name.toLowerCase() }
+        apps.sortBy { it.name.toLowerCase(Locale.ROOT) }
         val editor = prefs.edit()
         editor.putString("apps", System.currentTimeMillis().toString())
         editor.apply()
     }
 
-    fun addPackage(packageName: String, user: UserHandle) {
+    private fun addPackage(packageName: String, user: UserHandle) {
         Log.d(TAG, "addPackage $packageName")
         this.lock.lock()
         val app = launcherApps.getActivityList(packageName, user)
@@ -443,32 +450,28 @@ class AppList(val context: Context) : LauncherApps.Callback() {
 
     override fun onPackageChanged(packageName: String?, user: UserHandle?) {
         removePackage(packageName!!, user!!)
-        addPackage(packageName!!, user!!)
+        addPackage(packageName, user)
         iconPackManager.updateIconPacks()
-        apps.sortBy { it.name.toLowerCase() }
+        apps.sortBy { it.name.toLowerCase(Locale.ROOT) }
         val editor = prefs.edit()
         editor.putString("apps", System.currentTimeMillis().toString())
         editor.apply()
     }
 
     override fun onPackagesAvailable(packageNames: Array<out String>?, user: UserHandle?, replacing: Boolean) {
-        if (packageNames != null) {
-            packageNames.forEach {
-                addPackage(it, user!!)
-            }
+        packageNames?.forEach {
+            addPackage(it, user!!)
         }
         iconPackManager.updateIconPacks()
-        apps.sortBy { it.name.toLowerCase() }
+        apps.sortBy { it.name.toLowerCase(Locale.ROOT) }
         val editor = prefs.edit()
         editor.putString("apps", System.currentTimeMillis().toString())
         editor.apply()
     }
 
     override fun onPackagesUnavailable(packageNames: Array<out String>?, user: UserHandle?, replacing: Boolean) {
-        if (packageNames != null) {
-            packageNames.forEach {
-                removePackage(it, user!!)
-            }
+        packageNames?.forEach {
+            removePackage(it, user!!)
         }
         iconPackManager.updateIconPacks()
         val editor = prefs.edit()

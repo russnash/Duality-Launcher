@@ -4,9 +4,8 @@ import android.content.Context
 import android.graphics.*
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
-import android.graphics.drawable.ScaleDrawable
 import android.util.Log
-import android.view.Gravity
+import androidx.core.content.res.ResourcesCompat
 import androidx.core.graphics.drawable.toBitmap
 import org.xmlpull.v1.XmlPullParser
 import org.xmlpull.v1.XmlPullParserFactory
@@ -18,10 +17,9 @@ class IconPackManager(val context: Context) {
     var iconMask: Drawable? = null
     var scale: Float = 0f
     var iconSize = 0
-    var binary = false
-    val packageManager = context.packageManager
-    val BACK_ATTRS = arrayOf("img", "img1", "img2", "img3", "img4", "img5")
-    val TAG = javaClass.simpleName
+    private val packageManager = context.packageManager
+    private val BACK_ATTRS = arrayOf("img", "img1", "img2", "img3", "img4", "img5")
+    val TAG: String = javaClass.simpleName
 
     fun updateIconPacks() {
         iconPacks.clear()
@@ -40,8 +38,8 @@ class IconPackManager(val context: Context) {
         }
     }
 
-    fun checkIfIconPack(packageName: String): Int {
-        try {
+    private fun checkIfIconPack(packageName: String): Int {
+        return try {
             val pkgContext =
                 appContext.createPackageContext(packageName, Context.CONTEXT_IGNORE_SECURITY)
             val resources = pkgContext.resources
@@ -49,9 +47,9 @@ class IconPackManager(val context: Context) {
             if (resId == 0) {
                 resId = resources.getIdentifier("appfilter", "raw", packageName)
             }
-            return resId
+            resId
         } catch (e: Exception) {
-            return 0
+            0
         }
     }
 
@@ -86,12 +84,16 @@ class IconPackManager(val context: Context) {
                 XmlPullParser.START_TAG -> {
                     Log.d(TAG, "START_TAG name:${xmlPullParser.name}")
                     if (xmlPullParser.name == "item") {
-                        appFilter.add(
-                            AppFilter(
-                                xmlPullParser.getAttributeValue(null, "component"),
-                                xmlPullParser.getAttributeValue(null, "drawable")
+                        val component = xmlPullParser.getAttributeValue(null, "component")
+                        val drawable = xmlPullParser.getAttributeValue(null, "drawable")
+                        if(component != null && drawable != null) {
+                            appFilter.add(
+                                AppFilter(
+                                    component,
+                                    drawable
+                                )
                             )
-                        )
+                        }
                     }
                     if (xmlPullParser.name == "iconback") {
                         val resources = packageManager.getResourcesForApplication(packageName)
@@ -104,7 +106,7 @@ class IconPackManager(val context: Context) {
                                     ), "drawable", packageName
                                 )
                                 if (resId != 0) {
-                                    iconBack.add(resources.getDrawable(resId))
+                                    iconBack.add(ResourcesCompat.getDrawable(resources, resId, null)!!)
                                 }
                             } catch (e: Exception) {
                                 // Do nothing
@@ -112,7 +114,7 @@ class IconPackManager(val context: Context) {
                         }
                     }
                     if (xmlPullParser.name == "iconmask") {
-                        try {
+                        iconMask = try {
                             val resources = packageManager.getResourcesForApplication(packageName)
                             val resId = resources.getIdentifier(
                                 xmlPullParser.getAttributeValue(
@@ -120,12 +122,12 @@ class IconPackManager(val context: Context) {
                                     "img1"
                                 ), "drawable", packageName
                             )
-                            iconMask = resources.getDrawable(resId)
+                            ResourcesCompat.getDrawable(resources, resId, null)
                         } catch (e: Exception) {
-                            iconMask = null
+                            null
                         }
                         if (iconMask == null) {
-                            try {
+                            iconMask = try {
                                 val resources =
                                     packageManager.getResourcesForApplication(packageName)
                                 val resId = resources.getIdentifier(
@@ -134,9 +136,9 @@ class IconPackManager(val context: Context) {
                                         "img"
                                     ), "drawable", packageName
                                 )
-                                iconMask = resources.getDrawable(resId)
+                                ResourcesCompat.getDrawable(resources, resId, null)
                             } catch (e: Exception) {
-                                iconMask = null
+                                null
                             }
                         }
                     }
@@ -166,14 +168,14 @@ class IconPackManager(val context: Context) {
                     break
                 }
             }
-            val icon = resources.getDrawable(resId)
+            val icon = ResourcesCompat.getDrawable(resources, resId, null)!!
             iconSize = icon.intrinsicWidth
         } else {
             iconSize = 108
         }
     }
 
-    fun getResIdFromIconPacks(packageName: String): Int {
+    private fun getResIdFromIconPacks(packageName: String): Int {
         iconPacks.forEach {
             if (it.packageName == packageName) {
                 return it.resId
@@ -204,22 +206,21 @@ class IconPackManager(val context: Context) {
                     val iconPackageName = getPackageNameForIconPack(iconPack)
                     val resources = packageManager.getResourcesForApplication(iconPackageName)
                     val resId = resources.getIdentifier(it.drawable, "drawable", iconPackageName)
-                    val icon = resources.getDrawable(resId)
-                    return icon
+                    return ResourcesCompat.getDrawable(resources, resId, null)
                 }
             }
         } catch (e: Exception) {
             // Do nothing and return modded icon
         }
 
-        if (iconBack.size > 0) {
-            return makeAdaptedIcon(standardIcon)
+        return if (iconBack.size > 0) {
+            makeAdaptedIcon(standardIcon)
         } else {
-            return null
+            null
         }
     }
 
-    fun makeAdaptedIcon(standardIcon: Drawable): Drawable {
+    private fun makeAdaptedIcon(standardIcon: Drawable): Drawable {
         if (iconSize == 0) {
             iconSize = 192
         }
@@ -227,10 +228,15 @@ class IconPackManager(val context: Context) {
         var foreground = Bitmap.createBitmap(iconSize, iconSize, Bitmap.Config.ARGB_8888)
 
         if(scale > 0) {
-            var scaledForeground = Bitmap.createScaledBitmap(
+            var size = (iconSize * scale).toInt()
+            if(size <= 0) {
+               size = iconSize
+               Log.d(TAG, "makeAdaptedIcon() iconSize=$iconSize, scale=$scale, size=$size")
+            }
+            val scaledForeground = Bitmap.createScaledBitmap(
                 standardIcon.toBitmap(),
-                (iconSize * scale).toInt(),
-                (iconSize * scale).toInt(),
+                size,
+                size,
                 true
             )
             val foregroundBitmap = Bitmap.createBitmap(iconSize, iconSize, Bitmap.Config.ARGB_8888)
@@ -238,18 +244,18 @@ class IconPackManager(val context: Context) {
 
             if (scale <= 1.0) {
                 val offset = (iconSize - scaledForeground.width) / 2
-                var srcRect = Rect(0, 0, scaledForeground.width, scaledForeground.height)
-                var dstRect = Rect(offset, offset, iconSize - offset, iconSize - offset)
+                val srcRect = Rect(0, 0, scaledForeground.width, scaledForeground.height)
+                val dstRect = Rect(offset, offset, iconSize - offset, iconSize - offset)
                 foregroundCanvas.drawBitmap(scaledForeground, srcRect, dstRect, null)
             } else {
                 val offset = (scaledForeground.width - iconSize) / 2
-                var srcRect = Rect(
+                val srcRect = Rect(
                     offset,
                     offset,
                     scaledForeground.width - offset,
                     scaledForeground.height - offset
                 )
-                var dstRect = Rect(0, 0, iconSize, iconSize)
+                val dstRect = Rect(0, 0, iconSize, iconSize)
                 foregroundCanvas.drawBitmap(scaledForeground, srcRect, dstRect, null)
             }
 
@@ -257,7 +263,7 @@ class IconPackManager(val context: Context) {
         } else {
             foreground = standardIcon.toBitmap()
         }
-        var background = iconBack[(0..iconBack.size - 1).random()].toBitmap()
+        val background = iconBack[(0 until iconBack.size).random()].toBitmap()
 
         val bitmap = Bitmap.createBitmap(iconSize, iconSize, Bitmap.Config.ARGB_8888)
         val canvas = Canvas(bitmap)
@@ -271,7 +277,7 @@ class IconPackManager(val context: Context) {
         canvas.drawBitmap(foreground, srcRect, dstRect, null)
 
         if (iconMask != null) {
-            var mask = iconMask!!.toBitmap()
+            val mask = iconMask!!.toBitmap()
             val paint = Paint()
             paint.xfermode = PorterDuffXfermode(PorterDuff.Mode.DST_OUT)
             srcRect = Rect(0, 0, mask.width, mask.height)

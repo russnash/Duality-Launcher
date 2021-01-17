@@ -95,14 +95,6 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
         widgetDB.setListener(this, displayId)
 
         replicator.register(displayId, this)
-        try {
-            prefs.unregisterOnSharedPreferenceChangeListener(this)
-            settingsPreferences.unregisterOnSharedPreferenceChangeListener(this)
-        } catch (e: Exception) {
-            // Do nothing
-        }
-        prefs.registerOnSharedPreferenceChangeListener(this)
-        settingsPreferences.registerOnSharedPreferenceChangeListener(this)
 
         drawerFragment = DrawerFragment()
         widgetFragment = WidgetFragment()
@@ -187,6 +179,14 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
 
     fun startUI() {
         appList.waitForReady()
+        try {
+            prefs.unregisterOnSharedPreferenceChangeListener(this)
+            settingsPreferences.unregisterOnSharedPreferenceChangeListener(this)
+        } catch (e: Exception) {
+            // Do nothing
+        }
+        prefs.registerOnSharedPreferenceChangeListener(this)
+        settingsPreferences.registerOnSharedPreferenceChangeListener(this)
         dock = Dock(this, null)
         dockContainer.addView(dock)
         dock.depersistDock()
