@@ -57,7 +57,9 @@ const val UNINSTALL = 4
 var isFolderOpen = false
 var isDualLaunchOpen = false
 lateinit var generalContext: Context
+var startUI = false
 var dragWidgetBitmap: Bitmap? = null
+var swiping = false
 
 class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterface,
     SharedPreferences.OnSharedPreferenceChangeListener, Animation.AnimationListener,
@@ -424,6 +426,7 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
         prefs = this.getSharedPreferences(PREFS_FILENAME, 0)
 
         setWindowBackground()
+        startUI = true
     }
 
     override fun onDestroy() {
@@ -739,8 +742,10 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
             appManagerListener = this
             dualityLauncherApplication.startAppManager()
         } else {
-            onBackPressed()
-            dock.adjustIconSize()
+            if(startUI) {
+                onBackPressed()
+                dock.adjustIconSize()
+            }
         }
         super.onResume()
     }
@@ -1624,12 +1629,6 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
         }
         homePagerAdapter.lock.unlock()
         persistGrid(page)
-    }
-
-    override fun onPause() {
-        super.onPause()
-        Log.d(TAG, "onPause()")
-        dock.adjustIconSize()
     }
 
     override fun onStarted() {

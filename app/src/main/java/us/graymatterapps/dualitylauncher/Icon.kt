@@ -168,7 +168,7 @@ class Icon(
     }
 
     override fun onTouchEvent(event: MotionEvent?): Boolean {
-        if(!isScrolling) {
+        if (!isScrolling) {
             if (event != null) {
                 Log.d(TAG, "onTouchEvent() ${MotionEvent.actionToString(event.action)}")
                 if (downTime > 0 && System.currentTimeMillis() - downTime > longClickTime) {
@@ -181,12 +181,15 @@ class Icon(
                 when (event.action) {
                     MotionEvent.ACTION_DOWN -> {
                         downTime = System.currentTimeMillis()
+                        swiping = false
                         return true
                     }
                     MotionEvent.ACTION_UP -> {
                         if (System.currentTimeMillis() - downTime < longClickTime) {
                             if (!isDualLaunchEditWindow) {
-                                launch()
+                                if(!swiping) {
+                                    launch()
+                                }
                             }
                         }
                         downTime = 0
@@ -203,6 +206,7 @@ class Icon(
                                 )
                                 Log.d(TAG, "distance = $distance, touchSlop = $touchSlop")
                                 if (distance > touchSlop) {
+                                    swiping = true
                                     downTime = 0
                                     menu.dismiss()
                                     startDragging()

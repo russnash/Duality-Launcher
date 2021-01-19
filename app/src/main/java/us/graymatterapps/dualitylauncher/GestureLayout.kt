@@ -32,16 +32,20 @@ class GestureLayout(context: Context, attributeSet: AttributeSet) :
                             val swipeRightDistance = event.x - event.getHistoricalX(0)
 
                             if (swipeLeftDistance > touchSlop) {
+                                swiping = true
                                 return false
                             }
                             if (swipeRightDistance > touchSlop) {
+                                swiping = true
                                 return false
                             }
                             if (swipeUpDistance > touchSlop) {
+                                swiping = true
                                 listener.onSwipeUp()
                                 return !drawerOpen
                             }
                             if (swipeDownDistance > touchSlop) {
+                                swiping = true
                                 listener.onSwipeDown()
                                 return !drawerOpen
                             }

@@ -1,3 +1,8 @@
+Version 2021.1.19.1-internal
+Bugs:
+- Fixed an issue where swiping up to open the drawer and starting the swipe on an icon launched the icon also.
+- Fixed some startup / resume issues that were causing a crash.
+
 Version 2021.1.17.1-internal
 Changes:
 - Code optimizations in icon pack and appList management.
