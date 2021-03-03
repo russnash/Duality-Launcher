@@ -1,6 +1,6 @@
 <PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:android="http://schemas.android.com/apk/res/android">
-    <us.graymatterapps.dualitylauncher.ColorPreference
+    <us.graymatterapps.dualitylauncher.settings.ColorPreference
         android:defaultValue="-16777216"
         android:key="status_background"
         android:title="Background color"

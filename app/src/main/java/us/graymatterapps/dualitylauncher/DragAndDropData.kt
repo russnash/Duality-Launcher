@@ -1,5 +1,7 @@
 package us.graymatterapps.dualitylauncher
 
+import us.graymatterapps.dualitylauncher.components.widgets.WidgetInfo
+
 class DragAndDropData() {
     var ids: MutableList<String> = ArrayList()
     var launchInfos: MutableList<LaunchInfo> = ArrayList()

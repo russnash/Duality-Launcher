@@ -5,17 +5,17 @@
         android:title="Sort folders alphabetically"
         android:defaultValue="true"
         app:icon="@drawable/ic_sort_abc"/>
-    <us.graymatterapps.dualitylauncher.ColorPreference
+    <us.graymatterapps.dualitylauncher.settings.ColorPreference
         android:defaultValue="-16777216"
         android:key="folder_background"
         android:title="Background color"
         app:icon="@drawable/ic_color"/>
-    <us.graymatterapps.dualitylauncher.ColorPreference
+    <us.graymatterapps.dualitylauncher.settings.ColorPreference
         android:defaultValue="-1"
         android:key="folder_text"
         android:title="Text color"
         app:icon="@drawable/ic_color"/>
-    <us.graymatterapps.dualitylauncher.ColorPreference
+    <us.graymatterapps.dualitylauncher.settings.ColorPreference
         android:defaultValue="-16777216"
         android:key="folder_text_shadow"
         android:title="Text shadow color"
@@ -45,7 +45,7 @@
         android:entryValues="@array/folder_icon_backgrounds"
         android:defaultValue="None"
         app:icon="@drawable/ic_background"/>
-    <us.graymatterapps.dualitylauncher.ColorPreference
+    <us.graymatterapps.dualitylauncher.settings.ColorPreference
         android:defaultValue="-16777216"
         android:key="folder_icon_background_color"
         android:title="Folder icon background color"

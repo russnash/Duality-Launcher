@@ -22,7 +22,7 @@
             app:min="0"
             app:showSeekBarValue="true"
             app:icon="@drawable/ic_alpha"/>
-        <us.graymatterapps.dualitylauncher.ColorPreference
+        <us.graymatterapps.dualitylauncher.settings.ColorPreference
             android:defaultValue="-16777216"
             android:key="manual_color_scheme"
             android:title="Manual color scheme"
@@ -53,7 +53,7 @@
             android:title="@string/pref_dock_background"
             android:defaultValue="false"
             app:icon="@drawable/ic_background"/>
-        <us.graymatterapps.dualitylauncher.ColorPreference
+        <us.graymatterapps.dualitylauncher.settings.ColorPreference
             android:defaultValue="-16777216"
             android:key="dock_background_color"
             android:title="@string/pref_dock_background_color"
@@ -61,7 +61,7 @@
         <Preference
             android:title="Dock Search"
             android:summary="Display a custom search widget in the dock"
-            app:fragment="us.graymatterapps.dualitylauncher.SettingsDockSearch"
+            app:fragment="us.graymatterapps.dualitylauncher.settings.SettingsDockSearch"
             app:icon="@drawable/ic_search"/>
 
     </PreferenceCategory>
@@ -120,17 +120,17 @@
             android:summary="Shows an indicator of the current home screen page above the dock"
             android:title="Home page indicator"
             app:icon="@drawable/ic_home_page_indicator"/>
-        <us.graymatterapps.dualitylauncher.ColorPreference
+        <us.graymatterapps.dualitylauncher.settings.ColorPreference
             android:key="home_widget_color"
             android:title="Widget color"
             android:defaultValue="-1"
             app:icon="@drawable/ic_color"/>
-        <us.graymatterapps.dualitylauncher.ColorPreference
+        <us.graymatterapps.dualitylauncher.settings.ColorPreference
             android:key="home_text_color"
             android:title="Text color"
             android:defaultValue="-1"
             app:icon="@drawable/ic_color"/>
-        <us.graymatterapps.dualitylauncher.ColorPreference
+        <us.graymatterapps.dualitylauncher.settings.ColorPreference
             android:key="home_text_shadow_color"
             android:title="Text shadow color"
             android:defaultValue="-16777216"

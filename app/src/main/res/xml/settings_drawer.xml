@@ -1,16 +1,16 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
-    <us.graymatterapps.dualitylauncher.ColorPreference
+    <us.graymatterapps.dualitylauncher.settings.ColorPreference
         android:defaultValue="-16777216"
         android:key="app_drawer_background"
         android:title="@string/pref_app_drawer_background"
         app:icon="@drawable/ic_color"/>
-    <us.graymatterapps.dualitylauncher.ColorPreference
+    <us.graymatterapps.dualitylauncher.settings.ColorPreference
         android:defaultValue="-1"
         android:key="app_drawer_text"
         android:title="@string/pref_app_drawer_text"
         app:icon="@drawable/ic_color"/>
-    <us.graymatterapps.dualitylauncher.ColorPreference
+    <us.graymatterapps.dualitylauncher.settings.ColorPreference
         android:defaultValue="-16777216"
         android:key="app_drawer_text_shadow"
         android:title="@string/pref_app_drawer_text_shadow"

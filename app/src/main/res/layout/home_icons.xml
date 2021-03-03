@@ -17,12 +17,12 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <us.graymatterapps.dualitylauncher.HomeLayout
+        <us.graymatterapps.dualitylauncher.components.HomeLayout
             android:id="@+id/homeIconsTable"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
-        </us.graymatterapps.dualitylauncher.HomeLayout>
+        </us.graymatterapps.dualitylauncher.components.HomeLayout>
 
     </FrameLayout>
 

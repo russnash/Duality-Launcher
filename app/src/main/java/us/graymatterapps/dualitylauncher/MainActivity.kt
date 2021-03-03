@@ -45,6 +45,14 @@ import kotlinx.android.synthetic.main.home_folder.*
 import kotlinx.android.synthetic.main.home_screen_menu.*
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import us.graymatterapps.dualitylauncher.components.*
+import us.graymatterapps.dualitylauncher.components.widgets.WidgetContainer
+import us.graymatterapps.dualitylauncher.components.widgets.WidgetDB
+import us.graymatterapps.dualitylauncher.components.widgets.WidgetDragShadowBuilder
+import us.graymatterapps.dualitylauncher.components.widgets.WidgetFragment
+import us.graymatterapps.dualitylauncher.settings.SettingsActivity
+import us.graymatterapps.dualitylauncher.settings.SettingsDeveloper
+import us.graymatterapps.dualitylauncher.settings.SettingsFragment
 import us.graymatterapps.graymatterutils.GrayMatterUtils.getVersionCode
 import us.graymatterapps.graymatterutils.GrayMatterUtils.shortToast
 import us.graymatterapps.graymatterutils.GrayMatterUtils.showOkDialog
@@ -67,7 +75,7 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
     HomePagerAdapter.HomeIconsInterface, WidgetFragment.WidgetInterface,
     SettingsDeveloper.DeveloperInterface, WidgetContainer.WidgetInterface,
     FolderAdapter.FolderAdapterInterface, WidgetDB.WidgetDBInterface,
-    Replicator.ReplicatorInterface, AppManager.AppManagerInterface {
+    Replicator.ReplicatorInterface {
 
     lateinit var homeActivity: MainActivity
     var displayId: Int = 99999
@@ -172,11 +180,7 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
             }
         }, true)
 
-        if(dualityLauncherApplication.isAppManagerInitialized()) {
-            startUI()
-        } else {
-            appManagerListener = this
-        }
+        startUI()
     }
 
     fun startUI() {
@@ -285,20 +289,35 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
                         }
                         DragEvent.ACTION_DRAG_ENDED -> {
                             homeDelete.alpha = 0f
-                            if(dragEvent.result == false) {
+                            if (dragEvent.result == false) {
                                 val id = dragAndDropData.lastId
                                 val launchInfo = dragAndDropData.retrieveLaunchInfo(id)
-                                val view = frameLayout.findViewWithTag<View>(getCurrentHomePagerItem())
-                                if(launchInfo.getLastX() != 9999) {
-                                    if(launchInfo.getType() == LaunchInfo.ICON) {
+                                val view =
+                                    frameLayout.findViewWithTag<View>(getCurrentHomePagerItem())
+                                if (launchInfo.getLastX() != 9999) {
+                                    if (launchInfo.getType() == LaunchInfo.ICON) {
                                         if (view != null) {
                                             homePagerAdapter.lock.lock()
-                                            val homeIconsTable = view.findViewById<HomeLayout>(R.id.homeIconsTable)
-                                            val textColor = settingsPreferences.getInt("home_text_color", Color.WHITE)
-                                            val textShadowColor = settingsPreferences.getInt("home_text_shadow_color", Color.BLACK)
-                                            val iconPadding = settingsPreferences.getInt("home_icon_padding", 5)
-                                            val textSize = settingsPreferences.getInt("home_text_size", 14)
-                                            var icon = Icon(this@MainActivity, null, true, getCurrentHomePagerItem())
+                                            val homeIconsTable =
+                                                view.findViewById<HomeLayout>(R.id.homeIconsTable)
+                                            val textColor = settingsPreferences.getInt(
+                                                "home_text_color",
+                                                Color.WHITE
+                                            )
+                                            val textShadowColor = settingsPreferences.getInt(
+                                                "home_text_shadow_color",
+                                                Color.BLACK
+                                            )
+                                            val iconPadding =
+                                                settingsPreferences.getInt("home_icon_padding", 5)
+                                            val textSize =
+                                                settingsPreferences.getInt("home_text_size", 14)
+                                            var icon = Icon(
+                                                this@MainActivity,
+                                                null,
+                                                true,
+                                                getCurrentHomePagerItem()
+                                            )
                                             var iconParams = HomeLayout.LayoutParams(
                                                 ViewGroup.LayoutParams.WRAP_CONTENT,
                                                 ViewGroup.LayoutParams.WRAP_CONTENT
@@ -319,20 +338,36 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
                                                 launchInfo.getPackageName(),
                                                 launchInfo.getUserSerial()
                                             )
-                                            icon.setPadding(iconPadding, iconPadding, iconPadding, iconPadding)
+                                            icon.setPadding(
+                                                iconPadding,
+                                                iconPadding,
+                                                iconPadding,
+                                                iconPadding
+                                            )
                                             homeIconsTable.addView(icon, iconParams)
                                             homePagerAdapter.lock.unlock()
                                             persistGrid(getCurrentHomePagerItem())
                                         }
                                     }
-                                    if(launchInfo.getType() == LaunchInfo.FOLDER) {
+                                    if (launchInfo.getType() == LaunchInfo.FOLDER) {
                                         homePagerAdapter.lock.lock()
-                                        val view = frameLayout.findViewWithTag<View>(getCurrentHomePagerItem())
-                                        val homeIconsTable = view.findViewById<HomeLayout>(R.id.homeIconsTable)
-                                        val textColor = settingsPreferences.getInt("home_text_color", Color.WHITE)
-                                        val textShadowColor = settingsPreferences.getInt("home_text_shadow_color", Color.BLACK)
-                                        val iconPadding = settingsPreferences.getInt("home_icon_padding", 5)
-                                        val textSize = settingsPreferences.getInt("home_text_size", 14)
+                                        val view = frameLayout.findViewWithTag<View>(
+                                            getCurrentHomePagerItem()
+                                        )
+                                        val homeIconsTable =
+                                            view.findViewById<HomeLayout>(R.id.homeIconsTable)
+                                        val textColor = settingsPreferences.getInt(
+                                            "home_text_color",
+                                            Color.WHITE
+                                        )
+                                        val textShadowColor = settingsPreferences.getInt(
+                                            "home_text_shadow_color",
+                                            Color.BLACK
+                                        )
+                                        val iconPadding =
+                                            settingsPreferences.getInt("home_icon_padding", 5)
+                                        val textSize =
+                                            settingsPreferences.getInt("home_text_size", 14)
                                         var folder = Folder(
                                             this@MainActivity,
                                             null,
@@ -352,21 +387,42 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
                                         folderParams.columnSpan = 1
                                         folder.layoutParams = folderParams
                                         folder.folderLabel.setTextColor(textColor)
-                                        folder.folderLabel.setShadowLayer(6F, 0F, 0F, textShadowColor)
+                                        folder.folderLabel.setShadowLayer(
+                                            6F,
+                                            0F,
+                                            0F,
+                                            textShadowColor
+                                        )
                                         folder.folderLabel.textSize = textSize.toFloat()
-                                        folder.setPadding(iconPadding, iconPadding, iconPadding, iconPadding)
+                                        folder.setPadding(
+                                            iconPadding,
+                                            iconPadding,
+                                            iconPadding,
+                                            iconPadding
+                                        )
                                         homeIconsTable.addView(folder, folderParams)
                                         homePagerAdapter.lock.unlock()
                                         persistGrid(getCurrentHomePagerItem())
                                     }
-                                    if(launchInfo.getType() == LaunchInfo.DUALLAUNCH) {
+                                    if (launchInfo.getType() == LaunchInfo.DUALLAUNCH) {
                                         homePagerAdapter.lock.lock()
-                                        val view = frameLayout.findViewWithTag<View>(getCurrentHomePagerItem())
-                                        val homeIconsTable = view.findViewById<HomeLayout>(R.id.homeIconsTable)
-                                        val textColor = settingsPreferences.getInt("home_text_color", Color.WHITE)
-                                        val textShadowColor = settingsPreferences.getInt("home_text_shadow_color", Color.BLACK)
-                                        val iconPadding = settingsPreferences.getInt("home_icon_padding", 5)
-                                        val textSize = settingsPreferences.getInt("home_text_size", 14)
+                                        val view = frameLayout.findViewWithTag<View>(
+                                            getCurrentHomePagerItem()
+                                        )
+                                        val homeIconsTable =
+                                            view.findViewById<HomeLayout>(R.id.homeIconsTable)
+                                        val textColor = settingsPreferences.getInt(
+                                            "home_text_color",
+                                            Color.WHITE
+                                        )
+                                        val textShadowColor = settingsPreferences.getInt(
+                                            "home_text_shadow_color",
+                                            Color.BLACK
+                                        )
+                                        val iconPadding =
+                                            settingsPreferences.getInt("home_icon_padding", 5)
+                                        val textSize =
+                                            settingsPreferences.getInt("home_text_size", 14)
                                         var dualLaunch = DualLaunch(
                                             this@MainActivity,
                                             null,
@@ -386,9 +442,19 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
                                         dualLaunchParams.columnSpan = 1
                                         dualLaunch.layoutParams = dualLaunchParams
                                         dualLaunch.dualLaunchLabel.setTextColor(textColor)
-                                        dualLaunch.dualLaunchLabel.setShadowLayer(6F, 0F, 0F, textShadowColor)
+                                        dualLaunch.dualLaunchLabel.setShadowLayer(
+                                            6F,
+                                            0F,
+                                            0F,
+                                            textShadowColor
+                                        )
                                         dualLaunch.dualLaunchLabel.textSize = textSize.toFloat()
-                                        dualLaunch.setPadding(iconPadding, iconPadding, iconPadding, iconPadding)
+                                        dualLaunch.setPadding(
+                                            iconPadding,
+                                            iconPadding,
+                                            iconPadding,
+                                            iconPadding
+                                        )
                                         homeIconsTable.addView(dualLaunch, dualLaunchParams)
                                         homePagerAdapter.lock.unlock()
                                         persistGrid(getCurrentHomePagerItem())
@@ -431,6 +497,7 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
 
     override fun onDestroy() {
         super.onDestroy()
+        appList.appDB.closeDB()
         replicator.deregister(displayId)
         prefs.unregisterOnSharedPreferenceChangeListener(this)
         settingsPreferences.unregisterOnSharedPreferenceChangeListener(this)
@@ -439,7 +506,7 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
     fun setupHomePageIndicator() {
         homePageIndicator.removeAllViews()
 
-        if(settingsPreferences.getBoolean("home_pager_indicator", true)) {
+        if (settingsPreferences.getBoolean("home_pager_indicator", true)) {
             var params = TableRow.LayoutParams(
                 TableRow.LayoutParams.WRAP_CONTENT,
                 TableRow.LayoutParams.WRAP_CONTENT
@@ -473,7 +540,7 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
 
         homeDrawerButton.setColorFilter(filterColor)
 
-        if(settingsPreferences.getBoolean("drawer_button", false)) {
+        if (settingsPreferences.getBoolean("drawer_button", false)) {
             val params = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 48)
             homeDrawerButton.layoutParams = params
             homeDrawerButton.visibility = View.VISIBLE
@@ -738,12 +805,9 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
     }
 
     override fun onResume() {
-        if(!dualityLauncherApplication.isAppManagerInitialized()) {
-            appManagerListener = this
-            dualityLauncherApplication.startAppManager()
-        } else {
-            if(startUI) {
-                onBackPressed()
+        if (startUI) {
+            onBackPressed()
+            if (::dock.isInitialized) {
                 dock.adjustIconSize()
             }
         }
@@ -870,7 +934,7 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
                     )
                 )
             }
-            if(key == "drawer_button") {
+            if (key == "drawer_button") {
                 setupDrawerButton()
             }
             if (key == "home_text_color") {
@@ -908,8 +972,9 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
                 dock.depersistDock()
                 dock.populateDock()
             }
-            if(key == "choose_icon_pack") {
-                appList.updateApps()
+            if (key == "choose_icon_pack") {
+                appList.appDB.clearDB()
+                appList.createAppDB()
             }
         }
     }
@@ -1086,7 +1151,8 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
     }
 
     override fun updateAppList() {
-        appList.updateApps()
+        appList.appDB.clearDB()
+        appList.createAppDB()
         shortToast(this, "AppList update forced...")
     }
 
@@ -1274,7 +1340,7 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
         }
 
         homeFolderBackground.setOnDragListener { view, dragEvent ->
-            if(dragEvent.action == DragEvent.ACTION_DROP) {
+            if (dragEvent.action == DragEvent.ACTION_DROP) {
                 val id = dragAndDropData.lastId
                 val launchInfo = dragAndDropData.retrieveLaunchInfo(id)
                 folder.addFolderItem(launchInfo)
@@ -1417,7 +1483,10 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
                 }
             }
         }
-        dock.dockSearchWidget.clearSearchFocus()
+
+        if (::dock.isInitialized) {
+            dock.dockSearchWidget.clearSearchFocus()
+        }
     }
 
     override fun logRecents() {
@@ -1629,9 +1698,5 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
         }
         homePagerAdapter.lock.unlock()
         persistGrid(page)
-    }
-
-    override fun onStarted() {
-        startUI()
     }
 }

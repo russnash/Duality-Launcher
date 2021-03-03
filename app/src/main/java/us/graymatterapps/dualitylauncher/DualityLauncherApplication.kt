@@ -12,7 +12,6 @@ import android.graphics.drawable.BitmapDrawable
 import android.hardware.display.DisplayManager
 import android.net.Uri
 import android.os.Environment
-import android.os.IBinder
 import android.provider.MediaStore
 import android.text.format.DateFormat
 import android.view.View
@@ -23,6 +22,9 @@ import org.acra.annotation.AcraCore
 import org.acra.annotation.AcraDialog
 import org.acra.annotation.AcraMailSender
 import org.acra.data.StringFormat
+import us.graymatterapps.dualitylauncher.appdb.AppList
+import us.graymatterapps.dualitylauncher.appdb.IconPackManager
+import us.graymatterapps.dualitylauncher.components.widgets.WidgetDB
 import us.graymatterapps.graymatterutils.GrayMatterUtils
 import java.util.*
 
@@ -32,8 +34,6 @@ lateinit var appWidgetHost: AppWidgetHost
 lateinit var settingsPreferences: SharedPreferences
 lateinit var prefs: SharedPreferences
 lateinit var appList: AppList
-lateinit var appManager: AppManager
-lateinit var appManagerListener: AppManager.AppManagerInterface
 lateinit var appContext: Context
 lateinit var widgetDB: WidgetDB
 lateinit var replicator: Replicator
@@ -69,7 +69,7 @@ class DualityLauncherApplication: Application() {
         prefs = this.getSharedPreferences(PREFS_FILENAME, 0)
         settingsPreferences = PreferenceManager.getDefaultSharedPreferences(this)
         iconPackManager = IconPackManager(applicationContext)
-        startAppManager()
+        appList = AppList(applicationContext)
         appWidgetManager = AppWidgetManager.getInstance(applicationContext)
         appWidgetHost = AppWidgetHost(applicationContext, 1)
         appWidgetHost.startListening()
@@ -77,17 +77,6 @@ class DualityLauncherApplication: Application() {
         replicator = Replicator()
         dragAndDropData = DragAndDropData()
         dualWallpaper = DualWallpaper(this)
-    }
-
-    fun startAppManager() {
-        try {
-            if (!isServiceRunning(AppManager::class.java)) {
-                val intent = Intent(this, AppManager::class.java)
-                startService(intent)
-            }
-        } catch (e: Exception) {
-            System.exit(0)
-        }
     }
 
     override fun onTerminate() {
@@ -101,14 +90,6 @@ class DualityLauncherApplication: Application() {
 
     fun areScreensInitialized(): Boolean {
         return ::mainScreen.isInitialized && ::dualScreen.isInitialized
-    }
-
-    fun isAppManagerInitialized(): Boolean {
-        return ::appManager.isInitialized
-    }
-
-    fun isAppManagerListenerInitialized(): Boolean {
-        return ::appManagerListener.isInitialized
     }
 
     fun wideShot() {

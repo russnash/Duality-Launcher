@@ -24,7 +24,7 @@
             app:layout_constraintTop_toTopOf="parent"
             app:srcCompat="@drawable/ic_g" />
 
-        <us.graymatterapps.dualitylauncher.EditTextNoDrop
+        <us.graymatterapps.dualitylauncher.components.EditTextNoDrop
             android:id="@+id/dockSearchText"
             style="@style/TextShadow"
             android:layout_width="0dp"

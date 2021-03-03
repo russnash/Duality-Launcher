@@ -22,12 +22,12 @@
         android:title="Search provider"
         app:icon="@drawable/ic_search_provider"
         app:useSimpleSummaryProvider="true" />
-    <us.graymatterapps.dualitylauncher.ColorPreference
+    <us.graymatterapps.dualitylauncher.settings.ColorPreference
         android:defaultValue="-16777216"
         android:key="dock_search_color"
         android:title="@string/dock_search_color"
         app:icon="@drawable/ic_color" />
-    <us.graymatterapps.dualitylauncher.ColorPreference
+    <us.graymatterapps.dualitylauncher.settings.ColorPreference
         android:defaultValue="-1"
         android:key="dock_search_foreground_color"
         android:title="@string/dock_search_color_foreground"

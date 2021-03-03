@@ -12,6 +12,8 @@ import kotlinx.android.synthetic.main.dual_launch.view.*
 import kotlinx.android.synthetic.main.folder.view.*
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
+import us.graymatterapps.dualitylauncher.components.*
+import us.graymatterapps.dualitylauncher.components.widgets.WidgetContainer
 import java.util.concurrent.locks.ReentrantLock
 
 class HomePagerAdapter(private val parent: MainActivity, private val container: ViewGroup) :

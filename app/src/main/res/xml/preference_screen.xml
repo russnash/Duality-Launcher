@@ -5,44 +5,44 @@
     <Preference
         android:title="Home Screen"
         android:summary="Customize the home screen"
-        app:fragment="us.graymatterapps.dualitylauncher.SettingsHomeFragment"
+        app:fragment="us.graymatterapps.dualitylauncher.settings.SettingsHomeFragment"
         app:icon="@drawable/ic_home_screen"/>
     <Preference
         android:title="Folders"
         android:summary="Customize folders"
-        app:fragment="us.graymatterapps.dualitylauncher.SettingsFolder"
+        app:fragment="us.graymatterapps.dualitylauncher.settings.SettingsFolder"
         app:icon="@drawable/ic_folders"/>
     <Preference
         android:title="App Drawer"
         android:summary="Customize the app drawer"
-        app:fragment="us.graymatterapps.dualitylauncher.SettingsDrawerFragment"
+        app:fragment="us.graymatterapps.dualitylauncher.settings.SettingsDrawerFragment"
         app:icon="@drawable/ic_app_drawer"/>
     <Preference
         android:title="Status Bar"
         android:summary="Customize the status bar"
-        app:fragment="us.graymatterapps.dualitylauncher.SettingsStatusBarFragment"
+        app:fragment="us.graymatterapps.dualitylauncher.settings.SettingsStatusBarFragment"
         app:icon="@drawable/ic_status_bar"/>
     <Preference
         android:title="Navigation Bar"
         android:summary="Customize the navigation bar"
-        app:fragment="us.graymatterapps.dualitylauncher.SettingsNavBarFragment"
+        app:fragment="us.graymatterapps.dualitylauncher.settings.SettingsNavBarFragment"
         app:icon="@drawable/ic_navigation_bar"/>
     <Preference
         android:title="Wallpaper"
         android:summary="Set the wallpaper"
-        app:fragment="us.graymatterapps.dualitylauncher.SettingsWallpaperFragment"
+        app:fragment="us.graymatterapps.dualitylauncher.settings.SettingsWallpaperFragment"
         app:icon="@drawable/ic_wallpaper"/>
     <Preference
         android:title="Icons"
         android:summary="Customize icon appearance"
-        app:fragment="us.graymatterapps.dualitylauncher.SettingsIcon"
+        app:fragment="us.graymatterapps.dualitylauncher.settings.SettingsIcon"
         app:icon="@drawable/ic_icons" />
 
     <PreferenceCategory>
         <Preference
             android:title="Developer Tools"
             android:summary="Here be dragons..."
-            app:fragment="us.graymatterapps.dualitylauncher.SettingsDeveloper"
+            app:fragment="us.graymatterapps.dualitylauncher.settings.SettingsDeveloper"
             app:icon="@drawable/ic_developer_tools"/>
     </PreferenceCategory>
 

@@ -38,7 +38,7 @@ class DrawerFragment() : Fragment(), SharedPreferences.OnSharedPreferenceChangeL
 
         parent = activity as MainActivity
         val drawerColumns = settingsPreferences.getInt("app_drawer_columns", 6)
-        gridLayoutManager = if(GrayMatterUtils.isLandscape(parent)){
+        gridLayoutManager = if (GrayMatterUtils.isLandscape(parent)) {
             GridLayoutManager(context?.applicationContext, drawerColumns * 2)
         } else {
             GridLayoutManager(context?.applicationContext, drawerColumns)
@@ -46,8 +46,7 @@ class DrawerFragment() : Fragment(), SharedPreferences.OnSharedPreferenceChangeL
 
         drawer.layoutManager = gridLayoutManager
         adapter = AppDrawerAdapter(
-            parent,
-            appList.apps
+            parent
         )
         drawer.adapter = adapter
         adapter.filterWork(false)

@@ -1,3 +1,17 @@
+Version 2021.3.2.1-internal
+Bugs:
+- Fixed a bug where selecting Dock Search in settings would cause a crash.
+- Fixed a bug where ridiculously sized app icons would cause database read errors and a crash.
+
+Version 2021.3.1.1-internal
+Changes:
+- Code reorganization and cleanup for my own sanity.
+- appList changed to a permanent appDB on internal storage, faster startup times!
+- Service for appList/appDB has been removed, not needed with new peristent appDB.
+
+Bugs:
+- Removed use of separate thread for initial appList creation.
+
 Version 2021.1.19.1-internal
 Bugs:
 - Fixed an issue where swiping up to open the drawer and starting the swipe on an icon launched the icon also.
