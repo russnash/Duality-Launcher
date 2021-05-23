@@ -33,12 +33,12 @@ class AppDrawerAdapter(
 
         if (work) {
             cursor = db.rawQuery(
-                "select activityName, packageName, userSerial from ${AppDB.TABLENAME} where userSerial<>$currentUser or manualWork=1 order by name asc",
+                "select activityName, packageName, userSerial from ${AppDB.TABLENAME} where userSerial<>$currentUser or manualWork=1 order by name collate nocase asc",
                 null
             )
         } else {
             cursor = db.rawQuery(
-                "select activityName, packageName, userSerial from ${AppDB.TABLENAME} where userSerial=$currentUser and manualWork=0 order by name asc",
+                "select activityName, packageName, userSerial from ${AppDB.TABLENAME} where userSerial=$currentUser and manualWork=0 order by name collate nocase asc",
                 null
             )
         }

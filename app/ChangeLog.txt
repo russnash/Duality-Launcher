@@ -1,3 +1,10 @@
+Version 2021.3.6.1-internal
+Changes:
+- App drawer now uses case insensitive sorting.
+
+Bugs:
+- Fixed a bug where the icon pack wasn't being initialized if the appDB already existed on startup.
+
 Version 2021.3.2.1-internal
 Bugs:
 - Fixed a bug where selecting Dock Search in settings would cause a crash.

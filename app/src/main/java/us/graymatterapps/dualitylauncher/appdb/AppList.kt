@@ -455,6 +455,35 @@ class AppList(val context: Context) : LauncherApps.Callback() {
     fun verifyAppDB() {
         Log.d(TAG, "verifyAppDB() started")
         var activeIconPack = settingsPreferences.getString("choose_icon_pack", "Default")
+        if (activeIconPack != "Default") {
+            val debug: Boolean = false
+            if (debug) {
+                val pkgInfo = packageManager.getPackageInfo(
+                    iconPackManager.getPackageNameForIconPack(activeIconPack!!), 0
+                )
+                iconPackManager.initializeIconPack(activeIconPack)
+            } else {
+                try {
+                    val pkgInfo = packageManager.getPackageInfo(
+                        iconPackManager.getPackageNameForIconPack(activeIconPack!!), 0
+                    )
+                    iconPackManager.initializeIconPack(activeIconPack)
+                } catch (e: Exception) {
+                    activeIconPack = "Default"
+                    val editor = settingsPreferences.edit()
+                    editor.putString("choose_icon_pack", activeIconPack)
+                    editor.apply()
+                }
+            }
+        }
+
+        if (activeIconPack == "Default") {
+            iconPackManager.appFilter.clear()
+            iconPackManager.scale = 0f
+            iconPackManager.iconMask = null
+            iconPackManager.iconBack.clear()
+            iconPackManager.iconSize = 0
+        }
 
         thread{
             var appList: ArrayList<LauncherActivityInfo> = ArrayList()
