@@ -20,4 +20,13 @@ Firstly, check that the [issue doesn't currently exist](https://github.com/russn
 If the feature [doesn't already exist](https://github.com/russnash/Duality-Launcher/issues), [file a new feature request](https://github.com/russnash/Duality-Launcher/issues/new?assignees=&labels=&template=feature_request.md&title=).
 
 ### Contribute code
-To be completed...
+Code contributions to this project are managed via the "fork and branch" method, an excellent guide to this method can be found [here](https://blog.scottlowe.org/2015/01/27/using-fork-branch-git-workflow/).
+
+The basic steps are:
+- Fork this repository
+- Clone your forked repository to your development system
+- Add a Git remote for this repository
+- Create a branch for your changes
+- Commit your changes to the new branch
+- Push the branch
+- Create a [pull request](https://github.com/russnash/Duality-Launcher/compare)
