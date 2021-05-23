@@ -2,10 +2,10 @@
 
 ## How can I contribute?
 The main ways that you can contribute to this project are:
-- [Become a tester](https://github.com/russnash/Duality-Launcher/new/master#becoming-a-tester)
-- [File a bug report](https://github.com/russnash/Duality-Launcher/new/master#filing-a-bug-report)
-- [File a feature request](https://github.com/russnash/Duality-Launcher/new/master#filing-a-feature-request)
-- [Contribute code](https://github.com/russnash/Duality-Launcher/new/master#contribute-code)
+- [Become a tester](https://github.com/russnash/Duality-Launcher/blob/master/CONTRIBUTING.md#becoming-a-tester)
+- [File a bug report](https://github.com/russnash/Duality-Launcher/blob/master/CONTRIBUTING.md#filing-a-bug-report)
+- [File a feature request](https://github.com/russnash/Duality-Launcher/blob/master/CONTRIBUTING.md#filing-a-feature-request)
+- [Contribute code](https://github.com/russnash/Duality-Launcher/blob/master/CONTRIBUTING.md#contribute-code)
 
 ### Becoming a tester
 To join the internal testing program on Google Play, contact the developer and provide the email address associated with your Google account via:
