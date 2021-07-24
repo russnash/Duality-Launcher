@@ -17,7 +17,7 @@ To join the internal testing program on Google Play, contact the developer and p
 Firstly, check that the [issue doesn't currently exist](https://github.com/russnash/Duality-Launcher/issues), if it does exist and you have additional information to add please comment on the existing bug report.  For new issues, please [File a new bug report](https://github.com/russnash/Duality-Launcher/issues/new?assignees=&labels=&template=bug_report.md&title=).
 
 ### Filing a feature request
-If the feature [doesn't already exist](https://github.com/russnash/Duality-Launcher/issues), [file a new feature request](https://github.com/russnash/Duality-Launcher/issues/new?assignees=&labels=&template=feature_request.md&title=).
+If the feature request [doesn't already exist](https://github.com/russnash/Duality-Launcher/issues), [file a new feature request](https://github.com/russnash/Duality-Launcher/issues/new?assignees=&labels=&template=feature_request.md&title=).
 
 ### Contribute code
 Code contributions to this project are managed via the "fork and branch" method, an excellent guide to this method can be found [here](https://blog.scottlowe.org/2015/01/27/using-fork-branch-git-workflow/).
