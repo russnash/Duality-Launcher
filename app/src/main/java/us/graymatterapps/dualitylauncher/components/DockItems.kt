@@ -1,16 +1,16 @@
 package us.graymatterapps.dualitylauncher.components
 
 import kotlinx.serialization.Serializable
-import us.graymatterapps.dualitylauncher.appList
 
 @Serializable
 data class DockItems(
     var activityNames: ArrayList<String> = ArrayList(),
     var packageNames: ArrayList<String> = ArrayList(),
-    var userSerials: ArrayList<Long> = ArrayList()
+    var userSerials: ArrayList<Long> = ArrayList(),
 ) {
     val TAG = javaClass.simpleName
 
+    /*
     init {
         initialize()
     }
@@ -28,6 +28,7 @@ data class DockItems(
         }
         appList.lock.unlock()
     }
+     */
 
     fun add(activityName: String, packageName: String, userSerial: Long) {
         activityNames.add(activityName)

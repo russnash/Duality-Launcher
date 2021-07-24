@@ -234,8 +234,9 @@ class IconPackManager(val context: Context) {
                size = iconSize
                Log.d(TAG, "makeAdaptedIcon() iconSize=$iconSize, scale=$scale, size=$size")
             }
+
             val scaledForeground = Bitmap.createScaledBitmap(
-                standardIcon.toBitmap(),
+                standardIcon.toBitmap(size, size),
                 size,
                 size,
                 true

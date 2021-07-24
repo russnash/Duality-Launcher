@@ -21,6 +21,7 @@ class AppDrawerAdapter(
     val settingsPreferences: SharedPreferences =
         PreferenceManager.getDefaultSharedPreferences(parentActivity)
     var filteredWork: Boolean = false
+    val appList = dualityLauncherApplication.getAppListContext()
     val db = appList.appDB.readableDatabase
     lateinit var cursor: Cursor
     val TAG = javaClass.simpleName

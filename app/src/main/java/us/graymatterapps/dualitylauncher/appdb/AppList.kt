@@ -7,13 +7,18 @@ import android.content.pm.LauncherActivityInfo
 import android.content.pm.LauncherApps
 import android.content.pm.PackageManager
 import android.content.pm.ShortcutInfo
+import android.graphics.Bitmap
+import android.graphics.Canvas
+import android.graphics.Rect
 import android.graphics.drawable.AdaptiveIconDrawable
+import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
 import android.os.Process
 import android.os.UserHandle
 import android.os.UserManager
 import android.util.Log
 import androidx.core.content.ContextCompat
+import androidx.core.graphics.drawable.toBitmap
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -34,6 +39,7 @@ class AppList(val context: Context) : LauncherApps.Callback() {
         context.getSystemService(Context.LAUNCHER_APPS_SERVICE) as LauncherApps
     val userManager = context.getSystemService(Context.USER_SERVICE) as UserManager
     private val packageManager: PackageManager = context.packageManager
+    private val iconPackManager = dualityLauncherApplication.getIconPackManagerContext()
     val TAG: String = javaClass.simpleName
 
     init {
@@ -148,12 +154,22 @@ class AppList(val context: Context) : LauncherApps.Callback() {
         lock.unlock()
     }
 
+    private fun resizeDrawable(drawable: Drawable, size: Int): Drawable{
+        val bitmap = Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888)
+        val canvas = Canvas(bitmap)
+        val srcRect = Rect(0, 0, size, size)
+        val dstRect = Rect(0, 0, size, size)
+        canvas.drawBitmap(drawable.toBitmap(size, size), srcRect, dstRect, null)
+        return BitmapDrawable(appContext.resources, bitmap)
+    }
+
     private fun addAppDBEntry(app: LauncherActivityInfo, activeIconPack: String) {
         val packageName = app.applicationInfo.packageName
         val name = app.label.toString()
         val activityName = app.componentName.className
 
         var icon = app.getBadgedIcon(0)
+        //Log.d(TAG, "addAppDBEntry() $name size=${icon.intrinsicWidth}")
 
         if (activeIconPack != "Default") {
             try {
@@ -172,6 +188,9 @@ class AppList(val context: Context) : LauncherApps.Callback() {
                     iconRes,
                     activityInfo.applicationInfo
                 )
+                if(icon.intrinsicWidth == 0) {
+                    icon = app.getBadgedIcon(0)
+                }
             } catch (e: Exception) {
                 Log.d(TAG, "Couldn't get PackageManager icon for $name")
                 icon = app.getBadgedIcon(0)
@@ -205,6 +224,11 @@ class AppList(val context: Context) : LauncherApps.Callback() {
             if (icon == null) {
                 icon = app.getBadgedIcon(0)
             }
+        }
+
+        if(icon.intrinsicWidth < 189) {
+            Log.d(TAG, "addAppDBEntry() resizing $name")
+            icon = resizeDrawable(icon, 189)
         }
 
         val handle = app.user
@@ -281,6 +305,11 @@ class AppList(val context: Context) : LauncherApps.Callback() {
             if (icon == null) {
                 icon = app.getBadgedIcon(0)
             }
+        }
+
+        if(icon.intrinsicWidth < 189) {
+            Log.d(TAG, "updateAppDBEntry() resizing $name")
+            icon = resizeDrawable(icon, 189)
         }
 
         val handle = app.user

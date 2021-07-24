@@ -13,7 +13,7 @@ import us.graymatterapps.dualitylauncher.appWidgetHost
 import us.graymatterapps.dualitylauncher.prefs
 
 class WidgetDB(val con: Context) {
-    val widgets: ArrayList<WidgetDBDataType> = ArrayList()
+    var widgets: ArrayList<WidgetDBDataType> = ArrayList()
     var sizes: ArrayList<WidgetDBSizes> = ArrayList()
     val TAG = javaClass.simpleName
     var listeners: ArrayList<Listeners> = ArrayList()
@@ -23,6 +23,12 @@ class WidgetDB(val con: Context) {
         if (loadItJson != "") {
             sizes = loadItJson?.let { Json.decodeFromString(it) }!!
         }
+    }
+
+    fun reset(){
+        widgets = ArrayList()
+        sizes = ArrayList()
+        listeners = ArrayList()
     }
 
     fun setListener(ear: WidgetDBInterface, displayId: Int) {

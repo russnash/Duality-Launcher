@@ -19,6 +19,8 @@ import us.graymatterapps.graymatterutils.GrayMatterUtils.shortToast
 class SettingsDeveloper : PreferenceFragmentCompat() {
 
     lateinit var listener: DeveloperInterface
+    private val widgetDB = dualityLauncherApplication.getWidgetDBContext()
+    private val iconPackManager = dualityLauncherApplication.getIconPackManagerContext()
     val TAG = javaClass.simpleName
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
@@ -88,7 +90,7 @@ class SettingsDeveloper : PreferenceFragmentCompat() {
                     if(it.key.contains("widgetSizes")) {
                         editor.remove(it.key)
                     }
-                    widgetDB = WidgetDB(appContext)
+                    widgetDB.reset()
                 }
                 editor.putLong("notifyDataSetChanged", System.currentTimeMillis())
                 editor.apply()

@@ -65,6 +65,7 @@ class Icon(
     private var isPopupMenuVisible: Boolean = false
     private var downTime: Long = 0
     private var padding: Int = 5
+    private val appList = dualityLauncherApplication.getAppListContext()
     val TAG = javaClass.simpleName
 
     init {

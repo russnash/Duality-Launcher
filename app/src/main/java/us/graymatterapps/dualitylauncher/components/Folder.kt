@@ -43,6 +43,7 @@ class Folder(
     private var launchInfo: LaunchInfo = LaunchInfo()
     private lateinit var listener: FolderInterface
     lateinit var parentLayout: HomeLayout
+    private val appList = dualityLauncherApplication.getAppListContext()
     private val pulseAnim = AnimationUtils.loadAnimation(context, R.anim.pulse_alpha)
 
     init {

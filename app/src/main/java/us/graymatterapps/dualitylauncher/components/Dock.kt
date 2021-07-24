@@ -28,6 +28,7 @@ class Dock(val parentActivity: MainActivity, attrs: AttributeSet?) :
     var searchRowTop: LinearLayout
     var searchRowBottom: LinearLayout
     var dockSearchWidget: DockSearchWidget = DockSearchWidget(context)
+    val appList = dualityLauncherApplication.getAppListContext()
     val TAG = javaClass.simpleName
     lateinit var orientationEventListener: OrientationEventListener
 
@@ -120,6 +121,18 @@ class Dock(val parentActivity: MainActivity, attrs: AttributeSet?) :
         val loadItJson = prefs.getString("dockItems", "")
         if (loadItJson != "") {
             dockItems = loadItJson?.let { Json.decodeFromString(it) }!!
+        } else {
+            appList.waitForReady()
+            appList.lock.lock()
+            val apps = appList.appDB.get8Apps()
+            for (n in 0..7) {
+                dockItems.add(
+                    apps[n].activityName,
+                    apps[n].packageName,
+                    apps[n].userSerial
+                )
+            }
+            appList.lock.unlock()
         }
     }
 

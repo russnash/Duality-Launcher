@@ -1,3 +1,11 @@
+Version 2021.7.24.1-internal
+Changes:
+- Smaller icons are now resized to the default icon size.
+- Replaced many application wide static references with context retrieval functions, thus reducing the possibility of memory leaks.
+
+Bugs:
+- Fixed a bug in icon pack support where 0 width bitmaps were sometimes being generated and causing a crash.
+
 Version 2021.3.6.1-internal
 Changes:
 - App drawer now uses case insensitive sorting.

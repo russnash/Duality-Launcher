@@ -36,6 +36,7 @@ class DualLaunch(
     private val dualLaunchLayout: LinearLayout
     private val dualLaunchIcon: ImageView
     private val dualLaunchLabel: TextView
+    private val appList = dualityLauncherApplication.getAppListContext()
 
     @Serializable
     private var dualLaunchApps = ArrayList<LaunchInfo>()

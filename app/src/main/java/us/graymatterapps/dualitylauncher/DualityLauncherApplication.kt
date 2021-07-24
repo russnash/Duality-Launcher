@@ -9,6 +9,7 @@ import android.content.*
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.drawable.BitmapDrawable
+import android.graphics.drawable.Icon
 import android.hardware.display.DisplayManager
 import android.net.Uri
 import android.os.Environment
@@ -33,19 +34,13 @@ lateinit var appWidgetManager: AppWidgetManager
 lateinit var appWidgetHost: AppWidgetHost
 lateinit var settingsPreferences: SharedPreferences
 lateinit var prefs: SharedPreferences
-lateinit var appList: AppList
 lateinit var appContext: Context
-lateinit var widgetDB: WidgetDB
 lateinit var replicator: Replicator
 lateinit var dragAndDropData: DragAndDropData
-lateinit var dualWallpaper: DualWallpaper
 lateinit var dualityLauncherApplication: DualityLauncherApplication
-lateinit var mainScreen: View
-lateinit var mainContext: Context
-lateinit var dualScreen: View
+//lateinit var mainContext: Context
 lateinit var homePagerDual: ViewPager2
 lateinit var homePagerMain: ViewPager2
-lateinit var iconPackManager: IconPackManager
 var isScrolling = false
 val STANDARD_ICON_SIZE = 100
 
@@ -53,6 +48,12 @@ val STANDARD_ICON_SIZE = 100
 @AcraMailSender(mailTo = "russnash37@gmail.com", reportAsFile = true)
 @AcraDialog(resText = R.string.acra_dialog_text)
 class DualityLauncherApplication: Application() {
+    private lateinit var appList: AppList
+    private lateinit var widgetDB: WidgetDB
+    private lateinit var dualWallpaper: DualWallpaper
+    private lateinit var mainScreen: View
+    private lateinit var dualScreen: View
+    private lateinit var iconPackManager: IconPackManager
     val TAG = javaClass.simpleName
 
     override fun attachBaseContext(newBase: Context?) {
@@ -77,6 +78,30 @@ class DualityLauncherApplication: Application() {
         replicator = Replicator()
         dragAndDropData = DragAndDropData()
         dualWallpaper = DualWallpaper(this)
+    }
+
+    fun getAppListContext(): AppList {
+        return appList
+    }
+
+    fun getWidgetDBContext(): WidgetDB{
+        return widgetDB
+    }
+
+    fun getDualWallpaperContext(): DualWallpaper{
+        return dualWallpaper
+    }
+
+    fun getIconPackManagerContext(): IconPackManager{
+        return iconPackManager
+    }
+
+    fun setMainScreenView(view: View) {
+        mainScreen = view
+    }
+
+    fun setDualScreenView(view: View) {
+        dualScreen = view
     }
 
     override fun onTerminate() {
@@ -105,7 +130,7 @@ class DualityLauncherApplication: Application() {
                 if (displays[1].displayId != 1) {
                     displayOff()
                 } else {
-                    val wallpaperManager = WallpaperManager.getInstance(mainContext)
+                    val wallpaperManager = WallpaperManager.getInstance(appContext)
                     val mainWall: BitmapDrawable = wallpaperManager.drawable as BitmapDrawable
                     val wallBitmap = mainWall.bitmap
                     val bitmapMain = GrayMatterUtils.getScreenshotOfRoot(mainScreen)

@@ -86,6 +86,9 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
     lateinit var displayManager: DisplayManager
     lateinit var homePagerAdapter: HomePagerAdapter
     lateinit var dock: Dock
+    private val appList = dualityLauncherApplication.getAppListContext()
+    private val widgetDB = dualityLauncherApplication.getWidgetDBContext()
+    private val dualWallpaper = dualityLauncherApplication.getDualWallpaperContext()
     private val enteredColor = ColorUtils.setAlphaComponent(Color.GREEN, 20)
 
     val TAG = javaClass.simpleName
@@ -113,12 +116,12 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
         setContentView(R.layout.activity_main)
         if (displayId == 0) {
             homePagerMain = homePager
-            mainScreen = frameLayout
-            mainContext = this
+            dualityLauncherApplication.setMainScreenView(frameLayout)
+            //mainContext = this
         }
         if (displayId == 1) {
             homePagerDual = homePager
-            dualScreen = frameLayout
+            dualityLauncherApplication.setDualScreenView(frameLayout)
         }
         setStatusBars()
         setNavBarBackground()
@@ -497,7 +500,7 @@ class MainActivity : AppCompatActivity(), AppDrawerAdapter.DrawerAdapterInterfac
 
     override fun onDestroy() {
         super.onDestroy()
-        appList.appDB.closeDB()
+        //appList.appDB.closeDB()
         replicator.deregister(displayId)
         prefs.unregisterOnSharedPreferenceChangeListener(this)
         settingsPreferences.unregisterOnSharedPreferenceChangeListener(this)

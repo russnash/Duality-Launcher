@@ -12,6 +12,7 @@ import us.graymatterapps.dualitylauncher.*
 import us.graymatterapps.graymatterutils.GrayMatterUtils
 
 class SettingsIcon : PreferenceFragmentCompat(), SharedPreferences.OnSharedPreferenceChangeListener {
+    private val iconPackManager = dualityLauncherApplication.getIconPackManagerContext()
     val TAG = javaClass.simpleName
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {

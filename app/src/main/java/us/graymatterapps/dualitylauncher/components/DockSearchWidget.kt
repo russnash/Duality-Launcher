@@ -26,6 +26,7 @@ class DockSearchWidget(val con: Context, attributeSet: AttributeSet? = null) :
     private val dockSearchText: EditTextNoDrop
     private val dockSpeakIcon: ImageView
     private val displayId: Int
+    val appList = dualityLauncherApplication.getAppListContext()
 
     init {
         inflate(con, R.layout.dock_search_widget, this)

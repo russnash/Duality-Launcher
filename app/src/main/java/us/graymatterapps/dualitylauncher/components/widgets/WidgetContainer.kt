@@ -35,6 +35,7 @@ class WidgetContainer(
     private lateinit var viewParams: FrameLayout.LayoutParams
     private lateinit var menu: PopupMenu
     private var isPopupMenuVisible: Boolean = false
+    private val widgetDB = dualityLauncherApplication.getWidgetDBContext()
     val TAG = javaClass.simpleName
 
     init {
