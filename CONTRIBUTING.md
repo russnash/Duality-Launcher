@@ -13,6 +13,8 @@ To join the internal testing program on Google Play, contact the developer and p
 - Reddit [Gray Matter Apps](https://www.reddit.com/r/GrayMatterApps/)
 - Telegram [Gray Matter Apps](https://t.me/graymatterapps2020)
 
+Please note: The Google Play testing program is now full, however, you can download an APK and keep up to date with releases by joining the Telegram group (see above).
+
 ### Filing a bug report
 Firstly, check that the [issue doesn't currently exist](https://github.com/russnash/Duality-Launcher/issues), if it does exist and you have additional information to add please comment on the existing bug report.  For new issues, please [File a new bug report](https://github.com/russnash/Duality-Launcher/issues/new?assignees=&labels=&template=bug_report.md&title=).
 
