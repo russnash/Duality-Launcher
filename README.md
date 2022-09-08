@@ -9,6 +9,6 @@ Telegram Group: http://t.me/graymatterapps2020
 
 You can also obtain the latest release right here from GitHub at https://github.com/russnash/Duality-Launcher/releases/
 
-Change log is available [here](https://github.com/russnash/Duality-Launcher/blob/master/app/ChangeLog.txt)
+Change log is available [here](https://github.com/russnash/Duality-Launcher/blob/master/app/ChangeLog.txt).
 
 See the file [CONTRIBUTING](https://github.com/russnash/Duality-Launcher/blob/master/CONTRIBUTING.md) for information on filing bug reports, feature requests and contributing code to this project.
