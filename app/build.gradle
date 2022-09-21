@@ -5,14 +5,13 @@ apply plugin: 'kotlinx-serialization'
 
 android {
     compileSdkVersion 30
-    buildToolsVersion '30.0.0'
 
     defaultConfig {
         applicationId "us.graymatterapps.dualitylauncher"
         minSdkVersion 29
-        targetSdkVersion 29
-        versionCode 62
-        versionName "2021.7.24.1-internal"
+        targetSdkVersion 30
+        versionCode 63
+        versionName "2022.9.20.2-internal"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -24,6 +23,10 @@ android {
 
     kotlinOptions {
         jvmTarget = "1.8"
+    }
+
+    lintOptions {
+        disable 'QueryAllPackagesPermission'
     }
 
     buildTypes {

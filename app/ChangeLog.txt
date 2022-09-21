@@ -1,3 +1,11 @@
+Version 2022.9.20.2-internal
+Changes:
+- Updated to SDK 30 (Android 11) to satisfy Google Play requirements.
+- Added QUERY_ALL_PACKAGES permission to accommodate Android 11 (SDK 30) privacy changes.
+
+Bugs:
+- Fixed a bug where increasing the number of icons in the dock caused a crash and rendered Duality Launcher unlaunchable.
+
 Version 2021.7.24.1-internal
 Changes:
 - Smaller icons are now resized to the default icon size.

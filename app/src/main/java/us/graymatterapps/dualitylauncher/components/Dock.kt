@@ -82,10 +82,21 @@ class Dock(val parentActivity: MainActivity, attrs: AttributeSet?) :
                 var dockIcon = Icon(
                     parentActivity,
                     null,
-                    dockItems.activityNames[n],
-                    dockItems.packageNames[n],
-                    dockItems.userSerials[n]
+                    "",
+                    "",
+                    0
                 )
+                try {
+                    dockIcon = Icon(
+                        parentActivity,
+                        null,
+                        dockItems.activityNames[n],
+                        dockItems.packageNames[n],
+                        dockItems.userSerials[n]
+                    )
+                } catch (e: Exception) {
+                    // Do nothing
+                }
                 dockIcon.setIconSize("dock_icon_size")
                 dockIcon.label.height = 0
                 dockIcon.setListener(this)

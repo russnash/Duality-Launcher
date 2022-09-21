@@ -88,6 +88,7 @@ class DrawerFragment() : Fragment(), SharedPreferences.OnSharedPreferenceChangeL
             -16777216
         )
         drawerLayout.setBackgroundColor(color)
+
     }
 
     override fun onSharedPreferenceChanged(sharedPrefs: SharedPreferences?, key: String?) {
